@@ -1,0 +1,74 @@
+# Local overrides. Use together with docker-compose.yml.
+services:
+  app:
+    build:
+      target: development
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_HTTP_SERVER: ${APP_HTTP_SERVER:-artisan}
+      APP_URL: http://localhost:${APP_PORT:-8085}
+    ports:
+      - "127.0.0.1:${APP_PORT:-8085}:80"
+    volumes:
+      - .:/var/www
+      - app-vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+
+  postgres:
+    ports:
+      - "127.0.0.1:${DB_FORWARD_PORT:-5434}:5432"
+
+  redis:
+    ports:
+      - "127.0.0.1:${REDIS_FORWARD_PORT:-6381}:6379"
+
+  queue:
+    volumes:
+      - .:/var/www
+      - app-vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+
+  scheduler:
+    volumes:
+      - .:/var/www
+      - app-vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+
+  reverb:
+    volumes:
+      - .:/var/www
+      - app-vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+
+  vite:
+    image: qaturia-api:${IMAGE_TAG:-local}
+    profiles: ["frontend"]
+    env_file:
+      - .env
+    working_dir: /var/www
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    ports:
+      - "127.0.0.1:${VITE_PORT:-5173}:5173"
+    volumes:
+      - .:/var/www
+      - app-vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+    networks:
+      - qaturia
+    depends_on:
+      - app
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MAILPIT_DASHBOARD_PORT:-8026}:8025"
+    expose:
+      - "1025"
+    networks:
+      - qaturia
+
+volumes:
+  app-vendor:
+  app-node-modules:

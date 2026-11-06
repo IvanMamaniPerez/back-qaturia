@@ -1,0 +1,29 @@
+# Production overrides. SSL terminates at the host reverse proxy (e.g. Nginx + Certbot).
+services:
+  app:
+    build:
+      target: production
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_HTTP_SERVER: octane
+    ports:
+      - "127.0.0.1:${APP_PORT:-8085}:80"
+    volumes:
+      - app-storage:/var/www/storage
+
+  reverb:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    # Internal only; Nginx in the app container proxies /app/* and /apps/*.
+
+  queue:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+
+  scheduler:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
