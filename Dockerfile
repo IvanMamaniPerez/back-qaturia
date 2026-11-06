@@ -5,6 +5,8 @@ FROM dunglas/frankenphp:php8.5-alpine AS app
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN install-php-extensions \
+    bcmath \
+    gd \
     intl \
     pcntl \
     pdo_pgsql \
