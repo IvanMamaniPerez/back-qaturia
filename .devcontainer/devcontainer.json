@@ -16,9 +16,7 @@
     "overrideCommand": false,
     "customizations": {
         "vscode": {
-            "extensions": [
-                "bmewburn.vscode-intelephense-client"
-            ],
+            "extensions": ["bmewburn.vscode-intelephense-client"],
             "settings": {
                 "php.validate.executablePath": "/usr/local/bin/php",
                 "intelephense.environment.phpVersion": "8.5.0",

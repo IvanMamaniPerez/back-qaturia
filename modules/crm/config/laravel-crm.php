@@ -389,7 +389,7 @@ return [
     |
     */
 
-    'docs_url' => env('LARAVEL_CRM_DOCS_URL', 'https://github.com/venturedrake/laravel-crm'),
+    'docs_url' => env('LARAVEL_CRM_DOCS_URL', 'https://github.com/IvanMamaniPerez/back-qaturia'),
 
     /*
     |--------------------------------------------------------------------------
@@ -402,7 +402,7 @@ return [
     |
     */
 
-    'upgrade_guide_url' => env('LARAVEL_CRM_UPGRADE_GUIDE_URL', 'https://laravelcrm.com/docs/2.x/upgrading'),
+    'upgrade_guide_url' => env('LARAVEL_CRM_UPGRADE_GUIDE_URL', 'https://github.com/IvanMamaniPerez/back-qaturia'),
 
     /*
     |--------------------------------------------------------------------------

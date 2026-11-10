@@ -1,15 +1,15 @@
 # QATUR IA — Plan definitivo para internalizar el CRM UUID en back-qaturia (V2)
 
 **Fecha de análisis:** 2026-11-10  
-**Propósito:** ejecutar con Codex una migración *mecánica y verificable* del código ya adaptado a UUID del paquete privado hacia el repositorio del backend. El resultado no utilizará submódulos Git, Composer `path repositories` ni dependencias externas del CRM propio. Mantendrá el comportamiento funcional existente y los cambios UUID hechos. **No implementar funcionalidades nuevas de QATUR IA durante esta migración.**
+**Propósito:** ejecutar con Codex una migración _mecánica y verificable_ del código ya adaptado a UUID del paquete privado hacia el repositorio del backend. El resultado no utilizará submódulos Git, Composer `path repositories` ni dependencias externas del CRM propio. Mantendrá el comportamiento funcional existente y los cambios UUID hechos. **No implementar funcionalidades nuevas de QATUR IA durante esta migración.**
 
 ## 0. Repositorios, ramas y fuentes de verdad VERIFICADAS
 
-| Fuente | Ref/commit verificado | Autoridad durante la migración |
-|---|---|---|
-| `IvanMamaniPerez/back-qaturia` | `integration-pkg-crm-base` — `a9ccc65d9a9fa131b9187877734e27f00b211105` | **Fuente de verdad** para `app/Models/User.php`, `app/Models/Role.php`, `app/Models/Permission.php`, `config/permission.php`, **todas** las migraciones publicadas en `database/migrations/`, y configuración del backend |
-| `IvanMamaniPerez/pkg-laravelcrm-base` | `main` — `3326c42ec0f0e85e146e8d9e1424a290d133039f` | **Fuente de verdad** para código CRM modificado en `src/`, `database/seeders/`, `database/updates/`, `resources/`, `public/`, y defaults de configuración |
-| `venturedrake/laravel-crm` | `2.6.0` — `4ffc0ccc4592fb5b7b4f754cce193cfb29ea0879` | **Solo referencia histórica**, no copiar para reemplazar el fork adaptado |
+| Fuente                                | Ref/commit verificado                                                   | Autoridad durante la migración                                                                                                                                                                                            |
+| ------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IvanMamaniPerez/back-qaturia`        | `integration-pkg-crm-base` — `a9ccc65d9a9fa131b9187877734e27f00b211105` | **Fuente de verdad** para `app/Models/User.php`, `app/Models/Role.php`, `app/Models/Permission.php`, `config/permission.php`, **todas** las migraciones publicadas en `database/migrations/`, y configuración del backend |
+| `IvanMamaniPerez/pkg-laravelcrm-base` | `main` — `3326c42ec0f0e85e146e8d9e1424a290d133039f`                     | **Fuente de verdad** para código CRM modificado en `src/`, `database/seeders/`, `database/updates/`, `resources/`, `public/`, y defaults de configuración                                                                 |
+| `venturedrake/laravel-crm`            | `2.6.0` — `4ffc0ccc4592fb5b7b4f754cce193cfb29ea0879`                    | **Solo referencia histórica**, no copiar para reemplazar el fork adaptado                                                                                                                                                 |
 
 **Datos de auditoría:** la copia privada presenta 134 archivos existentes modificados y un archivo nuevo (`src/Support/LegacyUuid.php`) frente al origen 2.6.0. De las modificaciones, 84 son stubs SQL del paquete, y el branch de integración tiene 107 migraciones publicadas modificadas respecto a `main`. La rama de backend ya posee las migraciones UUID, además de `App\Models\User/Role/Permission`, prueba `tests/Feature/UuidPrimaryKeysTest.php`, archivo `.gitmodules`, submódulo `packages/laravel-crm` apuntando exactamente a `3326c42`, y Composer `repositories.type=path` más dependencia `ivanmamaniperez/pkg-laravelcrm-base:^1.0`.
 
@@ -54,7 +54,7 @@ back-qaturia/
 └── tests/
 ```
 
-**Decisión de namespaces:** se mantiene `VentureDrake\LaravelCrm\...` para la mayoría de clases **solo como namespace de compatibilidad local**. Ya no es una dependencia externa: todo vive bajo `modules/crm` y Git del backend. Es deliberado: protege serialización de jobs, policy/model bindings, claves morph, Livewire y rutas. Para `User`, `Role`, `Permission` se usan exclusivamente clases `App\Models\...` del backend. Cambiar *todos* los FQCN a `App\...` sería otra refactorización, de mayor riesgo, y no debe bloquear esta entrega. Documentar expresamente la diferencia entre el nombre PHP heredado y la propiedad del código.
+**Decisión de namespaces:** se mantiene `VentureDrake\LaravelCrm\...` para la mayoría de clases **solo como namespace de compatibilidad local**. Ya no es una dependencia externa: todo vive bajo `modules/crm` y Git del backend. Es deliberado: protege serialización de jobs, policy/model bindings, claves morph, Livewire y rutas. Para `User`, `Role`, `Permission` se usan exclusivamente clases `App\Models\...` del backend. Cambiar _todos_ los FQCN a `App\...` sería otra refactorización, de mayor riesgo, y no debe bloquear esta entrega. Documentar expresamente la diferencia entre el nombre PHP heredado y la propiedad del código.
 
 **No mover `User` a un segundo modelo CRM.** `App\Models\User` ya es el modelo del backend y el configurado por autenticación; migrarlo de FQCN aquí añade riesgo sin valor. Tampoco crear `CRM\Models\User` paralelo. `Role` y `Permission` del host serán únicos y conservarán scopes y características del paquete.
 

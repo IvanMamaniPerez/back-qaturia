@@ -10,7 +10,7 @@
                 <hr />
                 <h5 class="mb-4">{{ ucfirst(__('laravel-crm::lang.updated_version_of_laravel_crm_is_available')) }}</h5>
                 <p class="card-text">{{ ucfirst(__('laravel-crm::lang.you_can_update_from_laravel_crm')) }} {{ \VentureDrake\LaravelCrm\Models\Setting::where('name','version')->first()->value }} to {{ \VentureDrake\LaravelCrm\Models\Setting::where('name','version_latest')->first()->value }}</p>
-                <a type="button" class="btn btn-primary btn-sm" href="https://github.com/venturedrake/laravel-crm" target="_blank">{{ ucfirst(__('laravel-crm::lang.upgrade_guide')) }}</a>
+                <a type="button" class="btn btn-primary btn-sm" href="{{ config('laravel-crm.upgrade_guide_url') }}" target="_blank" rel="noopener">{{ ucfirst(__('laravel-crm::lang.upgrade_guide')) }}</a>
             @endif    
         </div>
     </div>

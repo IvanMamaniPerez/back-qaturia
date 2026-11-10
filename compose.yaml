@@ -70,7 +70,7 @@ services:
             - -c
             - >-
                 until php -r "exit(@fsockopen('postgres', 5432) ? 0 : 1);"; do sleep 1; done;
-                php artisan migrate --force && php artisan storage:link --force
+                php artisan laravelcrm:install --force --no-interaction && php artisan storage:link --force
         depends_on:
             postgres:
                 condition: service_healthy
@@ -171,6 +171,9 @@ services:
             - sh
             - -c
             - npm run dev -- --host=0.0.0.0 --port=$${VITE_PORT}
+        depends_on:
+            setup:
+                condition: service_completed_successfully
         healthcheck:
             disable: true
         volumes:

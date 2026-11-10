@@ -69,6 +69,7 @@ export default defineConfig({
             'composer.json',
             'modules/crm/**',
             'public/**',
+            'storage/**',
             'resources/js/components/ui/*',
             'resources/views/mail/*',
         ],

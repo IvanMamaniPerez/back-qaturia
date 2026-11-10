@@ -11,3 +11,8 @@ parameters:
         - routes/
 
     level: 7
+
+    ignoreErrors:
+        -
+            identifier: missingType.return
+            path: database/migrations/2024_01_01_*.php

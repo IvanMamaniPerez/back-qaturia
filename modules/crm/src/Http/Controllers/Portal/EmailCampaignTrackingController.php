@@ -90,7 +90,7 @@ class EmailCampaignTrackingController extends Controller
         return redirect()->away($url);
     }
 
-    public function unsubscribeForm(string $token)
+    public function showUnsubscribeForm(string $token)
     {
         $recipient = EmailCampaignRecipient::where('tracking_token', $token)->first();
 

@@ -65,7 +65,7 @@
 
             <div class="grid gap-y-4">
                 <div>
-                    <pre class="bg-base-200 rounded p-3 overflow-x-auto"><code>composer update venturedrake/laravel-crm</code></pre>
+                    <pre class="bg-base-200 rounded p-3 overflow-x-auto"><code>git pull --ff-only &amp;&amp; composer install --no-interaction --prefer-dist --optimize-autoloader</code></pre>
                     <p class="text-sm opacity-70 mt-1">{{ __('laravel-crm::lang.update_step_composer') }}</p>
                 </div>
                 <div>

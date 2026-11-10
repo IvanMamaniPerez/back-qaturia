@@ -91,7 +91,7 @@ class SmsCampaignTrackingController extends Controller
         return false;
     }
 
-    public function unsubscribeForm(string $token)
+    public function showUnsubscribeForm(string $token)
     {
         $recipient = SmsCampaignRecipient::where('tracking_token', $token)->first();
 
