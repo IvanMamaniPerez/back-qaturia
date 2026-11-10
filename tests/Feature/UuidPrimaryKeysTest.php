@@ -4,6 +4,8 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission as SpatiePermission;
+use Spatie\Permission\Models\Role as SpatieRole;
 use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmPipelineTablesSeeder;
 use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmTablesSeeder;
 use VentureDrake\LaravelCrm\Models\Label;
@@ -58,6 +60,31 @@ test('spatie roles permissions and polymorphic assignments use uuid keys', funct
         config('permission.column_names.model_morph_key') => $user->id,
         'model_type' => $user->getMorphClass(),
     ]);
+});
+
+test('host models are the only canonical authorization models and protect owner assignment', function () {
+    $owner = User::factory()->create();
+    $employee = User::factory()->create();
+    $ownerRole = Role::create([
+        'name' => 'Owner',
+        'guard_name' => 'web',
+        'crm_role' => true,
+    ]);
+    $employeeRole = Role::create([
+        'name' => 'Employee',
+        'guard_name' => 'web',
+        'crm_role' => true,
+    ]);
+
+    $owner->assignRole($ownerRole);
+    $employee->assignRole($employeeRole);
+
+    expect(get_parent_class(Role::class))->toBe(SpatieRole::class)
+        ->and(get_parent_class(Permission::class))->toBe(SpatiePermission::class)
+        ->and(class_exists('VentureDrake\\LaravelCrm\\Models\\Role'))->toBeFalse()
+        ->and(class_exists('VentureDrake\\LaravelCrm\\Models\\Permission'))->toBeFalse()
+        ->and(Role::query()->assignableBy($employee)->orderBy('name')->pluck('name')->all())->toBe(['Employee'])
+        ->and(Role::query()->assignableBy($owner)->orderBy('name')->pluck('name')->all())->toBe(['Employee', 'Owner']);
 });
 
 test('crm seeders preserve relationships with deterministic uuid keys', function () {

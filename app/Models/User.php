@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Traits\HasRoles;
+use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrm\Traits\HasCrmAccess;
 use VentureDrake\LaravelCrm\Traits\HasCrmTeams;
 
@@ -22,6 +23,7 @@ use VentureDrake\LaravelCrm\Traits\HasCrmTeams;
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
+ * @property Team|null $currentTeam
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */

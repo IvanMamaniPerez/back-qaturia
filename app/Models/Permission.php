@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use VentureDrake\LaravelCrm\Models\Permission as CrmPermission;
+use Spatie\Permission\Models\Permission as SpatiePermission;
 
 /**
  * @property string $id
@@ -12,7 +13,16 @@ use VentureDrake\LaravelCrm\Models\Permission as CrmPermission;
  *
  * @method static static create(array<string, mixed> $attributes = [])
  */
-class Permission extends CrmPermission
+class Permission extends SpatiePermission
 {
     use HasUuids;
+
+    /**
+     * @param  Builder<Permission>  $query
+     * @return Builder<Permission>
+     */
+    public function scopeCrm(Builder $query): Builder
+    {
+        return $query->where('crm_permission', 1);
+    }
 }
