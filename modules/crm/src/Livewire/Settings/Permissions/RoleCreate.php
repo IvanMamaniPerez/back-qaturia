@@ -1,0 +1,58 @@
+<?php
+
+namespace VentureDrake\LaravelCrm\Livewire\Settings\Permissions;
+
+use App\Models\Permission;
+use App\Models\Role;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Component;
+use Spatie\Permission\PermissionRegistrar;
+use VentureDrake\LaravelCrm\Livewire\Settings\Permissions\Traits\HasRoleCommon;
+
+class RoleCreate extends Component
+{
+    use AuthorizesRequests;
+    use HasRoleCommon;
+
+    public function save()
+    {
+        $this->authorize('create', Role::class);
+
+        $this->validate();
+
+        $permissionsArray = [];
+
+        foreach ($this->permissions as $permission) {
+            $permissionsArray[] = Permission::where('id', $permission)->first()->name;
+        }
+
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
+        if (config('laravel-crm.teams')) {
+            $role = Role::create([
+                'name' => $this->name,
+                'description' => $this->description,
+                'crm_role' => 1,
+                'team_id' => auth()->user()->currentTeam->id,
+            ]);
+        } else {
+            $role = Role::create([
+                'name' => $this->name,
+                'description' => $this->description,
+                'crm_role' => 1,
+            ]);
+        }
+
+        $role->syncPermissions($permissionsArray);
+
+        $this->success(
+            ucfirst(trans('laravel-crm::lang.role_created')),
+            redirectTo: route('laravel-crm.roles.index')
+        );
+    }
+
+    public function render()
+    {
+        return view('laravel-crm::livewire.settings.permissions.role-create');
+    }
+}

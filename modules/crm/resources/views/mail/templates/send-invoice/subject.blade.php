@@ -1,0 +1,1 @@
+Invoice {{ $invoice->invoice_id }} from {{ app('laravel-crm.settings')->get('organization_name') }}{{ ($for = $invoice->organization->name ?? $invoice->person->name ?? null) ? ' for '.$for : '' }}

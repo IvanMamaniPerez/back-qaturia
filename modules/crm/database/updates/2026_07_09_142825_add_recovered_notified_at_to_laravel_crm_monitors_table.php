@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        if (! Schema::hasTable(config('laravel-crm.db_table_prefix').'monitors')) {
+            return;
+        }
+
+        Schema::table(config('laravel-crm.db_table_prefix').'monitors', function (Blueprint $table) {
+            if (! Schema::hasColumn(config('laravel-crm.db_table_prefix').'monitors', 'recovered_notified_at')) {
+                $table->timestamp('recovered_notified_at')->nullable()->after('perf_notified_at');
+            }
+        });
+    }
+
+    public function down()
+    {
+        if (! Schema::hasTable(config('laravel-crm.db_table_prefix').'monitors')) {
+            return;
+        }
+
+        Schema::table(config('laravel-crm.db_table_prefix').'monitors', function (Blueprint $table) {
+            if (Schema::hasColumn(config('laravel-crm.db_table_prefix').'monitors', 'recovered_notified_at')) {
+                $table->dropColumn('recovered_notified_at');
+            }
+        });
+    }
+};
