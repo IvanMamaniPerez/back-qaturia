@@ -22,7 +22,7 @@ class AddNameToLaravelCrmCustomersTable extends Migration
         Schema::table($tableName, function (Blueprint $table) {
             $table->string('name')->after('customerable_id')->nullable();
             $table->string('customerable_type')->nullable()->change();
-            $table->unsignedBigInteger('customerable_id')->nullable()->change();
+            $table->uuid('customerable_id')->nullable()->change();
         });
     }
 
@@ -36,7 +36,7 @@ class AddNameToLaravelCrmCustomersTable extends Migration
         Schema::table(config('laravel-crm.db_table_prefix').'customers', function (Blueprint $table) {
             $table->dropColumn(['name']);
             $table->string('customerable_type')->nullable(false)->change();
-            $table->unsignedBigInteger('customerable_id')->nullable(false)->change();
+            $table->uuid('customerable_id')->nullable(false)->change();
         });
     }
 }

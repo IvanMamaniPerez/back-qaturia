@@ -9,8 +9,8 @@ class CreateLaravelCrmSmsCampaignClicksTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'sms_campaign_clicks', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('sms_campaign_recipient_id')->index();
+            $table->uuid('id')->primary();
+            $table->uuid('sms_campaign_recipient_id')->index();
             $table->text('original_url');
             $table->timestamp('clicked_at');
             $table->string('ip', 64)->nullable();

@@ -14,10 +14,10 @@ class CreateLaravelCrmProductVariationsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'product_variations', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('product_id')->index();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('product_id')->index();
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();

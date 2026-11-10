@@ -14,16 +14,16 @@ class CreateLaravelCrmIndustriesTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'industries', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('id')->primary();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
-        
+
         Schema::table(config('laravel-crm.db_table_prefix').'organizations', function (Blueprint $table) {
-            $table->unsignedBigInteger('industry_id')->index()->nullable();
+            $table->uuid('industry_id')->index()->nullable();
         });
     }
 
@@ -35,9 +35,9 @@ class CreateLaravelCrmIndustriesTable extends Migration
     public function down()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'organizations', function (Blueprint $table) {
-                $table->dropColumn(['industry_id']);
+            $table->dropColumn(['industry_id']);
         });
-  
+
         Schema::dropIfExists(config('laravel-crm.db_table_prefix').'industries');
     }
 }

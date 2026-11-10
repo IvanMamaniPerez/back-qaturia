@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use VentureDrake\LaravelCrm\Models\Field;
 
 class CreateLaravelCrmFieldOptionsTable extends Migration
 {
@@ -14,15 +15,15 @@ class CreateLaravelCrmFieldOptionsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'field_options', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\Field::class);
+            $table->uuid('team_id')->index()->nullable();
+            $table->foreignUuidFor(Field::class);
             $table->string('value')->nullable();
             $table->string('label')->nullable();
             $table->bigInteger('order')->nullable();
             $table->timestamps();
-            $table->softDeletes();      
+            $table->softDeletes();
         });
     }
 

@@ -1,7 +1,7 @@
 <?php
 
-use VentureDrake\LaravelCrm\Models\Permission;
-use VentureDrake\LaravelCrm\Models\Role;
+use App\Models\Permission;
+use App\Models\Role;
 
 return [
 

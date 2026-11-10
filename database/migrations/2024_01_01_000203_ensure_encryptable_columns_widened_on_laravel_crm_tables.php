@@ -62,4 +62,3 @@ class EnsureEncryptableColumnsWidenedOnLaravelCrmTables extends Migration
         // Intentionally a no-op — narrowing columns may truncate existing data.
     }
 }
-

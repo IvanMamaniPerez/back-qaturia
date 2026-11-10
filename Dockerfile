@@ -19,6 +19,7 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 
 COPY composer.json composer.lock ./
+COPY packages/laravel-crm ./packages/laravel-crm
 RUN composer install \
     --no-interaction \
     --no-scripts \

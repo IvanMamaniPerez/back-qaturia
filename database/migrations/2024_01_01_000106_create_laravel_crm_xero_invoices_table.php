@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use VentureDrake\LaravelCrm\Models\Invoice;
 
 class CreateLaravelCrmXeroInvoicesTable extends Migration
 {
@@ -14,10 +15,10 @@ class CreateLaravelCrmXeroInvoicesTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'xero_invoices', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\Invoice::class);   
+            $table->uuid('team_id')->index()->nullable();
+            $table->foreignUuidFor(Invoice::class);
             $table->string('xero_type');
             $table->string('xero_id');
             $table->string('number')->nullable();

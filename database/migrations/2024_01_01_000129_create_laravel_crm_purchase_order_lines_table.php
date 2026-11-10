@@ -13,26 +13,26 @@ class CreateLaravelCrmPurchaseOrderLinesTable extends Migration
      */
     public function up()
     {
-       Schema::create(config('laravel-crm.db_table_prefix').'purchase_order_lines', function (Blueprint $table) {
-               $table->bigIncrements('id');
-               $table->string('external_id');
-               $table->unsignedBigInteger('team_id')->index()->nullable();
-               $table->unsignedBigInteger('purchase_order_id')->index();
-               $table->foreign('purchase_order_id')->references('id')->on(config('laravel-crm.db_table_prefix').'purchase_orders');
-               $table->unsignedBigInteger('product_id')->index()->nullable();
-               $table->foreign('product_id')->references('id')->on(config('laravel-crm.db_table_prefix').'products');
-               $table->unsignedBigInteger('product_variation_id')->index()->nullable();
-               $table->foreign('product_variation_id')->references('id')->on(config('laravel-crm.db_table_prefix').'product_variations');
-               $table->text('description')->nullable();
-               $table->integer('price')->nullable();
-               $table->decimal('quantity', 15, 3)->nullable();
-               $table->decimal('tax_rate')->nullable();
-               $table->integer('tax_amount')->nullable();
-               $table->integer('amount')->nullable();
-               $table->string("currency", 3)->default("USD");
-               $table->timestamps();
-               $table->softDeletes();
-       });
+        Schema::create(config('laravel-crm.db_table_prefix').'purchase_order_lines', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('external_id');
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('purchase_order_id')->index();
+            $table->foreign('purchase_order_id')->references('id')->on(config('laravel-crm.db_table_prefix').'purchase_orders');
+            $table->uuid('product_id')->index()->nullable();
+            $table->foreign('product_id')->references('id')->on(config('laravel-crm.db_table_prefix').'products');
+            $table->uuid('product_variation_id')->index()->nullable();
+            $table->foreign('product_variation_id')->references('id')->on(config('laravel-crm.db_table_prefix').'product_variations');
+            $table->text('description')->nullable();
+            $table->integer('price')->nullable();
+            $table->decimal('quantity', 15, 3)->nullable();
+            $table->decimal('tax_rate')->nullable();
+            $table->integer('tax_amount')->nullable();
+            $table->integer('amount')->nullable();
+            $table->string('currency', 3)->default('USD');
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**

@@ -14,18 +14,18 @@ class CreateLaravelCrmQuoteProductsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'quote_products', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('quote_id')->index();
-            $table->unsignedBigInteger('product_id')->index()->nullable();
-            $table->unsignedBigInteger('product_variation_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('quote_id')->index();
+            $table->uuid('product_id')->index()->nullable();
+            $table->uuid('product_variation_id')->index()->nullable();
             $table->integer('price')->nullable();
             $table->decimal('quantity', 15, 3)->nullable();
             $table->decimal('tax_rate')->nullable();
             $table->integer('tax_amount')->nullable();
             $table->integer('amount')->nullable();
-            $table->string("currency", 3)->default("USD");
+            $table->string('currency', 3)->default('USD');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'feature_views', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('feature_id')->index();
-            $table->unsignedBigInteger('user_id')->nullable()->index();
-            $table->unsignedBigInteger('team_id')->nullable()->index();
+            $table->uuid('id')->primary();
+            $table->uuid('feature_id')->index();
+            $table->uuid('user_id')->nullable()->index();
+            $table->uuid('team_id')->nullable()->index();
             $table->string('ip_hash', 64)->nullable()->index();
             $table->timestamp('viewed_at')->index();
         });

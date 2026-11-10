@@ -14,8 +14,8 @@ class AddOrderProductIdToLaravelCrmInvoiceLinesTable extends Migration
     public function up()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'invoice_lines', function (Blueprint $table) {
-              $table->unsignedBigInteger('order_product_id')->index()->nullable()->after('product_variation_id');
-              $table->foreign('order_product_id')->references('id')->on(config('laravel-crm.db_table_prefix').'order_products');
+            $table->uuid('order_product_id')->index()->nullable()->after('product_variation_id');
+            $table->foreign('order_product_id')->references('id')->on(config('laravel-crm.db_table_prefix').'order_products');
         });
     }
 

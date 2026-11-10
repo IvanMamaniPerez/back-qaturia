@@ -40,6 +40,7 @@ class SeedLaravelCrmSmsTemplates extends Migration
             }
 
             DB::table($table)->insert([
+                'id' => $externalId,
                 'external_id' => $externalId,
                 'name' => $template['name'],
                 'body' => $this->{$template['method']}(),
@@ -59,16 +60,16 @@ class SeedLaravelCrmSmsTemplates extends Migration
 
     private function promotion(): string
     {
-        return "Hi {first_name}, save 20% this week only at {company_name}. Shop now: [add your link here]";
+        return 'Hi {first_name}, save 20% this week only at {company_name}. Shop now: [add your link here]';
     }
 
     private function reminder(): string
     {
-        return "Hi {first_name}, this is a friendly reminder from {company_name}. [add your details here]";
+        return 'Hi {first_name}, this is a friendly reminder from {company_name}. [add your details here]';
     }
 
     private function welcome(): string
     {
-        return "Welcome to {company_name}, {first_name}! Thanks for joining us. Reply STOP to opt out.";
+        return 'Welcome to {company_name}, {first_name}! Thanks for joining us. Reply STOP to opt out.';
     }
 }

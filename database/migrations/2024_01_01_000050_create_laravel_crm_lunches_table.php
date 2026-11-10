@@ -14,27 +14,27 @@ class CreateLaravelCrmLunchesTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'lunches', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->datetime('start_at')->nullable();
             $table->datetime('finish_at')->nullable();
             $table->boolean('reminder_email')->default(false);
             $table->boolean('reminder_sms')->default(false);
-            $table->nullableMorphs('lunchable');
-            $table->unsignedBigInteger('user_created_id')->nullable();
+            $table->nullableUuidMorphs('lunchable');
+            $table->uuid('user_created_id')->nullable();
             $table->foreign('user_created_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_updated_id')->nullable();
+            $table->uuid('user_updated_id')->nullable();
             $table->foreign('user_updated_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_deleted_id')->nullable();
+            $table->uuid('user_deleted_id')->nullable();
             $table->foreign('user_deleted_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_restored_id')->nullable();
+            $table->uuid('user_restored_id')->nullable();
             $table->foreign('user_restored_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_owner_id')->nullable();
+            $table->uuid('user_owner_id')->nullable();
             $table->foreign('user_owner_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_assigned_id')->nullable();
+            $table->uuid('user_assigned_id')->nullable();
             $table->foreign('user_assigned_id')->references('id')->on('users');
             $table->timestamps();
             $table->softDeletes();

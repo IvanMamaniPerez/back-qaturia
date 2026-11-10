@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddTeamIdToXeroTokensTable extends Migration
 {
@@ -14,7 +14,7 @@ class AddTeamIdToXeroTokensTable extends Migration
     public function up()
     {
         Schema::table('xero_tokens', function (Blueprint $table) {
-            $table->unsignedBigInteger('team_id')->after('id')->nullable();
+            $table->uuid('team_id')->after('id')->nullable();
         });
     }
 

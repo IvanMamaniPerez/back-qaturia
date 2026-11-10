@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use VentureDrake\LaravelCrm\Models\Product;
 
 class CreateLaravelCrmXeroItemsTable extends Migration
 {
@@ -14,10 +15,10 @@ class CreateLaravelCrmXeroItemsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'xero_items', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\Product::class);
+            $table->uuid('team_id')->index()->nullable();
+            $table->foreignUuidFor(Product::class);
             $table->string('item_id')->nullable();
             $table->string('code')->nullable();
             $table->string('name')->nullable();

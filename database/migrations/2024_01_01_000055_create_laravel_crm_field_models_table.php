@@ -14,14 +14,14 @@ class CreateLaravelCrmFieldModelsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'field_models', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('field_id')->index();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('field_id')->index();
             $table->foreign('field_id')->references('id')->on(config('laravel-crm.db_table_prefix').'fields');
             $table->string('model');
             $table->timestamps();
-            $table->softDeletes();      
+            $table->softDeletes();
         });
     }
 

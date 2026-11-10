@@ -18,8 +18,8 @@ class CreateLaravelCrmOrganizationTypesTable extends Migration
 
         if (! Schema::hasTable($typesTable)) {
             Schema::create($typesTable, function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->unsignedBigInteger('team_id')->index()->nullable();
+                $table->uuid('id')->primary();
+                $table->uuid('team_id')->index()->nullable();
                 $table->string('name');
                 $table->text('description')->nullable();
                 $table->timestamps();
@@ -29,7 +29,7 @@ class CreateLaravelCrmOrganizationTypesTable extends Migration
 
         if (Schema::hasTable($orgsTable) && ! Schema::hasColumn($orgsTable, 'organization_type_id')) {
             Schema::table($orgsTable, function (Blueprint $table) {
-                $table->unsignedBigInteger('organization_type_id')->index()->nullable();
+                $table->uuid('organization_type_id')->index()->nullable();
             });
         }
     }
@@ -42,9 +42,9 @@ class CreateLaravelCrmOrganizationTypesTable extends Migration
     public function down()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'organizations', function (Blueprint $table) {
-                $table->dropColumn(['organization_type_id']);
+            $table->dropColumn(['organization_type_id']);
         });
-  
+
         Schema::dropIfExists(config('laravel-crm.db_table_prefix').'organization_types');
     }
 }

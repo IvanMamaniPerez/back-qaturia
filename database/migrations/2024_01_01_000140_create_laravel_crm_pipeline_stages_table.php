@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use VentureDrake\LaravelCrm\Models\Pipeline;
+use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
 
 return new class extends Migration
 {
@@ -14,13 +16,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'pipeline_stages', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\Pipeline::class);
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\PipelineStageProbability::class)->nullable();
+            $table->foreignUuidFor(Pipeline::class);
+            $table->foreignUuidFor(PipelineStageProbability::class)->nullable();
             $table->tinyInteger('order')->default(0);
             $table->string('color')->nullable();
             $table->timestamps();

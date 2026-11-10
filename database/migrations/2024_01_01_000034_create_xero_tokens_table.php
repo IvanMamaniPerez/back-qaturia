@@ -14,7 +14,7 @@ class CreateXeroTokensTable extends Migration
     public function up()
     {
         Schema::create('xero_tokens', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->text('id_token')->nullable();
             $table->text('access_token');
             $table->string('expires_in')->nullable();

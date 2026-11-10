@@ -14,15 +14,15 @@ class CreateLaravelCrmProductPricesTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'product_prices', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('product_id')->index();
-            $table->unsignedBigInteger('product_variation_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('product_id')->index();
+            $table->uuid('product_variation_id')->index()->nullable();
             $table->integer('unit_price')->nullable();
             $table->integer('cost_per_unit')->nullable();
             $table->integer('direct_cost')->nullable();
-            $table->string("currency", 3)->default("USD");
+            $table->string('currency', 3)->default('USD');
             $table->timestamps();
             $table->softDeletes();
         });

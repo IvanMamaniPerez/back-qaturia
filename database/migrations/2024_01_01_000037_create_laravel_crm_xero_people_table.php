@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use VentureDrake\LaravelCrm\Models\Person;
 
 class CreateLaravelCrmXeroPeopleTable extends Migration
 {
@@ -14,13 +15,13 @@ class CreateLaravelCrmXeroPeopleTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'xero_people', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\Person::class);
+            $table->uuid('team_id')->index()->nullable();
+            $table->foreignUuidFor(Person::class);
             $table->string('contact_id')->nullable();
-            $table->string('first_name')->nullable(); 
-            $table->string('last_name')->nullable(); 
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('email')->nullable();
             $table->boolean('is_primary')->default(false);
             $table->timestamps();

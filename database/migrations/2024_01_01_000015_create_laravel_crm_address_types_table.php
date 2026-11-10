@@ -14,8 +14,8 @@ class CreateLaravelCrmAddressTypesTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'address_types', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('id')->primary();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();
@@ -23,7 +23,7 @@ class CreateLaravelCrmAddressTypesTable extends Migration
         });
 
         Schema::table(config('laravel-crm.db_table_prefix').'addresses', function (Blueprint $table) {
-            $table->unsignedBigInteger('address_type_id')->after('team_id')->index()->nullable();
+            $table->uuid('address_type_id')->after('team_id')->index()->nullable();
         });
     }
 
@@ -37,7 +37,7 @@ class CreateLaravelCrmAddressTypesTable extends Migration
         Schema::table(config('laravel-crm.db_table_prefix').'addresses', function (Blueprint $table) {
             $table->dropColumn(['address_type_id']);
         });
-        
+
         Schema::dropIfExists(config('laravel-crm.db_table_prefix').'address_types');
     }
 }

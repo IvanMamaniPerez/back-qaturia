@@ -8,6 +8,18 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/laravel-crm",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "ivanmamaniperez/pkg-laravelcrm-base": "1.0.0"
+                }
+            }
+        }
+    ],
     "require": {
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^3.0",
@@ -16,7 +28,7 @@
         "laravel/reverb": "^1.0",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
-        "venturedrake/laravel-crm": "^2.6"
+        "ivanmamaniperez/pkg-laravelcrm-base": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
@@ -79,8 +91,7 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi",
-            "@php artisan laravelcrm:upgrade --ansi"
+            "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",

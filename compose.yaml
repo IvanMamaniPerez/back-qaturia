@@ -51,6 +51,16 @@ x-php-service: &php-service
         - app-bootstrap-cache:/app/bootstrap/cache
 
 services:
+    workspace:
+        <<: *php-service
+        command: ['tail', '-f', '/dev/null']
+        depends_on:
+            setup:
+                condition: service_completed_successfully
+        healthcheck:
+            disable: true
+        restart: 'no'
+
     setup:
         <<: *php-service
         healthcheck:
