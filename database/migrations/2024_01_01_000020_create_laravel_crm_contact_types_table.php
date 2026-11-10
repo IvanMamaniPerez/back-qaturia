@@ -14,8 +14,8 @@ class CreateLaravelCrmContactTypesTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'contact_types', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('id')->primary();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();

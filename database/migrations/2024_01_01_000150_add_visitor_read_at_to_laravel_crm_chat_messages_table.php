@@ -21,4 +21,3 @@ class AddVisitorReadAtToLaravelCrmChatMessagesTable extends Migration
         });
     }
 }
-

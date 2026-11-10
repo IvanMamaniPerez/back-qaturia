@@ -15,8 +15,8 @@ class AddDefaultToLaravelCrmTaxRatesTable extends Migration
     {
         Schema::table(config('laravel-crm.db_table_prefix').'tax_rates', function (Blueprint $table) {
             $table->boolean('default')->after('rate')->default(false);
-  
-        });  
+
+        });
     }
 
     /**
@@ -27,9 +27,9 @@ class AddDefaultToLaravelCrmTaxRatesTable extends Migration
     public function down()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'tax_rates', function (Blueprint $table) {
-             $table->dropColumn([
+            $table->dropColumn([
                 'default',
-             ]);
+            ]);
         });
     }
 }

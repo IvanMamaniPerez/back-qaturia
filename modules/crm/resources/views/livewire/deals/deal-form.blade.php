@@ -1,0 +1,176 @@
+<div>
+    <x-mary-card title="{{ ucfirst(__('laravel-crm::lang.contact')) }}" separator>
+        <div class="grid gap-3" wire:key="person">
+            <div
+                class="autocomplete-input relative z-50"
+                x-data="{ open: false }"
+                @click.outside="open = false"
+            >
+                <x-mary-input
+                    wire:model.live="person_name"
+                    wire:keyup="searchPeople"
+                    @focus="open = true"
+                    @input="open = true"
+                    @keydown.tab="open = false"
+                    @keydown.escape="if (open) { open = false; $event.stopPropagation() }"
+                    autocomplete="off"
+                    label="{{ ucfirst(__('laravel-crm::lang.name')) }}"
+                    icon="fas.user"
+                />
+                @if($showPeople && !empty($people))
+                    <div
+                        x-show="open"
+                        x-cloak
+                        class="border border-solid border-primary absolute bg-base-100 dark:bg-base-200 z-40 w-96"
+                    >
+                        @foreach($people as $person)
+                            <x-mary-list-item
+                                wire:key="person-option-{{ $person->id }}"
+                                wire:click="linkPerson({{ $person->id }})"
+                                @click="open = false"
+                                :item="$person"
+                                class="cursor-pointer"
+                            >
+                                <x-slot:value>
+                                    {{ $person->name }}
+                                </x-slot:value>
+                            </x-mary-list-item>
+                        @endforeach
+                    </div>
+                @endif
+                @if(! $person_id && $person_name)
+                    <x-mary-badge value="New" class="badge-info badge-sm rounded-md autocomplete-new text-white" />
+                @endif
+            </div>
+            <x-mary-input wire:model="phone" label="{{ ucfirst(__('laravel-crm::lang.phone')) }}">
+                <x-slot:append>
+                    <x-mary-select wire:model="phone_type" :options="\VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\phoneTypes(false)" class="join-item bg-base-200 w-80"/>
+                </x-slot:append>
+            </x-mary-input>
+            <x-mary-input wire:model="email" label="{{ ucfirst(__('laravel-crm::lang.email')) }}">
+                <x-slot:append>
+                    <x-mary-select wire:model="email_type" :options="\VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\emailTypes(false)" class="join-item bg-base-200" />
+                </x-slot:append>
+            </x-mary-input>
+        </div>
+    </x-mary-card>
+    <x-mary-card title="{{ ucfirst(__('laravel-crm::lang.organization')) }}" separator>
+        <div class="grid gap-3" wire:key="organization">
+            <div
+                class="autocomplete-input relative z-40"
+                x-data="{ open: false }"
+                @click.outside="open = false"
+            >
+                <x-mary-input
+                    wire:model.live="organization_name"
+                    wire:keyup="searchOrganizations"
+                    @focus="open = true"
+                    @input="open = true"
+                    @keydown.tab="open = false"
+                    @keydown.escape="if (open) { open = false; $event.stopPropagation() }"
+                    autocomplete="off"
+                    label="{{ ucfirst(__('laravel-crm::lang.name')) }}"
+                    icon="fas.building"
+                />
+                @if($showOrganizations && !empty($organizations))
+                    <div
+                        x-show="open"
+                        x-cloak
+                        class="border border-solid border-primary absolute bg-base-100 dark:bg-base-200 z-50 w-96"
+                    >
+                        @foreach($organizations as $organization)
+                            <x-mary-list-item
+                                wire:key="org-option-{{ $organization->id }}"
+                                wire:click="linkOrganization({{ $organization->id }})"
+                                @click="open = false"
+                                :item="$organization"
+                                class="cursor-pointer"
+                            >
+                                <x-slot:value>
+                                    {{ $organization->name }}
+                                </x-slot:value>
+                            </x-mary-list-item>
+                        @endforeach
+                    </div>
+                @endif
+                @if(! $organization_id && $organization_name)
+                    <x-mary-badge value="New" class="badge-info badge-sm rounded-md autocomplete-new text-white" />
+                @endif
+            </div>
+            <x-mary-input wire:model="address_line_1" label="{{ ucfirst(__('laravel-crm::lang.address_line_1')) }}" />
+            <x-mary-input wire:model="address_line_2" label="{{ ucfirst(__('laravel-crm::lang.address_line_2')) }}" />
+            <x-mary-input wire:model="address_line_3" label="{{ ucfirst(__('laravel-crm::lang.address_line_3')) }}" />
+            <div class="grid lg:grid-cols-2 gap-5 items-start">
+                <x-mary-input wire:model="address_suburb" label="{{ ucfirst(__('laravel-crm::lang.suburb')) }}" />
+                <x-mary-input wire:model="address_state" label="{{ ucfirst(__('laravel-crm::lang.state')) }}" />
+            </div>
+            <div class="grid lg:grid-cols-2 gap-5 items-start">
+                <x-mary-input wire:model="address_postcode" label="{{ ucfirst(__('laravel-crm::lang.postcode')) }}" />
+                <x-mary-select wire:model="address_country" label="{{ ucfirst(__('laravel-crm::lang.country')) }}" :options="\VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\countries()" />
+            </div>
+        </div>
+    </x-mary-card>
+</div>
+<div>
+    <x-mary-card title="{{ ucfirst(__('laravel-crm::lang.details')) }}" class="mb-5" separator>
+        <div class="grid gap-3" wire:key="details">
+            <x-mary-input wire:model="title" label="{{ ucfirst(__('laravel-crm::lang.title')) }}" />
+            <x-mary-textarea wire:model="description" label="{{ ucfirst(__('laravel-crm::lang.description')) }}" rows="5" />
+            <div class="grid lg:grid-cols-2 gap-5 items-start">
+                <x-mary-input label="{{ ucfirst(__('laravel-crm::lang.value')) }}" wire:model="amount" prefix="$" x-mask:dynamic="$money($input)" x-on:keyup="$el.dispatchEvent(new Event('input'))" />
+                <x-mary-select label="{{ ucfirst(__('laravel-crm::lang.currency')) }}" wire:model="currency" :options="\VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\currencyOptions()" />
+            </div>
+            <div class="grid lg:grid-cols-2 gap-5 items-start">
+                <x-mary-select label="{{ ucfirst(__('laravel-crm::lang.stage')) }}" wire:model="pipeline_stage_id" :options="$pipeline->pipelineStages()->orderBy('order')->orderBy('id')->get() ?? []" />
+                <x-mary-datetime wire:model="expected_close" label="{{ ucfirst(__('laravel-crm::lang.expected_close_date')) }}" />
+            </div>
+            <x-mary-choices-offline
+                    wire:model="labels"
+                    label="{{ ucfirst(__('laravel-crm::lang.labels')) }}"
+                    :options="\VentureDrake\LaravelCrm\Models\Label::get()"
+                    placeholder="Search ..."
+                    searchable />
+            <x-mary-select label="{{ ucfirst(__('laravel-crm::lang.owner')) }}" wire:model="user_owner_id" :options="\VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\usersOptions(false)" />
+            <x-crm-custom-fields :model="$deal ?? new \VentureDrake\LaravelCrm\Models\Deal()" />
+        </div>
+    </x-mary-card>
+    <x-crm-custom-fields :model="$deal ?? new \VentureDrake\LaravelCrm\Models\Deal()" :group="true" />
+    <x-mary-card title="{{ ucfirst(__('laravel-crm::lang.products')) }}" separator>
+        <x-slot:menu>
+            <x-mary-button wire:click="addProduct" class="btn-sm btn-square" type="button" icon="fas.plus" />
+        </x-slot:menu>
+        <div id="dealProducts" class="grid gap-3" wire:key="products">
+            @foreach($products as $index => $product)
+                <div class="grid lg:grid-cols-12 gap-3 items-end">
+                    <input type="hidden" wire:model="products.{{ $index }}.deal_product_id" />
+                    <span class="lg:col-span-4">
+                        <x-mary-select wire:model.live="products.{{ $index }}.id" :options="$productOptions" label="{{ ($loop->first) ? ucfirst(__('laravel-crm::lang.item')) : null }}" />
+                    </span>
+                    {{-- Only a product with variations (or a line already on one) gets the select;
+                         the empty span keeps the columns lined up. The placeholder posts '' (no variation). --}}
+                    @php($variationOptions = $this->variationOptions($product['id'] ?? null, $product['product_variation_id'] ?? null))
+                    @if(count($variationOptions) > 0)
+                        <span class="lg:col-span-2">
+                            <x-mary-select wire:model.live="products.{{ $index }}.product_variation_id"
+                                           :options="$variationOptions"
+                                           placeholder="{{ ucfirst(__('laravel-crm::lang.no_variation')) }}"
+                                           placeholder-value=""
+                                           label="{{ ($loop->first) ? ucfirst(__('laravel-crm::lang.variation')) : null }}" />
+                        </span>
+                    @else
+                        <span class="lg:col-span-2"></span>
+                    @endif
+                    <span class="lg:col-span-2">
+                        <x-mary-input wire:model.blur="products.{{ $index }}.price" label="{{ ($loop->first) ? ucfirst(__('laravel-crm::lang.price'))  : null}}" prefix="$" x-mask:dynamic="$money($input)" x-on:keyup="$el.dispatchEvent(new Event('input'))" placeholder="0.00" />
+                    </span>
+                    <span class="lg:col-span-2">
+                        <x-mary-input wire:model.live="products.{{ $index }}.quantity" label="{{ ($loop->first) ? ucfirst(__('laravel-crm::lang.quantity')) : null }}" type="number" step="0.001" min="0" inputmode="decimal" />
+                    </span>
+                    <span class="lg:col-span-2">
+                        <x-mary-input wire:model="products.{{ $index }}.amount" label="{{ ($loop->first) ? ucfirst(__('laravel-crm::lang.amount')) : null }}" prefix="$" x-mask:dynamic="$money($input)" x-on:keyup="$el.dispatchEvent(new Event('input'))" placeholder="0.00" readonly />
+                    </span>
+                </div>
+            @endforeach
+        </div>
+    </x-mary-card>
+</div>

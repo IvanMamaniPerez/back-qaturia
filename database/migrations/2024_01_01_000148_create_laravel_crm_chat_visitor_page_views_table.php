@@ -9,9 +9,9 @@ class CreateLaravelCrmChatVisitorPageViewsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'chat_visitor_page_views', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('chat_visitor_id')->index();
+            $table->uuid('id')->primary();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('chat_visitor_id')->index();
             $table->string('url', 2048);
             $table->string('title', 512)->nullable();
             $table->timestamp('viewed_at')->useCurrent();
@@ -24,4 +24,3 @@ class CreateLaravelCrmChatVisitorPageViewsTable extends Migration
         Schema::dropIfExists(config('laravel-crm.db_table_prefix').'chat_visitor_page_views');
     }
 }
-

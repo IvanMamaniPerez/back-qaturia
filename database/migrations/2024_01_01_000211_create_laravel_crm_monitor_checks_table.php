@@ -14,10 +14,10 @@ class CreateLaravelCrmMonitorChecksTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'monitor_checks', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('monitor_id');
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('monitor_id');
             $table->foreign('monitor_id')
                 ->references('id')
                 ->on(config('laravel-crm.db_table_prefix').'monitors')

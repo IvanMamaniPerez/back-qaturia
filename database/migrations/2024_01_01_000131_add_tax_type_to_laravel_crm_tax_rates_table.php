@@ -15,7 +15,7 @@ class AddTaxTypeToLaravelCrmTaxRatesTable extends Migration
     {
         Schema::table(config('laravel-crm.db_table_prefix').'tax_rates', function (Blueprint $table) {
             $table->string('tax_type')->after('default')->nullable();
-        });  
+        });
     }
 
     /**
@@ -26,9 +26,9 @@ class AddTaxTypeToLaravelCrmTaxRatesTable extends Migration
     public function down()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'tax_rates', function (Blueprint $table) {
-             $table->dropColumn([
+            $table->dropColumn([
                 'tax_type',
-             ]);
+            ]);
         });
     }
 }

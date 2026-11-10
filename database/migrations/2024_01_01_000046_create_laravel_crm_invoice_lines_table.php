@@ -14,14 +14,14 @@ class CreateLaravelCrmInvoiceLinesTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'invoice_lines', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('invoice_id')->index();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('invoice_id')->index();
             $table->foreign('invoice_id')->references('id')->on(config('laravel-crm.db_table_prefix').'invoices');
-            $table->unsignedBigInteger('product_id')->index()->nullable();
+            $table->uuid('product_id')->index()->nullable();
             $table->foreign('product_id')->references('id')->on(config('laravel-crm.db_table_prefix').'products');
-            $table->unsignedBigInteger('product_variation_id')->index()->nullable();
+            $table->uuid('product_variation_id')->index()->nullable();
             $table->foreign('product_variation_id')->references('id')->on(config('laravel-crm.db_table_prefix').'product_variations');
             $table->text('description')->nullable();
             $table->integer('price')->nullable();
@@ -29,7 +29,7 @@ class CreateLaravelCrmInvoiceLinesTable extends Migration
             $table->decimal('tax_rate')->nullable();
             $table->integer('tax_amount')->nullable();
             $table->integer('amount')->nullable();
-            $table->string("currency", 3)->default("USD");
+            $table->string('currency', 3)->default('USD');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'settings', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable()->after('team_id');
+            $table->uuid('user_id')->nullable()->after('team_id');
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

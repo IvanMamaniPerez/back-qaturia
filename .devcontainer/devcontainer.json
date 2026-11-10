@@ -1,0 +1,37 @@
+{
+    "name": "Back Qaturia Laravel",
+    "dockerComposeFile": "../compose.yaml",
+    "service": "workspace",
+    "workspaceFolder": "/app",
+    "runServices": [
+        "workspace",
+        "app",
+        "reverb",
+        "queue",
+        "scheduler",
+        "vite",
+        "mailpit"
+    ],
+    "shutdownAction": "none",
+    "overrideCommand": false,
+    "customizations": {
+        "vscode": {
+            "extensions": ["bmewburn.vscode-intelephense-client"],
+            "settings": {
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "intelephense.environment.phpVersion": "8.5.0",
+                "intelephense.environment.includePaths": [
+                    "/app/vendor",
+                    "/app/packages/laravel-crm/src",
+                    "/app/packages/laravel-crm/database/seeders"
+                ],
+                "intelephense.files.exclude": [
+                    "**/.git/**",
+                    "**/node_modules/**",
+                    "**/storage/**",
+                    "**/public/build/**"
+                ]
+            }
+        }
+    }
+}

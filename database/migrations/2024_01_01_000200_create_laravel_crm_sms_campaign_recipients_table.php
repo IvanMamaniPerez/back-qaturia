@@ -9,12 +9,12 @@ class CreateLaravelCrmSmsCampaignRecipientsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'sms_campaign_recipients', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('sms_campaign_id')->index();
-            $table->unsignedBigInteger('phone_id')->index();
-            $table->unsignedBigInteger('person_id')->nullable()->index();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('sms_campaign_id')->index();
+            $table->uuid('phone_id')->index();
+            $table->uuid('person_id')->nullable()->index();
             $table->string('tracking_token', 64)->unique();
             $table->enum('status', ['pending', 'sent', 'delivered', 'failed', 'bounced', 'skipped'])->default('pending')->index();
             $table->timestamp('sent_at')->nullable();

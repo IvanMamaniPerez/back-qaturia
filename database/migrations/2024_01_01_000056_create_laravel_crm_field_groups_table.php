@@ -14,18 +14,18 @@ class CreateLaravelCrmFieldGroupsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'field_groups', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->string('handle')->nullable();
             $table->timestamps();
-            $table->softDeletes();      
+            $table->softDeletes();
         });
-        
+
         Schema::table(config('laravel-crm.db_table_prefix').'fields', function (Blueprint $table) {
-             $table->unsignedBigInteger('field_group_id')->index()->after('team_id');
-        }); 
+            $table->uuid('field_group_id')->index()->after('team_id');
+        });
     }
 
     /**
@@ -38,7 +38,7 @@ class CreateLaravelCrmFieldGroupsTable extends Migration
         Schema::table(config('laravel-crm.db_table_prefix').'fields', function (Blueprint $table) {
             $table->dropColumn(['field_group_id']);
         });
-    
+
         Schema::dropIfExists(config('laravel-crm.db_table_prefix').'field_groups');
     }
 }

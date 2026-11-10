@@ -14,25 +14,25 @@ class CreateLaravelCrmProductsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'products', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->string('code')->nullable();
             $table->string('unit')->nullable();
             $table->decimal('tax_rate')->nullable();
-            $table->unsignedBigInteger('product_category_id')->index()->nullable();
+            $table->uuid('product_category_id')->index()->nullable();
             $table->text('description')->nullable();
             $table->boolean('active')->default(true);
-            $table->unsignedBigInteger('user_created_id')->nullable();
+            $table->uuid('user_created_id')->nullable();
             $table->foreign('user_created_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_updated_id')->nullable();
+            $table->uuid('user_updated_id')->nullable();
             $table->foreign('user_updated_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_deleted_id')->nullable();
+            $table->uuid('user_deleted_id')->nullable();
             $table->foreign('user_deleted_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_restored_id')->nullable();
+            $table->uuid('user_restored_id')->nullable();
             $table->foreign('user_restored_id')->references('id')->on('users');
-            $table->unsignedBigInteger('user_owner_id')->nullable();
+            $table->uuid('user_owner_id')->nullable();
             $table->foreign('user_owner_id')->references('id')->on('users');
             $table->timestamps();
             $table->softDeletes();

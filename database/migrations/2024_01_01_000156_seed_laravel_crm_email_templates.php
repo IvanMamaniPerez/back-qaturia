@@ -53,6 +53,7 @@ class SeedLaravelCrmEmailTemplates extends Migration
             }
 
             DB::table($table)->insert([
+                'id' => $externalId,
                 'external_id' => $externalId,
                 'name' => $template['name'],
                 'subject' => $template['subject'],
@@ -73,7 +74,7 @@ class SeedLaravelCrmEmailTemplates extends Migration
 
     private function newsletter(): string
     {
-        return <<<HTML
+        return <<<'HTML'
 <h1 style="margin:0 0 16px 0;font-size:24px;color:#111827;">Newsletter</h1>
 <p>Hi {first_name},</p>
 <p>Here is a quick recap of what's been happening this month.</p>
@@ -90,7 +91,7 @@ HTML;
 
     private function announcement(): string
     {
-        return <<<HTML
+        return <<<'HTML'
 <h1 style="margin:0 0 16px 0;font-size:24px;color:#111827;">We have news</h1>
 <p>Hi {first_name},</p>
 <p>We have something exciting to share — a quick announcement we wanted you to hear first.</p>
@@ -101,7 +102,7 @@ HTML;
 
     private function promotion(): string
     {
-        return <<<HTML
+        return <<<'HTML'
 <h1 style="margin:0 0 16px 0;font-size:24px;color:#111827;">A special offer</h1>
 <p>Hi {first_name},</p>
 <p style="font-size:18px;color:#111827;"><strong>Save 20% this week only.</strong></p>
@@ -113,7 +114,7 @@ HTML;
 
     private function welcome(): string
     {
-        return <<<HTML
+        return <<<'HTML'
 <h1 style="margin:0 0 16px 0;font-size:24px;color:#111827;">Welcome</h1>
 <p>Hi {first_name},</p>
 <p>Welcome aboard — we're glad you're here.</p>
@@ -129,7 +130,7 @@ HTML;
 
     private function reengagement(): string
     {
-        return <<<HTML
+        return <<<'HTML'
 <h1 style="margin:0 0 16px 0;font-size:24px;color:#111827;">We miss you</h1>
 <p>Hi {first_name},</p>
 <p>It has been a while — we wanted to check back in.</p>

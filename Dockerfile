@@ -22,6 +22,7 @@ COPY composer.json composer.lock ./
 RUN composer install \
     --no-interaction \
     --no-scripts \
+    --no-autoloader \
     --prefer-dist
 
 COPY . .

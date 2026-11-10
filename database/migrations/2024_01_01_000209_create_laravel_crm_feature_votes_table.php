@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'feature_votes', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('feature_id')->index();
-            $table->unsignedBigInteger('user_id')->index();
+            $table->uuid('id')->primary();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('feature_id')->index();
+            $table->uuid('user_id')->index();
             $table->timestamps();
 
             $table->unique(['feature_id', 'user_id'], 'crm_feature_votes_feature_user_unique');

@@ -14,7 +14,7 @@ class AddRelatedNoteToLaravelCrmNotesTable extends Migration
     public function up()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'notes', function (Blueprint $table) {
-            $table->integer('related_note_id')->after('pinned')->nullable();
+            $table->uuid('related_note_id')->after('pinned')->nullable();
         });
     }
 

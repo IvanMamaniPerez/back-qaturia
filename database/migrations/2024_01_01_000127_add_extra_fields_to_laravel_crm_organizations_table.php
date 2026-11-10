@@ -20,7 +20,7 @@ class AddExtraFieldsToLaravelCrmOrganizationsTable extends Migration
             'domain' => fn (Blueprint $table) => $table->string('domain')->nullable(),
             'website_url' => fn (Blueprint $table) => $table->string('website_url')->nullable(),
             'year_founded' => fn (Blueprint $table) => $table->smallInteger('year_founded')->nullable(),
-            'timezone_id' => fn (Blueprint $table) => $table->unsignedBigInteger('timezone_id')->index()->nullable(),
+            'timezone_id' => fn (Blueprint $table) => $table->uuid('timezone_id')->index()->nullable(),
             'annual_revenue' => fn (Blueprint $table) => $table->integer('annual_revenue')->nullable(),
             'total_money_raised' => fn (Blueprint $table) => $table->bigInteger('total_money_raised')->nullable(),
             'number_of_employees' => fn (Blueprint $table) => $table->smallInteger('number_of_employees')->nullable(),

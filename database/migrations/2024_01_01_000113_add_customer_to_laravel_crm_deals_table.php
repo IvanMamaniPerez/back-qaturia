@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use VentureDrake\LaravelCrm\Models\Customer;
 
 class AddCustomerToLaravelCrmDealsTable extends Migration
 {
@@ -20,7 +21,7 @@ class AddCustomerToLaravelCrmDealsTable extends Migration
         }
 
         Schema::table($tableName, function (Blueprint $table) {
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\Customer::class)->after('organization_id')->nullable();
+            $table->foreignUuidFor(Customer::class)->after('organization_id')->nullable();
         });
     }
 

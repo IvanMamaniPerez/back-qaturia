@@ -14,11 +14,11 @@ class CreateLaravelCrmDeliveryProductsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'delivery_products', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('delivery_id')->index();
-            $table->unsignedBigInteger('order_product_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('delivery_id')->index();
+            $table->uuid('order_product_id')->index()->nullable();
             $table->foreign('order_product_id')->references('id')->on(config('laravel-crm.db_table_prefix').'order_products');
             $table->timestamps();
             $table->softDeletes();

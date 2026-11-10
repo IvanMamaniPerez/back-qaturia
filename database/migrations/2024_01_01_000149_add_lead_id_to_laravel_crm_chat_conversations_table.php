@@ -9,7 +9,7 @@ class AddLeadIdToLaravelCrmChatConversationsTable extends Migration
     public function up()
     {
         Schema::table(config('laravel-crm.db_table_prefix').'chat_conversations', function (Blueprint $table) {
-            $table->unsignedBigInteger('lead_id')->nullable()->index()->after('user_assigned_id');
+            $table->uuid('lead_id')->nullable()->index()->after('user_assigned_id');
         });
     }
 
@@ -20,4 +20,3 @@ class AddLeadIdToLaravelCrmChatConversationsTable extends Migration
         });
     }
 }
-

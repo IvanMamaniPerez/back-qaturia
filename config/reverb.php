@@ -84,7 +84,7 @@ return [
                 ],
                 'allowed_origins' => array_values(array_filter(array_map(
                     static fn (string $origin): string => trim($origin),
-                    explode(',', env('REVERB_ALLOWED_ORIGINS', 'localhost,127.0.0.1')),
+                    explode(',', (string) env('REVERB_ALLOWED_ORIGINS', 'localhost,127.0.0.1')),
                 ))),
                 'ping_interval' => env('REVERB_APP_PING_INTERVAL', 60),
                 'activity_timeout' => env('REVERB_APP_ACTIVITY_TIMEOUT', 30),

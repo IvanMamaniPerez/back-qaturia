@@ -9,12 +9,12 @@ class CreateLaravelCrmEmailCampaignRecipientsTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'email_campaign_recipients', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->unsignedBigInteger('email_campaign_id')->index();
-            $table->unsignedBigInteger('email_id')->index();
-            $table->unsignedBigInteger('person_id')->nullable()->index();
+            $table->uuid('team_id')->index()->nullable();
+            $table->uuid('email_campaign_id')->index();
+            $table->uuid('email_id')->index();
+            $table->uuid('person_id')->nullable()->index();
             $table->string('address');
             $table->string('tracking_token', 64)->unique();
             $table->enum('status', ['pending', 'sent', 'failed', 'bounced', 'skipped'])->default('pending')->index();

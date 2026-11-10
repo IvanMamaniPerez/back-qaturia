@@ -1,0 +1,1 @@
+Quote {{ $quote->reference }} from {{ app('laravel-crm.settings')->get('organization_name') }}{{ ($for = $quote->organization->name ?? $quote->person->name ?? null) ? ' for '.$for : '' }}.

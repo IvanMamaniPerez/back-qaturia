@@ -14,6 +14,7 @@ export default defineConfig({
             refresh: true,
             fonts: [
                 bunny('Instrument Sans', {
+                    optimizedFallbacks: false,
                     weights: [400, 500, 600],
                 }),
             ],
@@ -44,6 +45,7 @@ export default defineConfig({
             'vendor/**',
             'node_modules/**',
             'public/**',
+            'modules/crm/**',
             'bootstrap/ssr/**',
             'tailwind.config.js',
             'resources/js/actions/**',
@@ -66,6 +68,9 @@ export default defineConfig({
         ignorePatterns: [
             '.github/**',
             'composer.json',
+            'modules/crm/**',
+            'public/**',
+            'storage/**',
             'resources/js/components/ui/*',
             'resources/views/mail/*',
         ],

@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'pipelines', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->string('model');
             $table->timestamps();

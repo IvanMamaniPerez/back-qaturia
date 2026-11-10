@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 
 class CreateLaravelCrmXeroPurchaseOrdersTable extends Migration
 {
@@ -14,10 +15,10 @@ class CreateLaravelCrmXeroPurchaseOrdersTable extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'xero_purchase_orders', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
-            $table->foreignIdFor(\VentureDrake\LaravelCrm\Models\PurchaseOrder::class);   
+            $table->uuid('team_id')->index()->nullable();
+            $table->foreignUuidFor(PurchaseOrder::class);
             $table->string('xero_type');
             $table->string('xero_id');
             $table->string('number')->nullable();
@@ -29,7 +30,7 @@ class CreateLaravelCrmXeroPurchaseOrdersTable extends Migration
             $table->date('issue_date')->nullable();
             $table->date('delivery_date')->nullable();
             $table->string('line_amount_types')->nullable();
-            $table->string('currency_code', 3)->nullable();   
+            $table->string('currency_code', 3)->nullable();
             $table->datetime('xero_updated_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

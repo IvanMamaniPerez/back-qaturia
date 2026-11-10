@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create(config('laravel-crm.db_table_prefix').'pipeline_stage_probabilities', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('external_id');
-            $table->unsignedBigInteger('team_id')->index()->nullable();
+            $table->uuid('team_id')->index()->nullable();
             $table->string('name');
             $table->unsignedTinyInteger('percent');
             $table->tinyInteger('limit')->nullable();
