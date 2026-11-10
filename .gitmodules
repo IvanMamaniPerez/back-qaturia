@@ -1,3 +1,0 @@
-[submodule "packages/laravel-crm"]
-	path = packages/laravel-crm
-	url = git@github.com:IvanMamaniPerez/pkg-laravelcrm-base.git
