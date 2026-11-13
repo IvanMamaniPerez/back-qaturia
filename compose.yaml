@@ -32,11 +32,6 @@ x-app-environment: &app-environment
     REVERB_ALLOWED_ORIGINS: ${REVERB_ALLOWED_ORIGINS:-localhost,127.0.0.1}
     REVERB_SCALING_ENABLED: 'true'
     OCTANE_SERVER: frankenphp
-    VITE_PORT: ${VITE_PORT:-5174}
-    VITE_REVERB_APP_KEY: ${REVERB_APP_KEY:-local-key}
-    VITE_REVERB_HOST: ${VITE_REVERB_HOST:-localhost}
-    VITE_REVERB_PORT: ${REVERB_PUBLIC_PORT:-8080}
-    VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME:-http}
 
 x-php-service: &php-service
     image: back-qaturia-app
@@ -161,31 +156,6 @@ services:
                 condition: service_completed_successfully
         restart: unless-stopped
 
-    vite:
-        image: back-qaturia-frontend
-        build:
-            context: .
-            target: frontend
-        environment: *app-environment
-        command:
-            - sh
-            - -c
-            - npm run dev -- --host=0.0.0.0 --port=$${VITE_PORT}
-        depends_on:
-            setup:
-                condition: service_completed_successfully
-        healthcheck:
-            disable: true
-        volumes:
-            - .:/app
-            - app-vendor:/app/vendor
-            - app-node-modules:/app/node_modules
-            - app-storage:/app/storage
-            - app-bootstrap-cache:/app/bootstrap/cache
-        ports:
-            - ${VITE_PORT:-5174}:${VITE_PORT:-5174}
-        restart: unless-stopped
-
     postgres:
         image: postgres:16-alpine
         environment:
@@ -229,7 +199,6 @@ services:
 
 volumes:
     app-vendor:
-    app-node-modules:
     app-storage:
     app-bootstrap-cache:
     postgres-data:

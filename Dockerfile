@@ -37,14 +37,3 @@ RUN composer install \
 EXPOSE 8000
 
 CMD ["php", "artisan", "octane:frankenphp", "--host=0.0.0.0", "--port=8000", "--admin-port=2019", "--workers=1", "--max-requests=1", "--watch", "--poll"]
-
-FROM app AS frontend
-
-RUN apk add --no-cache nodejs npm
-
-COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
-
-EXPOSE 5173
-
-CMD ["npm", "run", "dev", "--", "--host=0.0.0.0"]
