@@ -36,7 +36,7 @@ class UserShow extends Component
         $this->authorize('delete', $user);
 
         // Self-deletion is a user error, not a permission failure -- see UserIndex::delete().
-        if ((int) $user->getKey() === (int) auth()->id()) {
+        if ((string) $user->getKey() === (string) auth()->id()) {
             $this->error(ucfirst(trans('laravel-crm::lang.user_cannot_delete_self')));
 
             return;

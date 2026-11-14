@@ -39,7 +39,7 @@ class StoreOrderRequest extends FormRequest
             'lead_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'leads', 'external_id')],
             'deal_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'deals', 'external_id')],
             'quote_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'quotes', 'external_id')],
-            'user_owner_id' => ['nullable', 'integer', 'exists:users,id', new OwnerInCurrentTeam],
+            'user_owner_id' => ['bail', 'nullable', 'uuid', 'exists:users,id', new OwnerInCurrentTeam],
             'labels' => ['nullable', 'array'],
             'labels.*' => ['string', 'uuid', ScopedExists::for($prefix.'labels', 'external_id')],
             'line_items' => ['nullable', 'array'],

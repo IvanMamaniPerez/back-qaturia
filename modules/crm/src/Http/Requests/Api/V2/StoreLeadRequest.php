@@ -27,7 +27,7 @@ class StoreLeadRequest extends FormRequest
             'organization_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'organizations', 'external_id')],
             'lead_source_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'lead_sources', 'external_id')],
             'pipeline_stage_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'pipeline_stages', 'external_id')],
-            'user_owner_id' => ['nullable', 'integer', 'exists:users,id', new OwnerInCurrentTeam],
+            'user_owner_id' => ['bail', 'nullable', 'uuid', 'exists:users,id', new OwnerInCurrentTeam],
             'labels' => ['nullable', 'array'],
             'labels.*' => ['string', 'uuid', ScopedExists::for($prefix.'labels', 'external_id')],
         ];

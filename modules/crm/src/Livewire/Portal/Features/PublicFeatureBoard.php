@@ -98,7 +98,7 @@ class PublicFeatureBoard extends Component
      * reachable at its own URL anyway. Falling back to resolve() rather than
      * to null keeps a component mounted without one on the visitor's board.
      */
-    protected function portalTeamId(): ?int
+    protected function portalTeamId(): ?string
     {
         return $this->portalTeamId ?? PortalTeam::resolve();
     }

@@ -52,7 +52,7 @@ trait HasProductCommon
 
     /**
      * Variation rows edited in the product form, in display order. Each row is
-     * ['id' => ?int, 'name', 'code', 'barcode', 'unit_price', 'active'];
+     * ['id' => ?string, 'name', 'code', 'barcode', 'unit_price', 'active'];
      * ProductService::syncVariations() persists them on save.
      */
     public array $variations = [];

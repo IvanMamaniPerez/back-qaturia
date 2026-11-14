@@ -16,7 +16,7 @@ use VentureDrake\LaravelCrm\Models\ProductVariation;
  */
 trait ResolvesProductVariation
 {
-    protected function variationIdFor($productId, $variationId, $currentId = null): ?int
+    protected function variationIdFor(?string $productId, ?string $variationId, ?string $currentId = null): ?string
     {
         if (! $productId || ! $variationId) {
             return null;
@@ -26,7 +26,7 @@ trait ResolvesProductVariation
             ->where('product_id', $productId)
             ->whereKey($variationId);
 
-        if ($currentId && (int) $currentId === (int) $variationId) {
+        if ($currentId && (string) $currentId === (string) $variationId) {
             $query->withTrashed();
         }
 
@@ -41,7 +41,7 @@ trait ResolvesProductVariation
      *
      * @param  class-string<Model>  $lineClass
      */
-    protected function sourceVariationId(string $lineClass, $lineId): ?int
+    protected function sourceVariationId(string $lineClass, ?string $lineId): ?string
     {
         return $lineId ? $lineClass::query()->whereKey($lineId)->value('product_variation_id') : null;
     }

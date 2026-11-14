@@ -51,10 +51,10 @@ class PortalTeam
     /**
      * Resolve the team whose board this request should show.
      *
-     * @param  int|null  $fromUrl  the team id taken from the route, when the
-     *                             request addressed one explicitly
+     * @param  string|null  $fromUrl  the team id taken from the route, when the
+     *                                request addressed one explicitly
      */
-    public static function resolve(?int $fromUrl = null): ?int
+    public static function resolve(?string $fromUrl = null): ?string
     {
         if (! static::scoped()) {
             return null;
@@ -71,7 +71,7 @@ class PortalTeam
         }
 
         if (($user = auth()->user()) && ($team = $user->currentTeam ?? null)) {
-            return (int) $team->id;
+            return (string) $team->id;
         }
 
         return static::soleBoardTeamId();
@@ -90,13 +90,13 @@ class PortalTeam
      * team_id is the only answer, because anything else is another tenant's
      * organisation name, ABN and logo printed on this tenant's invoice.
      */
-    public static function forDocument($model): ?int
+    public static function forDocument($model): ?string
     {
         if (! static::scoped()) {
             return null;
         }
 
-        return $model->team_id === null ? null : (int) $model->team_id;
+        return $model->team_id === null ? null : (string) $model->team_id;
     }
 
     /**
@@ -134,11 +134,11 @@ class PortalTeam
     /**
      * The board remembered from an earlier request in this session.
      */
-    public static function remembered(): ?int
+    public static function remembered(): ?string
     {
         $teamId = session(static::SESSION_KEY);
 
-        return $teamId === null ? null : (int) $teamId;
+        return $teamId === null ? null : (string) $teamId;
     }
 
     /**
@@ -150,7 +150,7 @@ class PortalTeam
      * would otherwise narrow the count to their own team and make every
      * install look single-team.
      */
-    protected static function soleBoardTeamId(): ?int
+    protected static function soleBoardTeamId(): ?string
     {
         $teamIds = Feature::query()
             ->withoutGlobalScopes()
@@ -160,6 +160,6 @@ class PortalTeam
             ->limit(2)
             ->pluck('team_id');
 
-        return $teamIds->count() === 1 ? (int) $teamIds->first() : null;
+        return $teamIds->count() === 1 ? (string) $teamIds->first() : null;
     }
 }

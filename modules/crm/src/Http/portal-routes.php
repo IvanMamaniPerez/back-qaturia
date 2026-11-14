@@ -66,7 +66,7 @@ Route::prefix('features')->group(function () {
        Opening this URL also remembers the board for the rest of the session,
        so the un-prefixed submit / vote / comment routes stay on it. */
     Route::get('team/{portalTeam}', 'VentureDrake\LaravelCrm\Http\Controllers\Portal\PublicFeatureController@index')
-        ->whereNumber('portalTeam')
+        ->whereUuid('portalTeam')
         ->name('laravel-crm.portal.features.team');
 
     Route::get('submit', 'VentureDrake\LaravelCrm\Http\Controllers\Portal\PublicFeatureController@create')

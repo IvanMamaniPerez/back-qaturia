@@ -42,7 +42,7 @@ class StoreQuoteRequest extends FormRequest
             'organization_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'organizations', 'external_id')],
             'lead_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'leads', 'external_id')],
             'pipeline_stage_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'pipeline_stages', 'external_id')],
-            'user_owner_id' => ['nullable', 'integer', 'exists:users,id', new OwnerInCurrentTeam],
+            'user_owner_id' => ['bail', 'nullable', 'uuid', 'exists:users,id', new OwnerInCurrentTeam],
             'labels' => ['nullable', 'array'],
             'labels.*' => ['string', 'uuid', ScopedExists::for($prefix.'labels', 'external_id')],
             'line_items' => ['nullable', 'array'],

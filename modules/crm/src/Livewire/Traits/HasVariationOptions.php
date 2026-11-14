@@ -2,6 +2,7 @@
 
 namespace VentureDrake\LaravelCrm\Livewire\Traits;
 
+use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\ProductVariation;
 
 /**
@@ -17,7 +18,7 @@ trait HasVariationOptions
      * Per-request memo, keyed by product id. Protected so it is not
      * serialised into the Livewire snapshot.
      *
-     * @var array<int, array<int, array{id: string, name: string}>>
+     * @var array<string, array<int, array{id: string, name: string}>>
      */
     protected array $variationOptionsCache = [];
 
@@ -30,13 +31,11 @@ trait HasVariationOptions
      *
      * @return array<int, array{id: string, name: string}>
      */
-    public function variationOptions($productId, $currentVariationId = null): array
+    public function variationOptions(?string $productId, ?string $currentVariationId = null): array
     {
-        if (! is_numeric($productId)) {
+        if (! Str::isUuid($productId)) {
             return [];
         }
-
-        $productId = (int) $productId;
 
         if (! array_key_exists($productId, $this->variationOptionsCache)) {
             $this->variationOptionsCache[$productId] = ProductVariation::query()
@@ -50,7 +49,7 @@ trait HasVariationOptions
 
         $options = $this->variationOptionsCache[$productId];
 
-        if (is_numeric($currentVariationId) && ! collect($options)->contains('id', (int) $currentVariationId)) {
+        if (Str::isUuid($currentVariationId) && ! collect($options)->contains('id', $currentVariationId)) {
             $current = ProductVariation::withTrashed()
                 ->where('product_id', $productId)
                 ->whereKey($currentVariationId)
@@ -73,9 +72,9 @@ trait HasVariationOptions
      * offers a deleted variation to the line that already holds it, and the
      * services drop a deleted variation that was not already on the line.
      */
-    protected function resolveRowVariation($productId, $variationId): ?ProductVariation
+    protected function resolveRowVariation(?string $productId, ?string $variationId): ?ProductVariation
     {
-        if (! is_numeric($productId) || ! is_numeric($variationId)) {
+        if (! Str::isUuid($productId) || ! Str::isUuid($variationId)) {
             return null;
         }
 

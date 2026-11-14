@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Http\Requests\Api\V2;
 
 use Illuminate\Foundation\Http\FormRequest;
 use VentureDrake\LaravelCrm\Http\Rules\Api\V2\OwnerInCurrentTeam;
+use VentureDrake\LaravelCrm\Http\Rules\Api\V2\ScopedExists;
 
 class StoreOrganizationRequest extends FormRequest
 {
@@ -22,10 +23,10 @@ class StoreOrganizationRequest extends FormRequest
             'number_of_employees' => ['nullable', 'integer', 'min:0'],
             'annual_revenue' => ['nullable', 'numeric', 'min:0'],
             'total_money_raised' => ['nullable', 'numeric', 'min:0'],
-            'organization_type_id' => ['nullable', 'integer'],
-            'industry_id' => ['nullable', 'integer'],
-            'timezone_id' => ['nullable', 'integer'],
-            'user_owner_id' => ['nullable', 'integer', 'exists:users,id', new OwnerInCurrentTeam],
+            'organization_type_id' => ['bail', 'nullable', 'uuid', ScopedExists::for(config('laravel-crm.db_table_prefix').'organization_types', 'id')],
+            'industry_id' => ['bail', 'nullable', 'uuid', ScopedExists::for(config('laravel-crm.db_table_prefix').'industries', 'id')],
+            'timezone_id' => ['bail', 'nullable', 'uuid', ScopedExists::for(config('laravel-crm.db_table_prefix').'timezones', 'id')],
+            'user_owner_id' => ['bail', 'nullable', 'uuid', 'exists:users,id', new OwnerInCurrentTeam],
         ];
     }
 }

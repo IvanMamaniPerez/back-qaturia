@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use VentureDrake\LaravelCrm\Support\LegacyUuid;
 use VentureDrake\LaravelCrm\Support\Money;
 use VentureDrake\LaravelCrm\Support\Quantity;
 use VentureDrake\LaravelCrm\Traits\BelongsToTeams;
@@ -195,12 +196,12 @@ class Order extends Model
 
     public function getBillingAddress()
     {
-        return $this->addresses()->where('address_type_id', 5)->first();
+        return $this->addresses()->where('address_type_id', LegacyUuid::fromInteger(5))->first();
     }
 
     public function getShippingAddress()
     {
-        return $this->addresses()->where('address_type_id', 6)->first();
+        return $this->addresses()->where('address_type_id', LegacyUuid::fromInteger(6))->first();
     }
 
     public function invoiceComplete()

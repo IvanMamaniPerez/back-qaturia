@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\PermissionRegistrar;
+use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmPermissionsSeeder;
 
 class LaravelCrmPermissions extends Command
 {
@@ -23,7 +24,7 @@ class LaravelCrmPermissions extends Command
      *
      * @var string
      */
-    protected $description = 'Migrate Laravel CRM permissions';
+    protected $description = 'Seed Laravel CRM roles and permissions';
 
     /**
      * The Composer instance.
@@ -48,12 +49,21 @@ class LaravelCrmPermissions extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Updating LaravelCRM Permissions...');
 
+        $result = $this->call('db:seed', [
+            '--class' => LaravelCrmPermissionsSeeder::class,
+            '--force' => true,
+        ]);
+
+        if ($result !== self::SUCCESS) {
+            return $result;
+        }
+
         if (config('laravel-crm.teams') === false) {
-            $this->error('Teams config for multi-tenant support is not enabled.');
+            $this->info('LaravelCRM Permissions Update Complete.');
         } else {
             $this->comment('Clearing permissions cache');
 
@@ -98,5 +108,7 @@ class LaravelCrmPermissions extends Command
 
             $this->info('LaravelCRM Permissions Update Complete.');
         }
+
+        return self::SUCCESS;
     }
 }

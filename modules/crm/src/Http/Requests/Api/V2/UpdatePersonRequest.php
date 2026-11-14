@@ -26,7 +26,7 @@ class UpdatePersonRequest extends FormRequest
             'birthday' => ['nullable', 'date'],
             'description' => ['nullable', 'string'],
             'organization_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'organizations', 'external_id')],
-            'user_owner_id' => ['nullable', 'integer', 'exists:users,id', new OwnerInCurrentTeam],
+            'user_owner_id' => ['bail', 'nullable', 'uuid', 'exists:users,id', new OwnerInCurrentTeam],
             'labels' => ['nullable', 'array'],
             'labels.*' => ['string', 'uuid', ScopedExists::for($prefix.'labels', 'external_id')],
         ];

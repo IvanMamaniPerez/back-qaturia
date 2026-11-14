@@ -47,12 +47,12 @@ class ChatConversation extends Model
 
     public function messages()
     {
-        return $this->hasMany(ChatMessage::class)->orderBy('created_at');
+        return $this->hasMany(ChatMessage::class)->orderBy('created_at')->orderBy('id');
     }
 
     public function latestMessage()
     {
-        return $this->hasOne(ChatMessage::class)->latestOfMany();
+        return $this->hasOne(ChatMessage::class)->orderByDesc('created_at')->orderByDesc('id');
     }
 
     public function assignedToUser()

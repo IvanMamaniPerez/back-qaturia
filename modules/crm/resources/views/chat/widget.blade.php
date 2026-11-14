@@ -125,8 +125,7 @@
         }
         bodyEl.innerHTML = messages.map(bubbleHtml).join('');
         bodyEl.scrollTop = bodyEl.scrollHeight;
-        var max = messages[messages.length-1].id;
-        if (max > lastId) lastId = max;
+        lastId = messages[messages.length-1].id;
     }
 
     function appendMessages(messages){
@@ -137,7 +136,7 @@
             var div = document.createElement('div');
             div.innerHTML = bubbleHtml(m);
             bodyEl.appendChild(div.firstChild);
-            if (m.id > lastId) lastId = m.id;
+            lastId = m.id;
         });
         bodyEl.scrollTop = bodyEl.scrollHeight;
     }

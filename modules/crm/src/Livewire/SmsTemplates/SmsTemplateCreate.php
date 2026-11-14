@@ -18,7 +18,7 @@ class SmsTemplateCreate extends Component
 
     public ?string $body = null;
 
-    public ?int $clone_from = null;
+    public ?string $clone_from = null;
 
     public bool $showPreview = false;
 

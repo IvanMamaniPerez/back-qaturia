@@ -44,7 +44,7 @@ trait ValidatesLineItemVariations
 
                     $productId = Product::where('external_id', $item['product_id'])->value('id');
 
-                    if ($variationProductId === null || $productId === null || (int) $variationProductId !== (int) $productId) {
+                    if ($variationProductId === null || $productId === null || (string) $variationProductId !== (string) $productId) {
                         $validator->errors()->add(
                             $variationKey,
                             "The selected {$variationKey} is not a variation of line_items.{$index}.product_id."

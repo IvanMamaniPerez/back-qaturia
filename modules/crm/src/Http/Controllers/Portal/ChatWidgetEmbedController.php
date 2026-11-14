@@ -229,10 +229,21 @@ JS;
             ]));
         }
 
-        $sinceId = (int) $request->query('since_id', 0);
+        $sinceId = $request->query('since_id');
+        $cursor = null;
+
+        if ($sinceId !== null && $sinceId !== '' && $sinceId !== '0') {
+            $request->validate(['since_id' => ['required', 'uuid']]);
+            $cursor = $conversation->messages()->whereKey($sinceId)->firstOrFail();
+        }
 
         $messages = $conversation->messages()
-            ->when($sinceId, fn ($q) => $q->where('id', '>', $sinceId))
+            ->when($cursor, fn ($query) => $query->where(function ($query) use ($cursor) {
+                $query->where('created_at', '>', $cursor->created_at)
+                    ->orWhere(function ($query) use ($cursor) {
+                        $query->where('created_at', $cursor->created_at)->where('id', '>', $cursor->id);
+                    });
+            }))
             ->get();
 
         return $this->cors(response()->json([

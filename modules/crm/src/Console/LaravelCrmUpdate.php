@@ -123,7 +123,7 @@ class LaravelCrmUpdate extends Command
 
         try {
             if ($this->callSilent('db:seed', [
-                '--class' => 'VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmTablesSeeder',
+                '--class' => 'VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmBootstrapSeeder',
                 '--force' => true,
             ]) !== self::SUCCESS) {
                 $this->error('Seeding base tables failed. Laravel CRM has NOT been updated.');

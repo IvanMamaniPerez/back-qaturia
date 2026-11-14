@@ -26,12 +26,12 @@ class StoreProductRequest extends FormRequest
             'unit_price' => ['nullable', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'size:3'],
             'tax_rate' => ['nullable', 'numeric'],
-            'tax_rate_id' => ['nullable', 'integer', ScopedExists::for($prefix.'tax_rates', 'id')],
+            'tax_rate_id' => ['bail', 'nullable', 'uuid', ScopedExists::for($prefix.'tax_rates', 'id')],
             'product_category_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'product_categories', 'external_id')],
             'purchase_account' => ['nullable', 'string', 'max:255'],
             'sales_account' => ['nullable', 'string', 'max:255'],
             'active' => ['nullable', 'boolean'],
-            'user_owner_id' => ['nullable', 'integer', 'exists:users,id', new OwnerInCurrentTeam],
+            'user_owner_id' => ['bail', 'nullable', 'uuid', 'exists:users,id', new OwnerInCurrentTeam],
         ];
     }
 }

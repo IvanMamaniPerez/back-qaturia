@@ -120,7 +120,7 @@ class UserInvite extends Component
         return $invitation;
     }
 
-    protected function currentTeamId(): ?int
+    protected function currentTeamId(): ?string
     {
         if (! config('laravel-crm.teams')) {
             return null;

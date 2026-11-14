@@ -61,7 +61,7 @@ trait HasMonitorCommon
             'downtime_minutes_before_alert' => 'required|integer|min:1',
             'perf_threshold_ms' => 'required|integer|min:1',
             'is_active' => 'required|boolean',
-            'user_owner_id' => 'required|integer',
+            'user_owner_id' => 'bail|required|uuid|exists:users,id',
         ];
     }
 

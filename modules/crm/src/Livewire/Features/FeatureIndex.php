@@ -103,7 +103,7 @@ class FeatureIndex extends Component
             $teamId = auth()->user()->currentTeam->id ?? null;
 
             if ($teamId !== null) {
-                return route('laravel-crm.portal.features.team', ['portalTeam' => (int) $teamId]);
+                return route('laravel-crm.portal.features.team', ['portalTeam' => $teamId]);
             }
         }
 

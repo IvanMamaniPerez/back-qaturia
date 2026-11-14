@@ -136,7 +136,7 @@ class PersonImport extends Component
     }
 
     /** Find-or-create an organization by name (encryption-aware lookup). */
-    private function resolveOrganizationId(string $name): ?int
+    private function resolveOrganizationId(string $name): ?string
     {
         $name = trim($name);
 

@@ -18,7 +18,7 @@ class PublicFeatureController extends Controller
      * settled — and remembered in the session — before the board renders, so
      * the component and every link on the page agree on which board this is.
      */
-    public function index(?int $portalTeam = null)
+    public function index(?string $portalTeam = null)
     {
         $teamId = PortalTeam::resolve($portalTeam);
 
@@ -166,6 +166,6 @@ class PublicFeatureController extends Controller
         // A teamless feature belongs to no board, so it is on none of them.
         abort_if($feature->team_id === null, 404);
 
-        PortalTeam::adopt((int) $feature->team_id);
+        PortalTeam::adopt($feature->team_id);
     }
 }

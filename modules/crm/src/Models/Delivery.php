@@ -3,8 +3,8 @@
 namespace VentureDrake\LaravelCrm\Models;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use VentureDrake\LaravelCrm\Support\LegacyUuid;
 use VentureDrake\LaravelCrm\Traits\BelongsToTeams;
 use VentureDrake\LaravelCrm\Traits\HasCrmActivities;
 use VentureDrake\LaravelCrm\Traits\HasGlobalSettings;
@@ -108,9 +108,9 @@ class Delivery extends Model
     public function getShippingAddress()
     {
         if ($this->relationLoaded('addresses')) {
-            return $this->addresses->firstWhere('address_type_id', 6);
+            return $this->addresses->firstWhere('address_type_id', LegacyUuid::fromInteger(6));
         }
 
-        return $this->addresses()->where('address_type_id', 6)->first();
+        return $this->addresses()->where('address_type_id', LegacyUuid::fromInteger(6))->first();
     }
 }

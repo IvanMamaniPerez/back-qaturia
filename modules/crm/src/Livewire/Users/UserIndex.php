@@ -217,7 +217,7 @@ class UserIndex extends Component
         // Self-deletion is a user error rather than a permission failure -- an Owner
         // legitimately holds 'delete crm users', and letting them remove their own
         // account can orphan the last Owner. Surface it as a toast, not a 403.
-        if ((int) $user->getKey() === (int) auth()->id()) {
+        if ((string) $user->getKey() === (string) auth()->id()) {
             $this->error(ucfirst(trans('laravel-crm::lang.user_cannot_delete_self')));
 
             return;

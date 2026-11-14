@@ -37,7 +37,7 @@ class StoreInvoiceRequest extends FormRequest
             'person_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'people', 'external_id')],
             'organization_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'organizations', 'external_id')],
             'order_id' => ['nullable', 'string', 'uuid', ScopedExists::for($prefix.'orders', 'external_id')],
-            'user_owner_id' => ['nullable', 'integer', 'exists:users,id', new OwnerInCurrentTeam],
+            'user_owner_id' => ['bail', 'nullable', 'uuid', 'exists:users,id', new OwnerInCurrentTeam],
             'labels' => ['nullable', 'array'],
             'labels.*' => ['string', 'uuid', ScopedExists::for($prefix.'labels', 'external_id')],
             'line_items' => ['nullable', 'array'],
