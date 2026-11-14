@@ -13,10 +13,10 @@
             @hasdealsenabled
             @can('edit crm deals')
                 | @if(!$deal->closed_at)
-                    <x-mary-button wire:click="won({{ $deal->id }})" label="{{ ucfirst(__('laravel-crm::lang.won')) }}" class="btn-sm btn-success text-white" />
-                    <x-mary-button wire:click="lost({{ $deal->id }})" label="{{ ucfirst(__('laravel-crm::lang.lost')) }}" class="btn-sm btn-error text-white" />
+                    <x-mary-button wire:click="won({{ \Illuminate\Support\Js::from($deal->id) }})" label="{{ ucfirst(__('laravel-crm::lang.won')) }}" class="btn-sm btn-success text-white" />
+                    <x-mary-button wire:click="lost({{ \Illuminate\Support\Js::from($deal->id) }})" label="{{ ucfirst(__('laravel-crm::lang.lost')) }}" class="btn-sm btn-error text-white" />
                 @else
-                    <x-mary-button wire:click="reopen({{ $deal->id }})" label="{{ ucfirst(__('laravel-crm::lang.reopen')) }}" class="btn-sm btn-outline" />
+                    <x-mary-button wire:click="reopen({{ \Illuminate\Support\Js::from($deal->id) }})" label="{{ ucfirst(__('laravel-crm::lang.reopen')) }}" class="btn-sm btn-outline" />
                 @endif
             @endcan
             @endhasdealsenabled
@@ -25,7 +25,7 @@
                 <x-mary-button link="{{ url(route('laravel-crm.deals.edit', $deal)) }}" icon="o-pencil-square" class="btn-sm btn-square btn-outline" responsive />
             @endcan
             @can('delete crm deals')
-                <x-mary-button onclick="modalDeleteDeal{{ $deal->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteDeal{{ $deal->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="deal" id="{{ $deal->id }}" />
             @endcan
         </x-slot:actions>

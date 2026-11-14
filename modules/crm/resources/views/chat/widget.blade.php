@@ -99,7 +99,7 @@
 
     function fmtTime(iso){
         if (!iso) return '';
-        try { return new Date(iso).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); } catch(e){ return ''; }
+        try { return new Date(iso).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', timeZone: @json($crmTimezone ?? 'UTC')}); } catch(e){ return ''; }
     }
 
     function bubbleHtml(m){

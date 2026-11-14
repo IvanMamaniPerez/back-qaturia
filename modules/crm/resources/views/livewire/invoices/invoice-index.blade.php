@@ -37,8 +37,8 @@
                 @endif
             @endscope
             @scope('cell_overdue_by', $invoice)
-                @if(! $invoice->fully_paid_at && $invoice->due_date && abs($invoice->due_date->diffInDays()) > 0 && $invoice->due_date < \Carbon\Carbon::now()->timezone($this->timezone))
-                    {{ $invoice->due_date->diffForHumans() }}
+                @if(! $invoice->fully_paid_at && $invoice->due_date && abs(\VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->diffInDays(\VentureDrake\LaravelCrm\Support\CrmDateTime::today())) > 0 && \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date) < \VentureDrake\LaravelCrm\Support\CrmDateTime::today())
+                    {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->diffForHumans(\VentureDrake\LaravelCrm\Support\CrmDateTime::today()) }}
                 @endif
             @endscope
             @scope('cell_sent', $invoice)
@@ -66,7 +66,7 @@
                                 <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.invoices.edit', $invoice)) }}" class="btn-sm btn-square btn-outline" />
                             @endcan
                             @can('delete crm invoices')
-                                <x-mary-button onclick="modalDeleteInvoice{{ $invoice->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                                <x-mary-button onclick="document.getElementById('modalDeleteInvoice{{ $invoice->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                                 <x-crm-delete-confirm model="invoice" id="{{ $invoice->id }}" />
                             @endcan
                         @endif

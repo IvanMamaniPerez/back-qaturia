@@ -15,7 +15,7 @@
                         @endif
                     </p>
                 @endif
-                <br/><small>{{ $file->created_at->format('h:i A') }} on {{ $file->created_at->toFormattedDateString() }}
+                <br/><small>{{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($file->created_at)->format('h:i A') }} on {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($file->created_at)->toFormattedDateString() }}
                     | {{ $file->createdByUser->name }} | {{ ($file->filesize / 1000) }} kB</small>
             </div>
         </div>

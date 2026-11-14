@@ -7,6 +7,7 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Meeting;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class MeetingItem extends Component
 {
@@ -54,8 +55,8 @@ class MeetingItem extends Component
     {
         $this->name = $this->meeting->name ?? '';
         $this->description = $this->meeting->description;
-        $this->start_at = $this->meeting->start_at?->format('Y-m-d\TH:i');
-        $this->finish_at = $this->meeting->finish_at?->format('Y-m-d\TH:i');
+        $this->start_at = CrmDateTime::local($this->meeting->start_at)?->format('Y-m-d\TH:i');
+        $this->finish_at = CrmDateTime::local($this->meeting->finish_at)?->format('Y-m-d\TH:i');
         $this->location = $this->meeting->location;
         $this->user_owner_id = $this->meeting->user_owner_id;
         $this->user_assigned_id = $this->meeting->user_assigned_id;
@@ -86,8 +87,8 @@ class MeetingItem extends Component
         $this->meeting->update([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->normalizeDatetime($this->start_at),
-            'finish_at' => $this->normalizeDatetime($this->finish_at),
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
             'user_owner_id' => $this->user_owner_id,
             'user_assigned_id' => $this->user_assigned_id,
@@ -122,11 +123,6 @@ class MeetingItem extends Component
 
         $this->dispatch('meeting-updated');
         $this->dispatch('activity-logged');
-    }
-
-    private function normalizeDatetime(?string $value): ?string
-    {
-        return $value ? str_replace('T', ' ', $value) : null;
     }
 
     public function render()

@@ -33,7 +33,7 @@
                                     <x-mary-menu-item link="{{ route('laravel-crm.leads.edit', ['lead' => $record['id']]) }}" title="{{ ucfirst(__('laravel-crm::lang.edit')) }}" />
                                 @endcan
                                 @can('delete crm leads')
-                                    <x-mary-menu-item onclick="modalDeleteLead{{ $record['id'] }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                                    <x-mary-menu-item onclick="document.getElementById('modalDeleteLead{{ $record['id'] }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                                 @endcan
                             </x-mary-dropdown>
                         @endcanany
@@ -44,10 +44,10 @@
                             <x-mary-dropdown class="btn-xs btn-square" right>
                                 @can('edit crm deals')
                                     @if(!\VentureDrake\LaravelCrm\Models\Deal::find($record['id'])->closed_at)
-                                        <x-mary-menu-item  wire:click="won({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.won')) }}" />
-                                        <x-mary-menu-item  wire:click="lost({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.lost')) }}" />
+                                        <x-mary-menu-item  wire:click="won({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.won')) }}" />
+                                        <x-mary-menu-item  wire:click="lost({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.lost')) }}" />
                                     @else
-                                        <x-mary-menu-item  wire:click="reopen({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.reopen')) }}" />
+                                        <x-mary-menu-item  wire:click="reopen({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.reopen')) }}" />
                                     @endif
                                 @endcan
                                 @can('view crm deals')
@@ -57,7 +57,7 @@
                                     <x-mary-menu-item link="{{ route('laravel-crm.deals.edit', ['deal' => $record['id']]) }}" title="{{ ucfirst(__('laravel-crm::lang.edit')) }}" />
                                 @endcan
                                 @can('delete crm deals')
-                                    <x-mary-menu-item onclick="modalDeleteDeal{{ $record['id'] }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                                    <x-mary-menu-item onclick="document.getElementById('modalDeleteDeal{{ $record['id'] }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                                 @endcan
                             </x-mary-dropdown>
                         @endcanany
@@ -71,24 +71,24 @@
                                     (!\VentureDrake\LaravelCrm\Http\Helpers\CheckAmount\subTotal($quote) || ! \VentureDrake\LaravelCrm\Http\Helpers\CheckAmount\total($quote)) ? $quoteError = true : $quoteError = false;
                                 @endphp
                                 @if(! $quote->order && !$quoteError)
-                                    <x-mary-menu-item wire:click="send({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.send')) }}" />
+                                    <x-mary-menu-item wire:click="send({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.send')) }}" />
                                 @endif
                                 @can('edit crm quotes')
                                     @if(! $quoteError)
                                         @if(!$quote->accepted_at && !$quote->rejected_at)
-                                            <x-mary-menu-item wire:click="accept({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.accept')) }}" />
-                                            <x-mary-menu-item wire:click="reject({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.reject')) }}" />
+                                            <x-mary-menu-item wire:click="accept({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.accept')) }}" />
+                                            <x-mary-menu-item wire:click="reject({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.reject')) }}" />
                                         @elseif($quote->accepted_at && $quote->orders()->count() > 0 && !$quote->orderComplete())
                                             @hasordersenabled
                                             <x-mary-menu-item link="{{ route('laravel-crm.orders.create',['model' => 'quote', 'id' => $quote->id]) }}" title="{{ ucfirst(__('laravel-crm::lang.create_order')) }}" />
                                             @endhasordersenabled
                                         @elseif($quote->accepted_at && $quote->orders()->count() < 1)
-                                            <x-mary-menu-item wire:click="unaccept({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.unaccept')) }}" />
+                                            <x-mary-menu-item wire:click="unaccept({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.unaccept')) }}" />
                                             @hasordersenabled
                                             <x-mary-menu-item link="{{ route('laravel-crm.orders.create',['model' => 'quote', 'id' => $quote->id]) }}" title="{{ ucfirst(__('laravel-crm::lang.create_order')) }}" />
                                             @endhasordersenabled
                                         @elseif($quote->rejected_at)
-                                            <x-mary-menu-item wire:click="unreject({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.unreject')) }}" />
+                                            <x-mary-menu-item wire:click="unreject({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.unreject')) }}" />
                                         @endif
                                     @endif
                                 @endcan
@@ -104,7 +104,7 @@
                                     @endif
                                 @endcan
                                 @can('delete crm quotes')
-                                    <x-mary-menu-item onclick="modalDeleteQuote{{ $record['id'] }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                                    <x-mary-menu-item onclick="document.getElementById('modalDeleteQuote{{ $record['id'] }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                                 @endcan
                             </x-mary-dropdown>
                             @if(! $quote->order && !$quoteError)

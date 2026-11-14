@@ -74,7 +74,7 @@
                     <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.organizations.edit', $organization)) }}" class="btn-sm btn-square btn-outline" />
                 @endcan
                 @can('delete crm organizations')
-                    <x-mary-button onclick="modalDeleteOrganization{{ $organization->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                    <x-mary-button onclick="document.getElementById('modalDeleteOrganization{{ $organization->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                     <x-crm-delete-confirm model="organization" id="{{ $organization->id }}" />
                 @endcan
             @endscope

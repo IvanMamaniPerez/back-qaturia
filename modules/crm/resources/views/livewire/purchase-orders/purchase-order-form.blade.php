@@ -26,7 +26,7 @@
                         @foreach($people as $person)
                             <x-mary-list-item
                                 wire:key="person-option-{{ $person->id }}"
-                                wire:click="linkPerson({{ $person->id }})"
+                                wire:click="linkPerson({{ \Illuminate\Support\Js::from($person->id) }})"
                                 @click="open = false"
                                 :item="$person"
                                 class="cursor-pointer"
@@ -67,7 +67,7 @@
                         @foreach($organizations as $organization)
                             <x-mary-list-item
                                 wire:key="org-option-{{ $organization->id }}"
-                                wire:click="linkOrganization({{ $organization->id }})"
+                                wire:click="linkOrganization({{ \Illuminate\Support\Js::from($organization->id) }})"
                                 @click="open = false"
                                 :item="$organization"
                                 class="cursor-pointer"

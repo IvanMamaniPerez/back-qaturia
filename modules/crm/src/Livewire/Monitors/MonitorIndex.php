@@ -2,7 +2,6 @@
 
 namespace VentureDrake\LaravelCrm\Livewire\Monitors;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -13,6 +12,7 @@ use Livewire\WithPagination;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrm\Models\MonitorCheck;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class MonitorIndex extends Component
 {
@@ -79,14 +79,14 @@ class MonitorIndex extends Component
             return [];
         }
 
-        $start = Carbon::now()->subDays(6)->startOfDay();
+        $start = CrmDateTime::today()->subDays(6);
         $ids = $monitors->pluck('id')->all();
 
         $rows = MonitorCheck::query()
             ->whereIn('monitor_id', $ids)
             ->where('type', 'uptime')
             ->whereNotNull('response_time')
-            ->where('checked_at', '>=', $start)
+            ->where('checked_at', '>=', CrmDateTime::utc($start))
             ->get(['monitor_id', 'response_time', 'checked_at']);
 
         $byMonitor = [];
@@ -96,7 +96,7 @@ class MonitorIndex extends Component
         }
 
         foreach ($rows as $row) {
-            $dayIndex = (int) floor(($row->checked_at->getTimestamp() - $start->getTimestamp()) / 86400);
+            $dayIndex = (int) $start->diffInDays(CrmDateTime::local($row->checked_at)->startOfDay());
 
             if ($dayIndex < 0 || $dayIndex > 6) {
                 continue;

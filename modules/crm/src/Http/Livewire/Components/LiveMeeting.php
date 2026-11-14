@@ -7,6 +7,7 @@ use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Meeting;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\HasGlobalSettings;
 use VentureDrake\LaravelCrm\Traits\NotifyToast;
 
@@ -52,8 +53,8 @@ class LiveMeeting extends Component
         $this->meeting = $meeting;
         $this->name = $meeting->name;
         $this->description = $meeting->description;
-        $this->start_at = ($meeting->start_at) ? $meeting->start_at->format($this->dateFormat().' H:i') : null;
-        $this->finish_at = ($meeting->finish_at) ? $meeting->finish_at->format($this->dateFormat().' H:i') : null;
+        $this->start_at = ($meeting->start_at) ? CrmDateTime::local($meeting->start_at)->format($this->dateFormat().' H:i') : null;
+        $this->finish_at = ($meeting->finish_at) ? CrmDateTime::local($meeting->finish_at)->format($this->dateFormat().' H:i') : null;
         $this->guests = $meeting->contacts()->pluck('entityable_id')->toArray();
         $this->location = $meeting->location;
 
@@ -89,8 +90,8 @@ class LiveMeeting extends Component
         $this->meeting->update([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->start_at,
-            'finish_at' => $this->finish_at,
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
         ]);
 

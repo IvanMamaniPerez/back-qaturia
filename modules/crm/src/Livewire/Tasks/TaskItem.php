@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class TaskItem extends Component
 {
@@ -52,9 +53,9 @@ class TaskItem extends Component
         $this->name = $this->task->name ?? '';
         $this->description = $this->task->description;
         // Both are bound to datetime-local inputs, which only accept Y-m-d\TH:i.
-        $this->start_at = $this->task->start_at?->format('Y-m-d\TH:i');
-        $this->due_at = $this->task->due_at?->format('Y-m-d\TH:i');
-        $this->completed_at = $this->task->completed_at?->toDateTimeString();
+        $this->start_at = CrmDateTime::local($this->task->start_at)?->format('Y-m-d\TH:i');
+        $this->due_at = CrmDateTime::local($this->task->due_at)?->format('Y-m-d\TH:i');
+        $this->completed_at = CrmDateTime::local($this->task->completed_at)?->toDateTimeString();
         $this->user_owner_id = $this->task->user_owner_id;
         $this->user_assigned_id = $this->task->user_assigned_id;
     }
@@ -88,8 +89,8 @@ class TaskItem extends Component
         $this->task->update([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->normalizeDatetime($this->start_at),
-            'due_at' => $this->normalizeDatetime($this->due_at),
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'due_at' => CrmDateTime::fromLocal($this->due_at, 'due_at'),
             'user_owner_id' => $this->user_owner_id,
             'user_assigned_id' => $this->user_assigned_id,
         ]);
@@ -102,17 +103,12 @@ class TaskItem extends Component
         $this->editing = false;
     }
 
-    private function normalizeDatetime(?string $value): ?string
-    {
-        return $value ? str_replace('T', ' ', $value) : null;
-    }
-
     public function complete(): void
     {
         $this->authorize('update', $this->task);
 
         $this->task->update(['completed_at' => now()]);
-        $this->completed_at = $this->task->completed_at->toDateTimeString();
+        $this->completed_at = CrmDateTime::local($this->task->completed_at)->toDateTimeString();
 
         $this->success(ucfirst(trans('laravel-crm::lang.task_completed')));
 

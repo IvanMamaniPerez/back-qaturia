@@ -37,7 +37,7 @@
                     @endcan
                     @can('delete crm email-templates')
                         @if(! $template->is_system)
-                            <x-mary-button wire:click="delete({{ $template->id }})" wire:confirm="Delete this template?" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                            <x-mary-button wire:click="delete({{ \Illuminate\Support\Js::from($template->id) }})" wire:confirm="Delete this template?" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                         @endif
                     @endcan
                 </div>

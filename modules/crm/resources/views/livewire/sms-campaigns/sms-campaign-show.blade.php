@@ -43,11 +43,11 @@
             </div>
             <div>
                 <div class="text-xs text-base-content/60">{{ ucfirst(__('laravel-crm::lang.scheduled_at')) }}</div>
-                <div>{{ $campaign->scheduled_at?->format('Y-m-d H:i') }} {{ $campaign->timezone }}</div>
+                <div>{{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($campaign->scheduled_at)?->format('Y-m-d H:i') }} {{ $campaign->timezone }}</div>
             </div>
             <div>
                 <div class="text-xs text-base-content/60">{{ ucfirst(__('laravel-crm::lang.sent_at')) }}</div>
-                <div>{{ $campaign->sent_at?->format('Y-m-d H:i') ?? '—' }}</div>
+                <div>{{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($campaign->sent_at)?->format('Y-m-d H:i') ?? '—' }}</div>
             </div>
             <div>
                 <div class="text-xs text-base-content/60">{{ ucfirst(__('laravel-crm::lang.sms_template')) }}</div>
@@ -71,10 +71,10 @@
                 <x-mary-badge :value="ucfirst($recipient->status)" class="badge-neutral text-white" />
             @endscope
             @scope('cell_sent_at', $recipient)
-                {{ $recipient->sent_at?->format('Y-m-d H:i') }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($recipient->sent_at)?->format('Y-m-d H:i') }}
             @endscope
             @scope('cell_unsubscribed_at', $recipient)
-                {{ $recipient->unsubscribed_at?->format('Y-m-d H:i') }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($recipient->unsubscribed_at)?->format('Y-m-d H:i') }}
             @endscope
         </x-mary-table>
     </x-mary-card>

@@ -8,7 +8,7 @@
             <form method="dialog">
                 <!-- if there is a button in form, it will close the modal -->
                 <button class="btn">Cancel</button>
-                <button wire:click="delete({{ $id }})" class="btn btn-error text-white">Delete {{ $deleting ?? $model }}</button>
+                <button wire:click="delete({{ \Illuminate\Support\Js::from($id) }})" class="btn btn-error text-white">Delete {{ $deleting ?? $model }}</button>
             </form>
         </div>
     </div>

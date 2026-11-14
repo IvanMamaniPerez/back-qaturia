@@ -24,7 +24,7 @@
                 <div class="flex gap-1 justify-end">
                     <x-mary-button icon="o-eye" link="{{ url(route('laravel-crm.chat-widgets.show', $w)) }}" class="btn-sm btn-square btn-outline" />
                     <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.chat-widgets.edit', $w)) }}" class="btn-sm btn-square btn-outline" />
-                    <x-mary-button wire:click="delete({{ $w->id }})" icon="o-trash" class="btn-sm btn-square btn-error text-white" wire:confirm="Delete widget?" spinner />
+                    <x-mary-button wire:click="delete({{ \Illuminate\Support\Js::from($w->id) }})" icon="o-trash" class="btn-sm btn-square btn-error text-white" wire:confirm="Delete widget?" spinner />
                 </div>
             @endscope
         </x-mary-table>

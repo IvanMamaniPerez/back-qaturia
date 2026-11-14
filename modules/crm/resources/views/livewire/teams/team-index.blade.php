@@ -33,7 +33,7 @@
                 <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.teams.edit', $team)) }}" class="btn-sm btn-square btn-outline" />
             @endcan
             @can('delete crm teams')
-                <x-mary-button onclick="modalDeleteLead{{ $team->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteTeam{{ $team->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="team" id="{{ $team->id }}" />
             @endcan
             @endscope
@@ -43,7 +43,7 @@
     {{-- FILTERS --}}
     <x-mary-drawer wire:model="showFilters" title="Filters" class="lg:w-1/3" right separator with-close-button>
         <div class="grid gap-5" @keydown.enter="$wire.showFilters = false">
-            <x-mary-choices label="Owner" wire:model.live="team_id" :options="$users" icon="o-user" inline searchable search-function="searchUsers" clearable />
+            <x-mary-choices label="Owner" wire:model.live="user_id" :options="$users" icon="o-user" inline searchable search-function="searchUsers" clearable />
             <x-mary-choices label="Label" wire:model.live="label_id" :options="$labels" icon="o-tag" inline allow-all />
         </div>
 

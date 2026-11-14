@@ -10,6 +10,7 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Pipeline;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class InvoiceRelatedIndex extends Component
 {
@@ -46,7 +47,7 @@ class InvoiceRelatedIndex extends Component
             ['key' => 'issue_date', 'label' => ucwords(__('laravel-crm::lang.date')), 'format' => fn ($row, $field) => $field?->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d'))],
             ['key' => 'due_date', 'label' => ucwords(__('laravel-crm::lang.due_date')), 'format' => fn ($row, $field) => $field?->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d'))],
             ['key' => 'total', 'label' => ucfirst(__('laravel-crm::lang.total')), 'format' => fn ($row, $field) => money($field, $row->currency)],
-            ['key' => 'fully_paid_at', 'label' => ucwords(__('laravel-crm::lang.paid_date')), 'format' => fn ($row, $field) => $field?->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d'))],
+            ['key' => 'fully_paid_at', 'label' => ucwords(__('laravel-crm::lang.paid_date')), 'format' => fn ($row, $field) => CrmDateTime::local($field)?->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d'))],
             ['key' => 'amount_paid', 'label' => ucfirst(__('laravel-crm::lang.paid')), 'format' => fn ($row, $field) => money($field, $row->currency)],
             ['key' => 'amount_due', 'label' => ucfirst(__('laravel-crm::lang.due')), 'format' => fn ($row, $field) => money($field, $row->currency)],
             ['key' => 'overdue_by', 'label' => ucfirst(__('laravel-crm::lang.overdue_by')), 'sortable' => false],

@@ -54,7 +54,7 @@ class PayInvoice extends Component
         $this->invoice->update([
             'amount_paid' => $this->amount_paid + ($this->invoice->amount_paid / 100),
             'amount_due' => $this->amount_due,
-            'fully_paid_at' => (($this->amount_due == 0) ? Carbon::now()->format($this->dateFormat()) : null),
+            'fully_paid_at' => (($this->amount_due == 0) ? Carbon::now('UTC') : null),
         ]);
 
         $this->notify(

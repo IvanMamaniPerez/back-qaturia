@@ -3,12 +3,12 @@
 namespace VentureDrake\LaravelCrm\Notifications;
 
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\Meeting;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class MeetingReminderNotification extends Notification
 {
@@ -52,7 +52,7 @@ class MeetingReminderNotification extends Notification
     public function toMail($notifiable)
     {
         $mailMessage = new MailMessage;
-        $subject = 'MEETING REMINDER: '.$this->meeting->name.' ('.Carbon::parse($this->meeting->start_at)->format('M d, Y \\@ h:i A').')';
+        $subject = 'MEETING REMINDER: '.$this->meeting->name.' ('.CrmDateTime::local($this->meeting->start_at)->format('M d, Y \\@ h:i A').')';
         $greeting = 'Hi '.$this->user->name.',';
 
         $mailMessage
@@ -61,7 +61,7 @@ class MeetingReminderNotification extends Notification
 
         $mailMessage->line(new HtmlString('<strong>THIS MEETING IS COMING UP:</strong>'));
         $mailMessage->line(new HtmlString('<strong>'.$this->meeting->name.'</strong>'));
-        $mailMessage->line(new HtmlString('Starting: '.Carbon::parse($this->meeting->start_at)->format('M d, Y \\@ h:i A').'<br />Ending: '.Carbon::parse($this->meeting->finish_at)->format('M d, Y \\@ h:i A').'<br />Location: '.$this->meeting->location));
+        $mailMessage->line(new HtmlString('Starting: '.CrmDateTime::local($this->meeting->start_at)->format('M d, Y \\@ h:i A').'<br />Ending: '.CrmDateTime::local($this->meeting->finish_at)->format('M d, Y \\@ h:i A').'<br />Location: '.$this->meeting->location));
         $mailMessage->line(new HtmlString($this->meeting->description));
 
         if ($this->meeting->meetingable) {

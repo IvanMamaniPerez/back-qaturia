@@ -3,12 +3,12 @@
 namespace VentureDrake\LaravelCrm\Notifications;
 
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\Call;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class CallReminderNotification extends Notification
 {
@@ -52,7 +52,7 @@ class CallReminderNotification extends Notification
     public function toMail($notifiable)
     {
         $mailMessage = new MailMessage;
-        $subject = 'CALL REMINDER: '.$this->call->name.' ('.Carbon::parse($this->call->start_at)->format('M d, Y \\@ h:i A').')';
+        $subject = 'CALL REMINDER: '.$this->call->name.' ('.CrmDateTime::local($this->call->start_at)->format('M d, Y \\@ h:i A').')';
         $greeting = 'Hi '.$this->user->name.',';
 
         $mailMessage
@@ -61,7 +61,7 @@ class CallReminderNotification extends Notification
 
         $mailMessage->line(new HtmlString('<strong>THIS CALL IS COMING UP:</strong>'));
         $mailMessage->line(new HtmlString('<strong>'.$this->call->name.'</strong>'));
-        $mailMessage->line(new HtmlString('Starting: '.Carbon::parse($this->call->start_at)->format('M d, Y \\@ h:i A').'<br />Ending: '.Carbon::parse($this->call->finish_at)->format('M d, Y \\@ h:i A').'<br />Location: '.$this->call->location));
+        $mailMessage->line(new HtmlString('Starting: '.CrmDateTime::local($this->call->start_at)->format('M d, Y \\@ h:i A').'<br />Ending: '.CrmDateTime::local($this->call->finish_at)->format('M d, Y \\@ h:i A').'<br />Location: '.$this->call->location));
         $mailMessage->line(new HtmlString($this->call->description));
 
         if ($this->call->callable) {

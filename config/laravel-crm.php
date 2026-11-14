@@ -42,7 +42,7 @@ return [
     |
     */
 
-    'teams' => env('LARAVEL_CRM_TEAMS', false),
+    'teams' => env('LARAVEL_CRM_TEAMS', true),
 
     /*
     |--------------------------------------------------------------------------

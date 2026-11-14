@@ -4,7 +4,7 @@
     $signedAction = url()->current().'?signature='.request()->input('signature').'&expires='.request()->input('expires');
     $isPaid = (bool) $invoice->fully_paid_at;
     $now = \Carbon\Carbon::now()->timezone($timezone);
-    $isExpired = ! $isPaid && $invoice->due_date && $invoice->due_date < $now;
+    $isExpired = ! $isPaid && $invoice->due_date && \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date) < \VentureDrake\LaravelCrm\Support\CrmDateTime::today();
 
     if ($isPaid) {
         $statusLabel = ucfirst(__('laravel-crm::lang.paid'));

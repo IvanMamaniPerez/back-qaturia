@@ -12,6 +12,8 @@ class XeroItem extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = ['updated_date' => 'datetime'];
+
     public function getTable()
     {
         return config('laravel-crm.db_table_prefix').'xero_items';

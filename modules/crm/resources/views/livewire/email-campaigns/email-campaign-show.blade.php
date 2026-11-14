@@ -25,7 +25,7 @@
             @endif
             <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.preview')) }}" wire:click="openPreview" spinner="openPreview" />
             @can('delete crm email-campaigns')
-                <x-mary-button onclick="modalDeleteEmailCampaign{{ $campaign->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" />
+                <x-mary-button onclick="document.getElementById('modalDeleteEmailCampaign{{ $campaign->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" />
                 <x-crm-delete-confirm model="emailCampaign" id="{{ $campaign->id }}" deleting="email campaign" />
             @endcan
             <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.back')) }}" link="{{ route('laravel-crm.email-campaigns.index') }}" />
@@ -47,11 +47,11 @@
             </div>
             <div>
                 <div class="text-xs text-base-content/60">{{ ucfirst(__('laravel-crm::lang.scheduled_at')) }}</div>
-                <div>{{ $campaign->scheduled_at?->format('Y-m-d H:i') }} {{ $campaign->timezone }}</div>
+                <div>{{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($campaign->scheduled_at)?->format('Y-m-d H:i') }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::timezone() }}</div>
             </div>
             <div>
                 <div class="text-xs text-base-content/60">{{ ucfirst(__('laravel-crm::lang.sent_at')) }}</div>
-                <div>{{ $campaign->sent_at?->format('Y-m-d H:i') ?? '—' }}</div>
+                <div>{{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($campaign->sent_at)?->format('Y-m-d H:i') ?? '—' }}</div>
             </div>
             <div>
                 <div class="text-xs text-base-content/60">{{ ucfirst(__('laravel-crm::lang.email_template')) }}</div>
@@ -68,10 +68,10 @@
                 <x-mary-badge :value="ucfirst($recipient->status)" class="badge-neutral text-white" />
             @endscope
             @scope('cell_sent_at', $recipient)
-                {{ $recipient->sent_at?->format('Y-m-d H:i') }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($recipient->sent_at)?->format('Y-m-d H:i') }}
             @endscope
             @scope('cell_unsubscribed_at', $recipient)
-                {{ $recipient->unsubscribed_at?->format('Y-m-d H:i') }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($recipient->unsubscribed_at)?->format('Y-m-d H:i') }}
             @endscope
         </x-mary-table>
     </x-mary-card>

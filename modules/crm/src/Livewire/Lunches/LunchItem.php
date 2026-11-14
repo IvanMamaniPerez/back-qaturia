@@ -7,6 +7,7 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Lunch;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class LunchItem extends Component
 {
@@ -54,8 +55,8 @@ class LunchItem extends Component
     {
         $this->name = $this->lunch->name ?? '';
         $this->description = $this->lunch->description;
-        $this->start_at = $this->lunch->start_at?->format('Y-m-d\TH:i');
-        $this->finish_at = $this->lunch->finish_at?->format('Y-m-d\TH:i');
+        $this->start_at = CrmDateTime::local($this->lunch->start_at)?->format('Y-m-d\TH:i');
+        $this->finish_at = CrmDateTime::local($this->lunch->finish_at)?->format('Y-m-d\TH:i');
         $this->location = $this->lunch->location;
         $this->user_owner_id = $this->lunch->user_owner_id;
         $this->user_assigned_id = $this->lunch->user_assigned_id;
@@ -86,8 +87,8 @@ class LunchItem extends Component
         $this->lunch->update([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->normalizeDatetime($this->start_at),
-            'finish_at' => $this->normalizeDatetime($this->finish_at),
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
             'user_owner_id' => $this->user_owner_id,
             'user_assigned_id' => $this->user_assigned_id,
@@ -122,11 +123,6 @@ class LunchItem extends Component
 
         $this->dispatch('lunch-updated');
         $this->dispatch('activity-logged');
-    }
-
-    private function normalizeDatetime(?string $value): ?string
-    {
-        return $value ? str_replace('T', ' ', $value) : null;
     }
 
     public function render()

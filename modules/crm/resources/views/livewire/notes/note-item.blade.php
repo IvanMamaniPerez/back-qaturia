@@ -33,7 +33,7 @@
                         @endif
                     @endcan
                     @can('delete crm notes')
-                        <x-mary-menu-item onclick="modalDeleteNoteItem{{ $note->id }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                        <x-mary-menu-item onclick="document.getElementById('modalDeleteNoteItem{{ $note->id }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                     @endcan
                 </x-mary-dropdown>
             @endcanany
@@ -59,7 +59,7 @@
 
             @if($note->noted_at)
                 <div>
-                    <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.noted_at')) }} {{ $note->noted_at->format('h:i A') }} on {{ $note->noted_at->toFormattedDateString() }}" class="badge-soft badge-sm" />
+                    <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.noted_at')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($note->noted_at)->format('h:i A') }} on {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($note->noted_at)->toFormattedDateString() }}" class="badge-soft badge-sm" />
                 </div>
             @endif
 

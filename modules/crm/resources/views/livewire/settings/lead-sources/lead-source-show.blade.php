@@ -6,7 +6,7 @@
                 <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.lead-sources.edit', $leadSource)) }}" class="btn-sm btn-square btn-outline" />
             @endcan
             @can('delete crm lead sources')
-                <x-mary-button onclick="modalDeleteLeadSource{{ $leadSource->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteLeadSource{{ $leadSource->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="leadSource" id="{{ $leadSource->id }}" />
             @endcan
         </x-slot:actions>

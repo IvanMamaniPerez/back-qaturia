@@ -8,6 +8,7 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use Ramsey\Uuid\Uuid;
 use VentureDrake\LaravelCrm\Models\Note;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class NoteRelated extends Component
 {
@@ -38,7 +39,7 @@ class NoteRelated extends Component
         $note = $this->model->notes()->create([
             'external_id' => Uuid::uuid4()->toString(),
             'content' => $data['content'],
-            'noted_at' => $this->noted_at,
+            'noted_at' => CrmDateTime::fromLocal($this->noted_at, 'noted_at'),
         ]);
 
         $this->model->activities()->create([

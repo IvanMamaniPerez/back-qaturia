@@ -19,6 +19,7 @@ use Livewire\WithPagination;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\UserInvitation;
 use VentureDrake\LaravelCrm\Notifications\UserInvitationNotification;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Support\TeamMembership;
 use VentureDrake\LaravelCrm\Traits\ClearsProperties;
 use VentureDrake\LaravelCrm\Traits\ResetsPaginationWhenPropsChanges;
@@ -74,7 +75,7 @@ class UserIndex extends Component
         return [
             ['key' => 'name', 'label' => ucfirst(__('laravel-crm::lang.name'))],
             ['key' => 'email', 'label' => ucfirst(__('laravel-crm::lang.email'))],
-            ['key' => 'email_verified_at', 'label' => ucwords(__('laravel-crm::lang.email_verified')), 'format' => fn ($row, $field) => ($field) ? $field->format($this->dateFormat) : null],
+            ['key' => 'email_verified_at', 'label' => ucwords(__('laravel-crm::lang.email_verified')), 'format' => fn ($row, $field) => ($field) ? CrmDateTime::local($field)->format($this->dateFormat) : null],
             ['key' => 'crm_access', 'label' => ucfirst(__('laravel-crm::lang.CRM_Access')), 'format' => fn ($row, $field) => $field ? ucfirst(__('laravel-crm::lang.yes')) : ucfirst(__('laravel-crm::lang.no'))],
             ['key' => 'role', 'label' => ucfirst(__('laravel-crm::lang.role')), 'sortable' => false],
             ['key' => 'created_at', 'label' => ucfirst(__('laravel-crm::lang.created')), 'format' => fn ($row, $field) => $field->diffForHumans()],

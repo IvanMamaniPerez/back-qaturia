@@ -50,7 +50,7 @@
                     @if(auth()->user()->id == $user->id)
                         <x-mary-button icon="o-trash" class="btn-sm btn-square btn-error" disabled />
                     @else
-                        <x-mary-button onclick="modalDeleteUser{{ $user->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                        <x-mary-button onclick="document.getElementById('modalDeleteUser{{ $user->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                         <x-crm-delete-confirm model="user" id="{{ $user->id }}" />
                     @endif
                 @endcan
@@ -84,8 +84,8 @@
                         {{ $row->expires_at?->diffForHumans() ?? '—' }}
                     @endscope
                     @scope('actions', $row)
-                        <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.resend_invitation')) }}" icon="o-paper-airplane" wire:click="resendInvitation({{ $row->id }})" class="btn-sm btn-outline" spinner />
-                        <x-mary-button icon="o-trash" wire:click="deleteInvitation({{ $row->id }})" wire:confirm class="btn-sm btn-square btn-error text-white" spinner />
+                        <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.resend_invitation')) }}" icon="o-paper-airplane" wire:click="resendInvitation({{ \Illuminate\Support\Js::from($row->id) }})" class="btn-sm btn-outline" spinner />
+                        <x-mary-button icon="o-trash" wire:click="deleteInvitation({{ \Illuminate\Support\Js::from($row->id) }})" wire:confirm class="btn-sm btn-square btn-error text-white" spinner />
                     @endscope
 
                     <x-slot:empty>

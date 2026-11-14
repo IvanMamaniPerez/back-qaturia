@@ -23,6 +23,8 @@ class Delivery extends Model
     protected $casts = [
         'delivery_expected' => 'datetime',
         'delivered_on' => 'datetime',
+        'delivery_initiated' => 'datetime',
+        'delivery_shipped' => 'datetime',
     ];
 
     protected $searchable = [

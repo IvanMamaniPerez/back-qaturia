@@ -51,7 +51,7 @@
                 {{ $monitor->last_response_time !== null ? $monitor->last_response_time.' ms' : '—' }}
             @endscope
             @scope('cell_last_checked_at', $monitor)
-                {{ $monitor->last_checked_at?->format('Y-m-d H:i') ?? '—' }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($monitor->last_checked_at)?->format('Y-m-d H:i') ?? '—' }}
             @endscope
             @scope('actions', $monitor)
                 <div class="flex gap-1 justify-end">
@@ -62,7 +62,7 @@
                         <x-mary-button icon="o-pencil-square" link="{{ route('laravel-crm.monitors.edit', $monitor) }}" class="btn-sm btn-square btn-outline" />
                     @endcan
                     @can('delete crm monitors')
-                        <x-mary-button onclick="modalDeleteMonitor{{ $monitor->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" />
+                        <x-mary-button onclick="document.getElementById('modalDeleteMonitor{{ $monitor->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" />
                         <x-crm-delete-confirm model="monitor" id="{{ $monitor->id }}" deleting="monitor" />
                     @endcan
                 </div>

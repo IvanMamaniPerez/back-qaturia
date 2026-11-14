@@ -20,7 +20,7 @@
 | **Name** | {{ $visitor?->name ?: '—' }} |
 | **Email** | {{ $visitor?->email ?: '—' }} |
 | **Conversation** | {{ $conversation->chat_id }} |
-| **Sent** | {{ $message->created_at->format('d M Y, H:i') }} |
+| **Sent** | {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($message->created_at)->format('d M Y, H:i') }} |
 @endcomponent
 
 @component('mail::button', ['url' => url(route('laravel-crm.chat.show', $conversation))])

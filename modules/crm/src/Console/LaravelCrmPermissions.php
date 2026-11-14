@@ -3,9 +3,9 @@
 namespace VentureDrake\LaravelCrm\Console;
 
 use App\Models\Role;
-use DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\PermissionRegistrar;
 use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmPermissionsSeeder;

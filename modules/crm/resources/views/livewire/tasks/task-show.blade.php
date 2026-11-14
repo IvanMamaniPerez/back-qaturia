@@ -20,7 +20,7 @@
                 <x-mary-button link="{{ url(route('laravel-crm.tasks.edit', $task)) }}" icon="o-pencil-square" class="btn-sm btn-square btn-outline" responsive />
             @endcan
             @can('delete crm tasks')
-                <x-mary-button onclick="modalDeleteTask{{ $task->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteTask{{ $task->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="task" id="{{ $task->id }}" />
             @endcan
         </x-slot:actions>

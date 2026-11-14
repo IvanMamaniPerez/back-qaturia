@@ -6,7 +6,7 @@
                 <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.pipeline-stages.edit', $pipelineStage)) }}" class="btn-sm btn-square btn-outline" />
             @endcan
             @can('delete crm pipelines')
-                <x-mary-button onclick="modalDeletePipelineStage{{ $pipelineStage->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeletePipelineStage{{ $pipelineStage->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="pipelineStage" id="{{ $pipelineStage->id }}" deleting="pipeline stage" />
             @endcan
         </x-slot:actions>

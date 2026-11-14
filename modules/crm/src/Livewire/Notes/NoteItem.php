@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Note;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class NoteItem extends Component
 {
@@ -40,7 +41,7 @@ class NoteItem extends Component
     private function hydrateFromRecord(): void
     {
         $this->content = $this->note->content ?? '';
-        $this->noted_at = $this->note->noted_at?->toDateTimeString();
+        $this->noted_at = CrmDateTime::local($this->note->noted_at)?->toDateTimeString();
     }
 
     public function edit(): void
@@ -64,7 +65,7 @@ class NoteItem extends Component
 
         $this->note->update([
             'content' => $this->content,
-            'noted_at' => $this->noted_at,
+            'noted_at' => CrmDateTime::fromLocal($this->noted_at, 'noted_at'),
         ]);
 
         $this->dispatch('note-updated');

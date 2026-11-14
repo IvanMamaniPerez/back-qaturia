@@ -8,7 +8,7 @@
                 <x-mary-button link="{{ url(route('laravel-crm.teams.edit', $team)) }}" icon="o-pencil-square" class="btn-sm btn-square btn-outline" responsive />
             @endcan
             @can('delete crm teams')
-                <x-mary-button onclick="modalDeleteTeam{{ $team->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteTeam{{ $team->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="team" id="{{ $team->id }}" />
             @endcan
         </x-slot:actions>

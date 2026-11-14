@@ -13,6 +13,7 @@ class ChatMessage extends Model
 
     protected $casts = [
         'read_at' => 'datetime',
+        'visitor_read_at' => 'datetime',
     ];
 
     public function getTable()

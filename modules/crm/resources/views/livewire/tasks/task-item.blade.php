@@ -10,10 +10,10 @@
                         <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.pending')) }}" class="badge-sm badge-primary" />
                     @endif
                     @if($task->start_at)
-                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.start_at')) }} {{ $task->start_at->format('h:i A') }} {{ __('laravel-crm::lang.on') }} {{ $task->start_at->toFormattedDateString() }}" class="badge-soft badge-sm" />
+                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.start_at')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($task->start_at)->format('h:i A') }} {{ __('laravel-crm::lang.on') }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($task->start_at)->toFormattedDateString() }}" class="badge-soft badge-sm" />
                     @endif
                     @if($task->due_at)
-                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.due')) }} {{ $task->due_at->format('h:i A') }} {{ __('laravel-crm::lang.on') }} {{ $task->due_at->toFormattedDateString() }}" class="badge-soft badge-sm" />
+                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.due')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($task->due_at)->format('h:i A') }} {{ __('laravel-crm::lang.on') }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($task->due_at)->toFormattedDateString() }}" class="badge-soft badge-sm" />
                     @endif
                 </div>
                 @if($related)
@@ -45,7 +45,7 @@
                             @endif
                         @endcan
                         @can('delete crm tasks')
-                            <x-mary-menu-item onclick="modalDeleteTaskItem{{ $task->id }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                            <x-mary-menu-item onclick="document.getElementById('modalDeleteTaskItem{{ $task->id }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                         @endcan
                     </x-mary-dropdown>
                 @endcanany

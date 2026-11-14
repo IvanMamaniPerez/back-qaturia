@@ -31,10 +31,10 @@
                 <x-mary-badge :value="ucfirst($campaign->status)" class="badge-neutral text-white" />
             @endscope
             @scope('cell_scheduled_at', $campaign)
-                {{ $campaign->scheduled_at?->format('Y-m-d H:i') }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($campaign->scheduled_at)?->format('Y-m-d H:i') }}
             @endscope
             @scope('cell_sent_at', $campaign)
-                {{ $campaign->sent_at?->format('Y-m-d H:i') }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($campaign->sent_at)?->format('Y-m-d H:i') }}
             @endscope
             @scope('actions', $campaign)
                 <div class="flex gap-1 justify-end">
@@ -47,7 +47,7 @@
                         @endif
                     @endcan
                     @can('delete crm sms-campaigns')
-                        <x-mary-button onclick="modalDeleteSmsCampaign{{ $campaign->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                        <x-mary-button onclick="document.getElementById('modalDeleteSmsCampaign{{ $campaign->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                         <x-crm-delete-confirm model="smsCampaign" id="{{ $campaign->id }}" deleting="sms campaign" />
                     @endcan
                 </div>

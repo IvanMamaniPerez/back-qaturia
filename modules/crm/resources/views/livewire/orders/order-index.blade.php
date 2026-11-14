@@ -135,7 +135,7 @@
                         <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.orders.edit', $order)) }}" class="btn-sm btn-square btn-outline" />
                     @endcan
                     @can('delete crm orders')
-                        <x-mary-button onclick="modalDeleteOrder{{ $order->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                        <x-mary-button onclick="document.getElementById('modalDeleteOrder{{ $order->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                         <x-crm-delete-confirm model="order" id="{{ $order->id }}" />
                     @endcan
                 </div>

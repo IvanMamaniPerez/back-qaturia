@@ -12,6 +12,8 @@ class XeroInvoice extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = ['fully_paid_at' => 'datetime', 'xero_updated_at' => 'datetime'];
+
     public function getTable()
     {
         return config('laravel-crm.db_table_prefix').'xero_invoices';

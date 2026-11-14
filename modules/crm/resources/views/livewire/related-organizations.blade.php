@@ -39,7 +39,7 @@
                             @foreach($organizations as $organization)
                                 <x-mary-list-item
                                     wire:key="org-option-{{ $organization->id }}"
-                                    wire:click="linkOrganization({{ $organization->id }})"
+                                    wire:click="linkOrganization({{ \Illuminate\Support\Js::from($organization->id) }})"
                                     @click="open = false"
                                     :item="$organization"
                                     class="cursor-pointer"
@@ -77,7 +77,7 @@
                         </div>
                         <div>
                             @can('update', $model)
-                                <x-mary-button wire:click="remove({{ $contact->entityable->id }})" class="btn-xs btn-error btn-square text-white" type="button" icon="fas.x" />
+                                <x-mary-button wire:click="remove({{ \Illuminate\Support\Js::from($contact->entityable->id) }})" class="btn-xs btn-error btn-square text-white" type="button" icon="fas.x" />
                             @endcan
                         </div>
                     </div>

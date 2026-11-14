@@ -28,7 +28,7 @@ class UpdateSettingRequest extends FormRequest
             'country' => 'required',
             'language' => 'required',
             'currency' => 'required',
-            'timezone' => 'required',
+            'timezone' => 'required|timezone',
             'date_format' => 'required',
             'time_format' => 'required',
         ];

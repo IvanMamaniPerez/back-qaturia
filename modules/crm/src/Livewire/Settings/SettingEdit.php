@@ -193,7 +193,7 @@ class SettingEdit extends Component
             'country' => 'required',
             'language' => 'required',
             'currency' => 'required',
-            'timezone' => 'required',
+            'timezone' => 'required|timezone',
             'dateFormat' => 'required',
             'timeFormat' => 'required',
             'logoFile' => 'nullable|image|max:1024',

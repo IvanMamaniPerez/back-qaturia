@@ -6,7 +6,7 @@
                 <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.tax-rates.edit', $taxRate)) }}" class="btn-sm btn-square btn-outline" />
             @endcan
             @can('delete crm tax rates')
-                <x-mary-button onclick="modalDeleteTaxRate{{ $taxRate->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteTaxRate{{ $taxRate->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="taxRate" id="{{ $taxRate->id }}" deleting="tax rate" />
             @endcan
         </x-slot:actions>

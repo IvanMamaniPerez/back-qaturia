@@ -8,16 +8,16 @@
             @endif
             @if($invoice->fully_paid_at)
                 <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.paid')) }}" class="badge badge-sm badge-success text-white" />
-            @elseif(! $invoice->fully_paid_at && $invoice->due_date && $invoice->due_date->isToday())
+            @elseif(! $invoice->fully_paid_at && $invoice->due_date && \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->isToday())
                 <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.due_today')) }}" class="badge badge-sm badge-secondary text-white" />
-            @elseif(! $invoice->fully_paid_at && $invoice->due_date && $invoice->due_date->isTomorrow())
+            @elseif(! $invoice->fully_paid_at && $invoice->due_date && \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->isTomorrow())
                 <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.due_tomorrow')) }}" class="badge badge-sm badge-secondary text-white" />
-            @elseif(! $invoice->fully_paid_at && $invoice->due_date && $invoice->due_date->isYesterday())
+            @elseif(! $invoice->fully_paid_at && $invoice->due_date && \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->isYesterday())
                 <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.due_yesterday')) }}" class="badge badge-sm badge-secondary text-white" />
-            @elseif(! $invoice->fully_paid_at && $invoice->due_date && abs($invoice->due_date->diffInDays()) > 0  && $invoice->due_date >= \Carbon\Carbon::now()->timezone($timezone))
-                <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.due')) }} {{ $invoice->due_date->diffForHumans() }}" class="badge badge-sm badge-secondary text-white" />
-            @elseif(! $invoice->fully_paid_at && $invoice->due_date && abs($invoice->due_date->diffInDays()) > 0  && $invoice->due_date < \Carbon\Carbon::now()->timezone($timezone))
-                <x-mary-badge value="{{ $invoice->due_date->diffForHumans() }} {{ ucfirst(__('laravel-crm::lang.overdue')) }}" class="badge badge-sm badge-error text-white" />
+            @elseif(! $invoice->fully_paid_at && $invoice->due_date && abs(\VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->diffInDays(\VentureDrake\LaravelCrm\Support\CrmDateTime::today())) > 0  && \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date) >= \VentureDrake\LaravelCrm\Support\CrmDateTime::today())
+                <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.due')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->diffForHumans(\VentureDrake\LaravelCrm\Support\CrmDateTime::today()) }}" class="badge badge-sm badge-secondary text-white" />
+            @elseif(! $invoice->fully_paid_at && $invoice->due_date && abs(\VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->diffInDays(\VentureDrake\LaravelCrm\Support\CrmDateTime::today())) > 0  && \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date) < \VentureDrake\LaravelCrm\Support\CrmDateTime::today())
+                <x-mary-badge value="{{ \VentureDrake\LaravelCrm\Support\CrmDateTime::civil($invoice->due_date)->diffForHumans(\VentureDrake\LaravelCrm\Support\CrmDateTime::today()) }} {{ ucfirst(__('laravel-crm::lang.overdue')) }}" class="badge badge-sm badge-error text-white" />
             @endif
         </x-slot:title>
         <x-slot:badges>
@@ -80,7 +80,7 @@
                         <x-mary-button link="{{ url(route('laravel-crm.invoices.edit', $invoice)) }}" icon="o-pencil-square" class="btn-sm btn-square btn-outline" responsive />
                     @endcan
                     @can('delete crm invoices')
-                        <x-mary-button onclick="modalDeleteInvoice{{ $invoice->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                        <x-mary-button onclick="document.getElementById('modalDeleteInvoice{{ $invoice->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                         <x-crm-delete-confirm model="invoice" id="{{ $invoice->id }}" />           
                     @endcan
                 @endif

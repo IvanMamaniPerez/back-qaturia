@@ -8,10 +8,10 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{
     snap15(el) {
         if (!el.value) return;
-        const d = new Date(el.value);
-        d.setMinutes(Math.round(d.getMinutes() / 15) * 15, 0, 0);
+        const d = new Date(el.value + 'Z');
+        d.setUTCMinutes(Math.round(d.getUTCMinutes() / 15) * 15, 0, 0);
         const p = n => String(n).padStart(2, '0');
-        el.value = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+        el.value = `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())}T${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
         el.dispatchEvent(new Event('input'));
     }
 }">

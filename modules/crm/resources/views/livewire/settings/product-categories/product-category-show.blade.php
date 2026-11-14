@@ -6,7 +6,7 @@
                 <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.product-categories.edit', $productCategory)) }}" class="btn-sm btn-square btn-outline" />
             @endcan
             @can('delete crm product categories')
-                <x-mary-button onclick="modalDeleteProductCategory{{ $productCategory->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteProductCategory{{ $productCategory->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="productCategory" id="{{ $productCategory->id }}" deleting="product category" />
             @endcan
         </x-slot:actions>

@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use VentureDrake\LaravelCrm\Models\Monitor;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class MonitorDownNotification extends Notification
 {
@@ -47,7 +48,7 @@ class MonitorDownNotification extends Notification
         }
 
         if ($this->monitor->down_since_at) {
-            $mail->line('Down since: '.$this->monitor->down_since_at->toDateTimeString().' UTC');
+            $mail->line('Down since: '.CrmDateTime::local($this->monitor->down_since_at)->toDateTimeString().' '.CrmDateTime::timezone());
         }
 
         return $mail;

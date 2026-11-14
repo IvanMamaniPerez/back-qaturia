@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use VentureDrake\LaravelCrm\Models\Monitor;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class MonitorSslExpiringNotification extends Notification
 {
@@ -41,7 +42,7 @@ class MonitorSslExpiringNotification extends Notification
         $expiresAt = $this->result['expires_at'] ?? $this->monitor->ssl_expires_at;
 
         if ($expiresAt instanceof Carbon) {
-            $mail->line('Expires at: '.$expiresAt->toDateTimeString().' UTC');
+            $mail->line('Expires at: '.CrmDateTime::local($expiresAt)->toDateTimeString().' '.CrmDateTime::timezone());
         }
 
         if (! empty($this->result['issuer'])) {

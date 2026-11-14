@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Note;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\HasGlobalSettings;
 use VentureDrake\LaravelCrm\Traits\NotifyToast;
 
@@ -44,7 +45,7 @@ class LiveNote extends Component
     {
         $this->note = $note;
         $this->content = $note->content;
-        $this->noted_at = ($note->noted_at) ? $note->noted_at->format($this->dateFormat().' H:i') : null;
+        $this->noted_at = ($note->noted_at) ? CrmDateTime::local($note->noted_at)->format($this->dateFormat().' H:i') : null;
 
         if ($this->settingService->get('show_related_activity')->value == 1) {
             $this->showRelated = true;
@@ -73,7 +74,7 @@ class LiveNote extends Component
         $this->validate();
         $this->note->update([
             'content' => $this->content,
-            'noted_at' => $this->noted_at,
+            'noted_at' => CrmDateTime::fromLocal($this->noted_at, 'noted_at'),
         ]);
         $this->toggleEditMode();
         $this->emit('refreshComponent');

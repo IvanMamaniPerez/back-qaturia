@@ -2,7 +2,6 @@
 
 namespace VentureDrake\LaravelCrm\Livewire;
 
-use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Activity;
@@ -17,6 +16,7 @@ use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class Dashboard extends Component
 {
@@ -52,17 +52,17 @@ class Dashboard extends Component
     protected function getDateRange(): array
     {
         return match ($this->period) {
-            'today' => [today()->startOfDay(), today()->endOfDay()],
-            'yesterday' => [today()->subDay()->startOfDay(), today()->subDay()->endOfDay()],
-            'last_7_days' => [today()->subDays(6)->startOfDay(), now()],
-            'this_month' => [today()->startOfMonth()->startOfDay(), now()],
-            'last_month' => [today()->subMonth()->startOfMonth()->startOfDay(), today()->subMonth()->endOfMonth()->endOfDay()],
-            'this_quarter' => [today()->startOfQuarter()->startOfDay(), now()],
-            'last_quarter' => [today()->subQuarter()->startOfQuarter()->startOfDay(), today()->subQuarter()->endOfQuarter()->endOfDay()],
-            'this_year' => [today()->startOfYear()->startOfDay(), now()],
-            'last_year' => [today()->subYear()->startOfYear()->startOfDay(), today()->subYear()->endOfYear()->endOfDay()],
-            'all_time' => [Carbon::parse('2000-01-01'), now()],
-            default => [today()->startOfMonth()->startOfDay(), now()],
+            'today' => [CrmDateTime::today()->startOfDay(), CrmDateTime::today()->endOfDay()],
+            'yesterday' => [CrmDateTime::today()->subDay()->startOfDay(), CrmDateTime::today()->subDay()->endOfDay()],
+            'last_7_days' => [CrmDateTime::today()->subDays(6)->startOfDay(), CrmDateTime::now()],
+            'this_month' => [CrmDateTime::today()->startOfMonth()->startOfDay(), CrmDateTime::now()],
+            'last_month' => [CrmDateTime::today()->subMonthNoOverflow()->startOfMonth()->startOfDay(), CrmDateTime::today()->subMonthNoOverflow()->endOfMonth()->endOfDay()],
+            'this_quarter' => [CrmDateTime::today()->startOfQuarter()->startOfDay(), CrmDateTime::now()],
+            'last_quarter' => [CrmDateTime::today()->subQuarter()->startOfQuarter()->startOfDay(), CrmDateTime::today()->subQuarter()->endOfQuarter()->endOfDay()],
+            'this_year' => [CrmDateTime::today()->startOfYear()->startOfDay(), CrmDateTime::now()],
+            'last_year' => [CrmDateTime::today()->subYear()->startOfYear()->startOfDay(), CrmDateTime::today()->subYear()->endOfYear()->endOfDay()],
+            'all_time' => [CrmDateTime::civil('2000-01-01'), CrmDateTime::now()],
+            default => [CrmDateTime::today()->startOfMonth()->startOfDay(), CrmDateTime::now()],
         };
     }
 
@@ -83,7 +83,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return Lead::whereNull('converted_at')
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('created_at', CrmDateTime::databaseRange($start, $end))
             ->count();
     }
 
@@ -92,7 +92,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return (int) Lead::whereNull('converted_at')
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('created_at', CrmDateTime::databaseRange($start, $end))
             ->sum('amount');
     }
 
@@ -101,7 +101,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return Lead::whereNotNull('converted_at')
-            ->whereBetween('converted_at', [$start, $end])
+            ->whereBetween('converted_at', CrmDateTime::databaseRange($start, $end))
             ->count();
     }
 
@@ -137,7 +137,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return Deal::where('closed_status', 'won')
-            ->whereBetween('closed_at', [$start, $end])
+            ->whereBetween('closed_at', CrmDateTime::databaseRange($start, $end))
             ->count();
     }
 
@@ -146,7 +146,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return (int) Deal::where('closed_status', 'won')
-            ->whereBetween('closed_at', [$start, $end])
+            ->whereBetween('closed_at', CrmDateTime::databaseRange($start, $end))
             ->sum('amount');
     }
 
@@ -155,7 +155,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return Deal::where('closed_status', 'lost')
-            ->whereBetween('closed_at', [$start, $end])
+            ->whereBetween('closed_at', CrmDateTime::databaseRange($start, $end))
             ->count();
     }
 
@@ -204,7 +204,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return Invoice::whereNotNull('fully_paid_at')
-            ->whereBetween('fully_paid_at', [$start, $end])
+            ->whereBetween('fully_paid_at', CrmDateTime::databaseRange($start, $end))
             ->count();
     }
 
@@ -213,7 +213,7 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         return (int) Invoice::whereNotNull('fully_paid_at')
-            ->whereBetween('fully_paid_at', [$start, $end])
+            ->whereBetween('fully_paid_at', CrmDateTime::databaseRange($start, $end))
             ->sum('total');
     }
 
@@ -300,8 +300,8 @@ class Dashboard extends Component
         if ($granularity === 'hour') {
             $current = $start->copy();
             while ($current <= $end) {
-                $labels[] = $current->format('H:i');
-                $current->addHour();
+                $labels[] = $current->format('H:i P');
+                $current->setTimestamp($current->getTimestamp() + 3600);
             }
         } elseif ($granularity === 'day') {
             $period = CarbonPeriod::create($start->copy()->startOfDay(), $end->copy()->startOfDay());
@@ -349,7 +349,7 @@ class Dashboard extends Component
         }
 
         // Use PHP-side grouping for reliable results across MySQL versions
-        $records = $query->whereBetween($dateColumn, [$start, $end])
+        $records = $query->whereBetween($dateColumn, CrmDateTime::databaseRange($start, $end))
             ->orderBy($dateColumn)
             ->get();
 
@@ -359,10 +359,10 @@ class Dashboard extends Component
         }
 
         foreach ($records as $record) {
-            $date = Carbon::parse($record->$dateColumn);
+            $date = CrmDateTime::local($record->$dateColumn);
 
             if ($granularity === 'hour') {
-                $key = $date->format('H').':00';
+                $key = $date->format('H:00 P');
             } elseif ($granularity === 'day') {
                 $key = $date->format('M d');
             } elseif ($granularity === 'week') {
@@ -538,8 +538,8 @@ class Dashboard extends Component
         [$start, $end] = $this->getDateRange();
 
         $open = Deal::whereNull('closed_status')->count();
-        $won = Deal::where('closed_status', 'won')->whereBetween('closed_at', [$start, $end])->count();
-        $lost = Deal::where('closed_status', 'lost')->whereBetween('closed_at', [$start, $end])->count();
+        $won = Deal::where('closed_status', 'won')->whereBetween('closed_at', CrmDateTime::databaseRange($start, $end))->count();
+        $lost = Deal::where('closed_status', 'lost')->whereBetween('closed_at', CrmDateTime::databaseRange($start, $end))->count();
 
         return [
             'type' => 'doughnut',

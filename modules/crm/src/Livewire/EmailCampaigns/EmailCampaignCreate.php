@@ -9,6 +9,7 @@ use VentureDrake\LaravelCrm\Mail\EmailCampaignMessage;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
 use VentureDrake\LaravelCrm\Services\EmailCampaignService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class EmailCampaignCreate extends Component
 {
@@ -40,7 +41,7 @@ class EmailCampaignCreate extends Component
             'preview_text' => 'nullable|string|max:255',
             'body' => 'required|string',
             'send_mode' => 'required|in:now,schedule',
-            'scheduled_at' => 'required_if:send_mode,schedule|nullable|date|after:now',
+            'scheduled_at' => 'required_if:send_mode,schedule|nullable|date',
         ];
     }
 
@@ -69,6 +70,10 @@ class EmailCampaignCreate extends Component
         $this->authorize('create', EmailCampaign::class);
 
         $this->validate();
+
+        if ($this->send_mode === 'schedule') {
+            CrmDateTime::futureLocal($this->scheduled_at, 'scheduled_at');
+        }
 
         $campaign = $service->create([
             'name' => $this->name,

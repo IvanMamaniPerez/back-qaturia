@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\HasGlobalSettings;
 use VentureDrake\LaravelCrm\Traits\NotifyToast;
 
@@ -46,7 +47,7 @@ class LiveTask extends Component
         $this->task = $task;
         $this->name = $task->name;
         $this->description = $task->description;
-        $this->due_at = ($task->due_at) ? $task->due_at->format($this->dateFormat().' H:i') : null;
+        $this->due_at = ($task->due_at) ? CrmDateTime::local($task->due_at)->format($this->dateFormat().' H:i') : null;
 
         if ($this->settingService->get('show_related_activity')->value == 1) {
             $this->showRelated = true;
@@ -77,7 +78,7 @@ class LiveTask extends Component
         $this->task->update([
             'name' => $this->name,
             'description' => $this->description,
-            'due_at' => $this->due_at,
+            'due_at' => CrmDateTime::fromLocal($this->due_at, 'due_at'),
             'reminder_email' => 0,
             'reminder_sms' => 0,
         ]);

@@ -22,7 +22,7 @@
                 <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.features.edit', $feature)) }}" class="btn-sm btn-square btn-outline" />
             @endcan
             @can('delete crm features')
-                <x-mary-button onclick="modalDeleteFeature{{ $feature->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteFeature{{ $feature->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="feature" id="{{ $feature->id }}" />
             @endcan
         </x-slot:actions>

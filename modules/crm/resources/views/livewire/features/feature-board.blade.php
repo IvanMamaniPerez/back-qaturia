@@ -41,7 +41,7 @@
                                                     <x-mary-menu-item link="{{ route('laravel-crm.features.edit', ['feature' => $record['id']]) }}" title="{{ ucfirst(__('laravel-crm::lang.edit')) }}" />
                                                 @endcan
                                                 @can('delete crm features')
-                                                    <x-mary-menu-item wire:click="delete({{ $record['id'] }})" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                                                    <x-mary-menu-item wire:click="delete({{ \Illuminate\Support\Js::from($record['id']) }})" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                                                 @endcan
                                             </x-mary-dropdown>
                                         @endcanany

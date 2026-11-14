@@ -2,7 +2,6 @@
 
 namespace VentureDrake\LaravelCrm\Livewire\Monitors;
 
-use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
@@ -10,6 +9,7 @@ use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Jobs\RunMonitorCheck;
 use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrm\Models\MonitorCheck;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class MonitorShow extends Component
 {
@@ -54,22 +54,22 @@ class MonitorShow extends Component
 
     protected function chartRange(): array
     {
-        $now = Carbon::now();
+        $now = CrmDateTime::now();
 
         return match ($this->chartPeriod) {
-            'today' => [today()->startOfDay(), $now, 'hour', 'H:i'],
-            'yesterday' => [today()->subDay()->startOfDay(), today()->subDay()->endOfDay(), 'hour', 'H:i'],
-            'last_7_days' => [today()->subDays(6)->startOfDay(), $now, 'day', 'M j'],
-            'last_30_days' => [today()->subDays(29)->startOfDay(), $now, 'day', 'M j'],
-            'last_90_days' => [today()->subDays(89)->startOfDay(), $now, 'day', 'M j'],
-            'last_365_days' => [today()->subDays(364)->startOfDay(), $now, 'week', 'M j'],
-            'last_month' => [today()->subMonth()->startOfMonth()->startOfDay(), today()->subMonth()->endOfMonth()->endOfDay(), 'day', 'M j'],
-            'this_quarter' => [today()->startOfQuarter()->startOfDay(), $now, 'week', 'M j'],
-            'last_quarter' => [today()->subQuarter()->startOfQuarter()->startOfDay(), today()->subQuarter()->endOfQuarter()->endOfDay(), 'week', 'M j'],
-            'this_year' => [today()->startOfYear()->startOfDay(), $now, 'month', 'M Y'],
-            'last_year' => [today()->subYear()->startOfYear()->startOfDay(), today()->subYear()->endOfYear()->endOfDay(), 'month', 'M Y'],
+            'today' => [CrmDateTime::today()->startOfDay(), $now, 'hour', 'H:i P'],
+            'yesterday' => [CrmDateTime::today()->subDay()->startOfDay(), CrmDateTime::today()->subDay()->endOfDay(), 'hour', 'H:i P'],
+            'last_7_days' => [CrmDateTime::today()->subDays(6)->startOfDay(), $now, 'day', 'M j'],
+            'last_30_days' => [CrmDateTime::today()->subDays(29)->startOfDay(), $now, 'day', 'M j'],
+            'last_90_days' => [CrmDateTime::today()->subDays(89)->startOfDay(), $now, 'day', 'M j'],
+            'last_365_days' => [CrmDateTime::today()->subDays(364)->startOfDay(), $now, 'week', 'M j'],
+            'last_month' => [CrmDateTime::today()->subMonthNoOverflow()->startOfMonth()->startOfDay(), CrmDateTime::today()->subMonthNoOverflow()->endOfMonth()->endOfDay(), 'day', 'M j'],
+            'this_quarter' => [CrmDateTime::today()->startOfQuarter()->startOfDay(), $now, 'week', 'M j'],
+            'last_quarter' => [CrmDateTime::today()->subQuarter()->startOfQuarter()->startOfDay(), CrmDateTime::today()->subQuarter()->endOfQuarter()->endOfDay(), 'week', 'M j'],
+            'this_year' => [CrmDateTime::today()->startOfYear()->startOfDay(), $now, 'month', 'M Y'],
+            'last_year' => [CrmDateTime::today()->subYear()->startOfYear()->startOfDay(), CrmDateTime::today()->subYear()->endOfYear()->endOfDay(), 'month', 'M Y'],
             'all_time' => [$this->allTimeStart($now), $now, 'month', 'M Y'],
-            default => [today()->startOfMonth()->startOfDay(), $now, 'day', 'M j'],
+            default => [CrmDateTime::today()->startOfMonth()->startOfDay(), $now, 'day', 'M j'],
         };
     }
 
@@ -79,7 +79,7 @@ class MonitorShow extends Component
             ->where('type', 'uptime')
             ->min('checked_at');
 
-        return $earliest ? Carbon::parse($earliest) : $now->copy()->subMonth();
+        return $earliest ? CrmDateTime::local($earliest)->startOfMonth() : $now->copy()->subMonthNoOverflow()->startOfMonth();
     }
 
     protected function buildResponseTimeChart(): array
@@ -88,7 +88,7 @@ class MonitorShow extends Component
 
         $checks = MonitorCheck::where('monitor_id', $this->monitor->id)
             ->where('type', 'uptime')
-            ->whereBetween('checked_at', [$start, $end])
+            ->whereBetween('checked_at', CrmDateTime::databaseRange($start, $end))
             ->whereNotNull('response_time')
             ->orderBy('checked_at')
             ->get(['response_time', 'checked_at']);
@@ -164,7 +164,7 @@ class MonitorShow extends Component
     private function advanceCursor(CarbonInterface $cursor, string $bucket): CarbonInterface
     {
         return match ($bucket) {
-            'hour' => $cursor->copy()->addHour(),
+            'hour' => $cursor->copy()->setTimestamp($cursor->getTimestamp() + 3600),
             'day' => $cursor->copy()->addDay(),
             'week' => $cursor->copy()->addWeek(),
             'month' => $cursor->copy()->addMonth(),
@@ -174,27 +174,7 @@ class MonitorShow extends Component
 
     private function bucketKey(CarbonInterface $when, CarbonInterface $start, string $bucket): ?int
     {
-        if ($when->lt($start)) {
-            return null;
-        }
-
-        if ($bucket === 'month') {
-            $monthsDiff = ($when->year - $start->year) * 12 + ($when->month - $start->month);
-
-            return $start->copy()->addMonths($monthsDiff)->getTimestamp();
-        }
-
-        $sizeSeconds = match ($bucket) {
-            'hour' => 3600,
-            'day' => 86400,
-            'week' => 7 * 86400,
-            default => 86400,
-        };
-
-        $delta = $when->getTimestamp() - $start->getTimestamp();
-        $index = (int) floor($delta / $sizeSeconds);
-
-        return $start->copy()->addSeconds($index * $sizeSeconds)->getTimestamp();
+        return CrmDateTime::bucketKey($when, $start, $bucket);
     }
 
     public function recentChecks()

@@ -13,6 +13,7 @@ use VentureDrake\LaravelCrm\Livewire\Traits\HasUserOwnerFilter;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Label;
 use VentureDrake\LaravelCrm\Models\Pipeline;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\ClearsProperties;
 use VentureDrake\LaravelCrm\Traits\ResetsPaginationWhenPropsChanges;
 
@@ -86,7 +87,7 @@ class InvoiceIndex extends Component
             ['key' => 'issue_date', 'label' => ucwords(__('laravel-crm::lang.date')), 'format' => fn ($row, $field) => ($field) ? $field->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d')) : null],
             ['key' => 'due_date', 'label' => ucwords(__('laravel-crm::lang.due_date')), 'format' => fn ($row, $field) => ($field) ? $field->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d')) : null],
             ['key' => 'total', 'label' => ucfirst(__('laravel-crm::lang.total')), 'format' => fn ($row, $field) => money($field, $row->currency)],
-            ['key' => 'fully_paid_at', 'label' => ucwords(__('laravel-crm::lang.paid_date')), 'format' => fn ($row, $field) => ($field) ? $field->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d')) : null],
+            ['key' => 'fully_paid_at', 'label' => ucwords(__('laravel-crm::lang.paid_date')), 'format' => fn ($row, $field) => ($field) ? CrmDateTime::local($field)->format(app('laravel-crm.settings')->get('date_format', 'Y-m-d')) : null],
             ['key' => 'amount_paid', 'label' => ucfirst(__('laravel-crm::lang.paid')), 'format' => fn ($row, $field) => money($field, $row->currency)],
             ['key' => 'amount_due', 'label' => ucfirst(__('laravel-crm::lang.due')), 'format' => fn ($row, $field) => money($field, $row->currency)],
             ['key' => 'overdue_by', 'label' => ucfirst(__('laravel-crm::lang.overdue_by')), 'sortable' => false],

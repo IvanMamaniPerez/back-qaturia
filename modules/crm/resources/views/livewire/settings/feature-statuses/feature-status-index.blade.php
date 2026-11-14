@@ -15,7 +15,7 @@
             @scope('actions', $status)
                 @can('manage crm feature statuses')
                     <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.feature-statuses.edit', $status)) }}" class="btn-sm btn-square btn-outline" />
-                    <x-mary-button onclick="modalDeleteFeatureStatus{{ $status->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                    <x-mary-button onclick="document.getElementById('modalDeleteFeatureStatus{{ $status->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                     <x-crm-delete-confirm model="featureStatus" id="{{ $status->id }}" />
                 @endcan
             @endscope

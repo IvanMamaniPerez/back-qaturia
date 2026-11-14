@@ -41,7 +41,7 @@
                     <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.deliveries.edit', $delivery)) }}" class="btn-sm btn-square btn-outline" />
                 @endcan
                 @can('delete crm deliveries')
-                    <x-mary-button onclick="modalDeleteDelivery{{ $delivery->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                    <x-mary-button onclick="document.getElementById('modalDeleteDelivery{{ $delivery->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                     <x-crm-delete-confirm model="delivery" id="{{ $delivery->id }}" />
                 @endcan
             </div>

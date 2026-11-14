@@ -5,10 +5,10 @@
                 {{ $meeting->name }}
                 <div class="flex flex-row gap-1 mt-1">
                     @if($meeting->start_at)
-                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.start_at')) }} {{ $meeting->start_at->format('h:i A') }} on {{ $meeting->start_at->toFormattedDateString() }}" class="badge-soft badge-sm" />
+                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.start_at')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($meeting->start_at)->format('h:i A') }} on {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($meeting->start_at)->toFormattedDateString() }}" class="badge-soft badge-sm" />
                     @endif
                     @if($meeting->finish_at)
-                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.finish_at')) }} {{ $meeting->finish_at->format('h:i A') }} on {{ $meeting->finish_at->toFormattedDateString() }}" class="badge-soft badge-sm" />
+                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.finish_at')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($meeting->finish_at)->format('h:i A') }} on {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($meeting->finish_at)->toFormattedDateString() }}" class="badge-soft badge-sm" />
                     @endif
                 </div>
                 @if($related)
@@ -36,7 +36,7 @@
                         <x-mary-menu-item wire:click="edit" title="{{ ucfirst(__('laravel-crm::lang.edit')) }}" />
                     @endcan
                     @can('delete crm meetings')
-                        <x-mary-menu-item onclick="modalDeleteMeetingItem{{ $meeting->id }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                        <x-mary-menu-item onclick="document.getElementById('modalDeleteMeetingItem{{ $meeting->id }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                     @endcan
                 </x-mary-dropdown>
             @endcanany
@@ -49,10 +49,10 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{
                         snap15(el) {
                             if (!el.value) return;
-                            const d = new Date(el.value);
-                            d.setMinutes(Math.round(d.getMinutes() / 15) * 15, 0, 0);
+                            const d = new Date(el.value + 'Z');
+                            d.setUTCMinutes(Math.round(d.getUTCMinutes() / 15) * 15, 0, 0);
                             const p = n => String(n).padStart(2, '0');
-                            el.value = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+                            el.value = `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())}T${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
                             el.dispatchEvent(new Event('input'));
                         }
                     }">

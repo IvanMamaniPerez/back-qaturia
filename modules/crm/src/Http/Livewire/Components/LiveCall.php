@@ -7,6 +7,7 @@ use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\HasGlobalSettings;
 use VentureDrake\LaravelCrm\Traits\NotifyToast;
 
@@ -52,8 +53,8 @@ class LiveCall extends Component
         $this->call = $call;
         $this->name = $call->name;
         $this->description = $call->description;
-        $this->start_at = ($call->start_at) ? $call->start_at->format($this->dateFormat().' H:i') : null;
-        $this->finish_at = ($call->finish_at) ? $call->finish_at->format($this->dateFormat().' H:i') : null;
+        $this->start_at = ($call->start_at) ? CrmDateTime::local($call->start_at)->format($this->dateFormat().' H:i') : null;
+        $this->finish_at = ($call->finish_at) ? CrmDateTime::local($call->finish_at)->format($this->dateFormat().' H:i') : null;
         $this->guests = $call->contacts()->pluck('entityable_id')->toArray();
         $this->location = $call->location;
 
@@ -89,8 +90,8 @@ class LiveCall extends Component
         $this->call->update([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->start_at,
-            'finish_at' => $this->finish_at,
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
         ]);
 

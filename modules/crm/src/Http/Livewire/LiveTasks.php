@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\NotifyToast;
 
 class LiveTasks extends Component
@@ -60,7 +61,7 @@ class LiveTasks extends Component
         $task = $this->model->tasks()->create([
             'name' => $data['name'],
             'description' => $data['description'],
-            'due_at' => $this->due_at,
+            'due_at' => CrmDateTime::fromLocal($this->due_at, 'due_at'),
             'user_owner_id' => auth()->user()->id,
             'user_assigned_id' => auth()->user()->id,
         ]);

@@ -13,7 +13,7 @@
                 @if(in_array($role->name, ['Owner','Admin']))
                     <x-mary-button icon="o-trash" class="btn-sm btn-square btn-error" disabled />
                 @else
-                    <x-mary-button onclick="modalDeleteRole{{ $role->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                    <x-mary-button onclick="document.getElementById('modalDeleteRole{{ $role->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                     <x-crm-delete-confirm model="role" id="{{ $role->id }}"  />
                 @endif
             @endcan

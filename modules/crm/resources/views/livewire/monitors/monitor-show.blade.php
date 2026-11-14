@@ -15,7 +15,7 @@
                 <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.edit')) }}" link="{{ route('laravel-crm.monitors.edit', $monitor) }}" icon="o-pencil-square" class="btn-outline" />
             @endcan
             @can('delete crm monitors')
-                <x-mary-button onclick="modalDeleteMonitor{{ $monitor->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" />
+                <x-mary-button onclick="document.getElementById('modalDeleteMonitor{{ $monitor->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" />
                 <x-crm-delete-confirm model="monitor" id="{{ $monitor->id }}" deleting="monitor" />
             @endcan
             <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.back')) }}" link="{{ route('laravel-crm.monitors.index') }}" />
@@ -37,7 +37,7 @@
         </x-mary-card>
         <x-mary-card shadow>
             <div class="text-xs text-base-content/60">{{ ucfirst(__('laravel-crm::lang.last_checked')) }}</div>
-            <div class="text-lg font-semibold">{{ $monitor->last_checked_at?->format('Y-m-d H:i') ?? '—' }}</div>
+            <div class="text-lg font-semibold">{{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($monitor->last_checked_at)?->format('Y-m-d H:i') ?? '—' }}</div>
         </x-mary-card>
     </div>
 
@@ -108,7 +108,7 @@
                 {{ $check->response_time !== null ? $check->response_time.' ms' : '—' }}
             @endscope
             @scope('cell_checked_at', $check)
-                {{ $check->checked_at?->format('Y-m-d H:i:s') }}
+                {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($check->checked_at)?->format('Y-m-d H:i:s') }}
             @endscope
         </x-mary-table>
     </x-mary-card>

@@ -3,12 +3,12 @@
 namespace VentureDrake\LaravelCrm\Notifications;
 
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class TaskReminderNotification extends Notification
 {
@@ -52,7 +52,7 @@ class TaskReminderNotification extends Notification
     public function toMail($notifiable)
     {
         $mailMessage = new MailMessage;
-        $subject = 'TASK REMINDER: '.$this->task->name.' ('.Carbon::parse($this->task->due_at)->format('M d, Y \\@ h:i A').')';
+        $subject = 'TASK REMINDER: '.$this->task->name.' ('.CrmDateTime::local($this->task->due_at)->format('M d, Y \\@ h:i A').')';
         $greeting = 'Hi '.$this->user->name.',';
 
         $mailMessage

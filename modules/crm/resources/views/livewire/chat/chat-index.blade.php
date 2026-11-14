@@ -37,7 +37,7 @@
                     @endcan
                     @can('create', \VentureDrake\LaravelCrm\Models\Lead::class)
                         @if(!$c->lead)
-                            <x-mary-button onclick="modalConvertConversation{{ $c->id }}.showModal()" icon="fas.crosshairs" class="btn-sm btn-square btn-success text-white" spinner />
+                            <x-mary-button onclick="document.getElementById('modalConvertConversation{{ $c->id }}').showModal()" icon="fas.crosshairs" class="btn-sm btn-square btn-success text-white" spinner />
                             <dialog id="modalConvertConversation{{ $c->id }}" class="modal">
                                 <div class="modal-box text-left">
                                     <h3 class="text-lg font-bold">{{ ucfirst(__('laravel-crm::lang.convert_to_lead')) }}?</h3>
@@ -45,7 +45,7 @@
                                     <div class="modal-action">
                                         <form method="dialog">
                                             <button class="btn">{{ ucfirst(__('laravel-crm::lang.cancel')) }}</button>
-                                            <button wire:click="convertToLead({{ $c->id }})" class="btn btn-success text-white">{{ ucfirst(__('laravel-crm::lang.convert_to_lead')) }}</button>
+                                            <button wire:click="convertToLead({{ \Illuminate\Support\Js::from($c->id) }})" class="btn btn-success text-white">{{ ucfirst(__('laravel-crm::lang.convert_to_lead')) }}</button>
                                         </form>
                                     </div>
                                 </div>
@@ -53,7 +53,7 @@
                         @endif
                     @endcan
                     @if($c->status !== 'closed')
-                        <x-mary-button onclick="modalCloseConversation{{ $c->id }}.showModal()" icon="o-x-circle" class="btn-sm btn-square btn-warning text-white" spinner />
+                        <x-mary-button onclick="document.getElementById('modalCloseConversation{{ $c->id }}').showModal()" icon="o-x-circle" class="btn-sm btn-square btn-warning text-white" spinner />
                         <dialog id="modalCloseConversation{{ $c->id }}" class="modal">
                             <div class="modal-box text-left">
                                 <h3 class="text-lg font-bold">{{ ucfirst(__('laravel-crm::lang.close_chat')) }}?</h3>
@@ -61,14 +61,14 @@
                                 <div class="modal-action">
                                     <form method="dialog">
                                         <button class="btn">{{ ucfirst(__('laravel-crm::lang.cancel')) }}</button>
-                                        <button wire:click="close({{ $c->id }})" class="btn btn-warning text-white">{{ ucfirst(__('laravel-crm::lang.close_chat')) }}</button>
+                                        <button wire:click="close({{ \Illuminate\Support\Js::from($c->id) }})" class="btn btn-warning text-white">{{ ucfirst(__('laravel-crm::lang.close_chat')) }}</button>
                                     </form>
                                 </div>
                             </div>
                         </dialog>
                     @endif
                     @can('delete crm chat')
-                        <x-mary-button onclick="modalDeleteConversation{{ $c->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                        <x-mary-button onclick="document.getElementById('modalDeleteConversation{{ $c->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                         <x-crm-delete-confirm model="conversation" id="{{ $c->id }}" deleting="conversation" />
                     @endcan
                 </div>

@@ -35,7 +35,7 @@
                 <div class="flex gap-1 justify-end">
                     @can('edit crm tasks')
                         @if(! $task->completed_at)
-                            <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.complete')) }}" wire:click="complete({{ $task->id }})" class="btn-sm btn-success text-white" spinner />
+                            <x-mary-button label="{{ ucfirst(__('laravel-crm::lang.complete')) }}" wire:click="complete({{ \Illuminate\Support\Js::from($task->id) }})" class="btn-sm btn-success text-white" spinner />
                         @endif
                     @endcan
                     @can('view crm tasks')
@@ -45,7 +45,7 @@
                         <x-mary-button icon="o-pencil-square" link="{{ url(route('laravel-crm.tasks.edit', $task)) }}" class="btn-sm btn-square btn-outline" />
                     @endcan
                     @can('delete crm tasks')
-                        <x-mary-button onclick="modalDeleteTask{{ $task->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                        <x-mary-button onclick="document.getElementById('modalDeleteTask{{ $task->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                         <x-crm-delete-confirm model="task" id="{{ $task->id }}" />
                     @endcan
                 </div>

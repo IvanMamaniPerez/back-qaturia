@@ -21,7 +21,7 @@
                 <x-mary-button link="{{ url(route('laravel-crm.leads.edit', $lead)) }}" icon="o-pencil-square" class="btn-sm btn-square btn-outline" responsive />
             @endcan
             @can('delete crm leads')
-                <x-mary-button onclick="modalDeleteLead{{ $lead->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                <x-mary-button onclick="document.getElementById('modalDeleteLead{{ $lead->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                 <x-crm-delete-confirm model="lead" id="{{ $lead->id }}" />
             @endcan
         </x-slot:actions>

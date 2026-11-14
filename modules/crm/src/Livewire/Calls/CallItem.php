@@ -7,6 +7,7 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class CallItem extends Component
 {
@@ -54,8 +55,8 @@ class CallItem extends Component
     {
         $this->name = $this->call->name ?? '';
         $this->description = $this->call->description;
-        $this->start_at = $this->call->start_at?->format('Y-m-d\TH:i');
-        $this->finish_at = $this->call->finish_at?->format('Y-m-d\TH:i');
+        $this->start_at = CrmDateTime::local($this->call->start_at)?->format('Y-m-d\TH:i');
+        $this->finish_at = CrmDateTime::local($this->call->finish_at)?->format('Y-m-d\TH:i');
         $this->location = $this->call->location;
         $this->user_owner_id = $this->call->user_owner_id;
         $this->user_assigned_id = $this->call->user_assigned_id;
@@ -86,8 +87,8 @@ class CallItem extends Component
         $this->call->update([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->normalizeDatetime($this->start_at),
-            'finish_at' => $this->normalizeDatetime($this->finish_at),
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
             'user_owner_id' => $this->user_owner_id,
             'user_assigned_id' => $this->user_assigned_id,
@@ -122,11 +123,6 @@ class CallItem extends Component
 
         $this->dispatch('call-updated');
         $this->dispatch('activity-logged');
-    }
-
-    private function normalizeDatetime(?string $value): ?string
-    {
-        return $value ? str_replace('T', ' ', $value) : null;
     }
 
     public function render()

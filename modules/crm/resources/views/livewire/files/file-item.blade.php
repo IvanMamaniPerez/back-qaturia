@@ -43,7 +43,7 @@
                 </x-slot:trigger>
                 <x-mary-menu-item wire:click="download" title="{{ ucfirst(__('laravel-crm::lang.download')) }}" />
                 @can('delete crm files')
-                    <x-mary-menu-item onclick="modalDeleteFileItem{{ $file->id }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                    <x-mary-menu-item onclick="document.getElementById('modalDeleteFileItem{{ $file->id }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                 @endcan
             </x-mary-dropdown>
         </div>

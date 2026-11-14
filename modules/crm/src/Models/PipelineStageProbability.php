@@ -12,6 +12,8 @@ class PipelineStageProbability extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = ['archived_at' => 'datetime'];
+
     public function getTable()
     {
         return config('laravel-crm.db_table_prefix').'pipeline_stage_probabilities';

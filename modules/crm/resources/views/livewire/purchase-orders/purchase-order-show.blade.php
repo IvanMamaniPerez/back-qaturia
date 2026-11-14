@@ -28,7 +28,7 @@
                     <x-mary-button link="{{ url(route('laravel-crm.purchase-orders.edit', $purchaseOrder)) }}" icon="o-pencil-square" class="btn-sm btn-square btn-outline" responsive />
                 @endcan
                 @can('delete crm purchase orders')
-                    <x-mary-button onclick="modalDeletePurchaseOrder{{ $purchaseOrder->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                    <x-mary-button onclick="document.getElementById('modalDeletePurchaseOrder{{ $purchaseOrder->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                     <x-crm-delete-confirm model="purchaseOrder" id="{{ $purchaseOrder->id }}" deleting="purchase order" />
                 @endcan
             @endif

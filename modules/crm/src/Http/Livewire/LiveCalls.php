@@ -7,6 +7,7 @@ use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\NotifyToast;
 
 class LiveCalls extends Component
@@ -70,8 +71,8 @@ class LiveCalls extends Component
         $call = $this->model->calls()->create([
             'name' => $data['name'],
             'description' => $data['description'],
-            'start_at' => $this->start_at,
-            'finish_at' => $this->finish_at,
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
             'user_owner_id' => auth()->user()->id,
             'user_assigned_id' => auth()->user()->id,

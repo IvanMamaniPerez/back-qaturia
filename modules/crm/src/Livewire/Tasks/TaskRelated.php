@@ -7,6 +7,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class TaskRelated extends Component
 {
@@ -59,8 +60,8 @@ class TaskRelated extends Component
         $task = $this->model->tasks()->create([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->normalizeDatetime($this->start_at),
-            'due_at' => $this->normalizeDatetime($this->due_at),
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'due_at' => CrmDateTime::fromLocal($this->due_at, 'due_at'),
             'user_owner_id' => $this->user_owner_id,
             'user_assigned_id' => $this->user_assigned_id,
         ]);
@@ -131,11 +132,6 @@ class TaskRelated extends Component
                 'related' => in_array($task->id, $relatedIds),
             ];
         }
-    }
-
-    private function normalizeDatetime(?string $value): ?string
-    {
-        return $value ? str_replace('T', ' ', $value) : null;
     }
 
     private function resetFields(): void

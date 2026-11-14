@@ -121,7 +121,7 @@ return [
      * 'model_has_permissions'(view the latest version of package's migration file)
      */
 
-    'teams' => env('LARAVEL_CRM_TEAMS', false),
+    'teams' => env('LARAVEL_CRM_TEAMS', true),
 
     /*
      * Passport Client Credentials Grant

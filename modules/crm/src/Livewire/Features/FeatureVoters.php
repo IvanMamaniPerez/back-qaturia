@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrm\Livewire\Features;
 use Livewire\Component;
 use Livewire\WithPagination;
 use VentureDrake\LaravelCrm\Models\Feature;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class FeatureVoters extends Component
 {
@@ -33,7 +34,7 @@ class FeatureVoters extends Component
         $mapped = $rows->through(fn ($user) => [
             'name' => $user->name,
             'email' => $user->email,
-            'voted_at' => optional($user->pivot->created_at)->format('Y-m-d H:i'),
+            'voted_at' => CrmDateTime::local($user->pivot->created_at)?->format('Y-m-d H:i'),
         ]);
 
         return view('laravel-crm::livewire.features.feature-voters', [

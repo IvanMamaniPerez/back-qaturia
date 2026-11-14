@@ -3,12 +3,12 @@
 namespace VentureDrake\LaravelCrm\Notifications;
 
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\Lunch;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class LunchReminderNotification extends Notification
 {
@@ -52,7 +52,7 @@ class LunchReminderNotification extends Notification
     public function toMail($notifiable)
     {
         $mailMessage = new MailMessage;
-        $subject = 'LUNCH REMINDER: '.$this->lunch->name.' ('.Carbon::parse($this->lunch->start_at)->format('M d, Y \\@ h:i A').')';
+        $subject = 'LUNCH REMINDER: '.$this->lunch->name.' ('.CrmDateTime::local($this->lunch->start_at)->format('M d, Y \\@ h:i A').')';
         $greeting = 'Hi '.$this->user->name.',';
 
         $mailMessage
@@ -61,7 +61,7 @@ class LunchReminderNotification extends Notification
 
         $mailMessage->line(new HtmlString('<strong>THIS LUNCH IS COMING UP:</strong>'));
         $mailMessage->line(new HtmlString('<strong>'.$this->lunch->name.'</strong>'));
-        $mailMessage->line(new HtmlString('Starting: '.Carbon::parse($this->lunch->start_at)->format('M d, Y \\@ h:i A').'<br />Ending: '.Carbon::parse($this->lunch->finish_at)->format('M d, Y \\@ h:i A').'<br />Location: '.$this->lunch->location));
+        $mailMessage->line(new HtmlString('Starting: '.CrmDateTime::local($this->lunch->start_at)->format('M d, Y \\@ h:i A').'<br />Ending: '.CrmDateTime::local($this->lunch->finish_at)->format('M d, Y \\@ h:i A').'<br />Location: '.$this->lunch->location));
         $mailMessage->line(new HtmlString($this->lunch->description));
 
         if ($this->lunch->lunchable) {

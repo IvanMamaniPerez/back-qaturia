@@ -8,6 +8,7 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class CallRelated extends Component
 {
@@ -58,8 +59,8 @@ class CallRelated extends Component
         $call = $this->model->calls()->create([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->normalizeDatetime($this->start_at),
-            'finish_at' => $this->normalizeDatetime($this->finish_at),
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
             'user_owner_id' => auth()->user()->id,
             'user_assigned_id' => auth()->user()->id,
@@ -140,11 +141,6 @@ class CallRelated extends Component
                 'related' => in_array($call->id, $relatedIds),
             ];
         }
-    }
-
-    private function normalizeDatetime(?string $value): ?string
-    {
-        return $value ? str_replace('T', ' ', $value) : null;
     }
 
     private function resetFields(): void

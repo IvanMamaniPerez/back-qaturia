@@ -11,7 +11,7 @@
                 @if(auth()->user()->id == $user->id)
                     <x-mary-button icon="o-trash" class="btn-sm btn-square btn-error" disabled />
                 @else
-                    <x-mary-button onclick="modalDeleteUser{{ $user->id }}.showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
+                    <x-mary-button onclick="document.getElementById('modalDeleteUser{{ $user->id }}').showModal()" icon="o-trash" class="btn-sm btn-square btn-error text-white" spinner />
                     <x-crm-delete-confirm model="user" id="{{ $user->id }}" />
                 @endif    
             @endcan
@@ -32,7 +32,7 @@
                     </div>
                     <div class="flex flex-row gap-5">
                         <strong>{{ ucfirst(__('laravel-crm::lang.email_verified')) }}</strong>
-                        <span>{{ ($user->email_verified_at) ? $user->email_verified_at->format($dateFormat.' '.$timeFormat) : null }}</span>
+                        <span>{{ ($user->email_verified_at) ? \VentureDrake\LaravelCrm\Support\CrmDateTime::local($user->email_verified_at)->format($dateFormat.' '.$timeFormat) : null }}</span>
                     </div>
                     <div class="flex flex-row gap-5">
                         <strong>{{ ucfirst(__('laravel-crm::lang.CRM_Access')) }}</strong>

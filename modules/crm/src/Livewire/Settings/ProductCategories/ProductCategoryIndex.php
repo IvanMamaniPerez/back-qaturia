@@ -8,6 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\ProductCategory;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\ClearsProperties;
 use VentureDrake\LaravelCrm\Traits\ResetsPaginationWhenPropsChanges;
 
@@ -31,8 +32,8 @@ class ProductCategoryIndex extends Component
         return [
             ['key' => 'name', 'label' => ucfirst(__('laravel-crm::lang.name'))],
             ['key' => 'products', 'label' => ucfirst(__('laravel-crm::lang.products')), 'format' => fn ($row, $field) => count($field)],
-            ['key' => 'created_at', 'label' => ucfirst(__('laravel-crm::lang.created')), 'format' => fn ($row, $field) => $field->format($this->dateFormat)],
-            ['key' => 'updated_at', 'label' => ucfirst(__('laravel-crm::lang.updated')), 'format' => fn ($row, $field) => $field->format($this->dateFormat)],
+            ['key' => 'created_at', 'label' => ucfirst(__('laravel-crm::lang.created')), 'format' => fn ($row, $field) => CrmDateTime::local($field)->format($this->dateFormat)],
+            ['key' => 'updated_at', 'label' => ucfirst(__('laravel-crm::lang.updated')), 'format' => fn ($row, $field) => CrmDateTime::local($field)->format($this->dateFormat)],
         ];
     }
 

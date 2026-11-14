@@ -5,10 +5,10 @@
                 {{ $call->name }}
                 <div class="flex flex-row gap-1 mt-1">
                     @if($call->start_at)
-                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.start_at')) }} {{ $call->start_at->format('h:i A') }} on {{ $call->start_at->toFormattedDateString() }}" class="badge-soft badge-sm" />
+                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.start_at')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($call->start_at)->format('h:i A') }} on {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($call->start_at)->toFormattedDateString() }}" class="badge-soft badge-sm" />
                     @endif
                     @if($call->finish_at)
-                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.finish_at')) }} {{ $call->finish_at->format('h:i A') }} on {{ $call->finish_at->toFormattedDateString() }}" class="badge-soft badge-sm" />
+                        <x-mary-badge value="{{ ucfirst(__('laravel-crm::lang.finish_at')) }} {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($call->finish_at)->format('h:i A') }} on {{ \VentureDrake\LaravelCrm\Support\CrmDateTime::local($call->finish_at)->toFormattedDateString() }}" class="badge-soft badge-sm" />
                     @endif
                 </div>
                 @if($related)
@@ -36,7 +36,7 @@
                         <x-mary-menu-item wire:click="edit" title="{{ ucfirst(__('laravel-crm::lang.edit')) }}" />
                     @endcan
                     @can('delete crm calls')
-                        <x-mary-menu-item onclick="modalDeleteCallItem{{ $call->id }}.showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
+                        <x-mary-menu-item onclick="document.getElementById('modalDeleteCallItem{{ $call->id }}').showModal()" title="{{ ucfirst(__('laravel-crm::lang.delete')) }}" />
                     @endcan
                 </x-mary-dropdown>
             @endcanany

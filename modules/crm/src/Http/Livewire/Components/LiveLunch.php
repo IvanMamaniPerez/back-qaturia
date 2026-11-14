@@ -7,6 +7,7 @@ use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Lunch;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Traits\HasGlobalSettings;
 use VentureDrake\LaravelCrm\Traits\NotifyToast;
 
@@ -52,8 +53,8 @@ class LiveLunch extends Component
         $this->lunch = $lunch;
         $this->name = $lunch->name;
         $this->description = $lunch->description;
-        $this->start_at = ($lunch->start_at) ? $lunch->start_at->format($this->dateFormat().' H:i') : null;
-        $this->finish_at = ($lunch->finish_at) ? $lunch->finish_at->format($this->dateFormat().' H:i') : null;
+        $this->start_at = ($lunch->start_at) ? CrmDateTime::local($lunch->start_at)->format($this->dateFormat().' H:i') : null;
+        $this->finish_at = ($lunch->finish_at) ? CrmDateTime::local($lunch->finish_at)->format($this->dateFormat().' H:i') : null;
         $this->guests = $lunch->contacts()->pluck('entityable_id')->toArray();
         $this->location = $lunch->location;
 
@@ -89,8 +90,8 @@ class LiveLunch extends Component
         $this->lunch->update([
             'name' => $this->name,
             'description' => $this->description,
-            'start_at' => $this->start_at,
-            'finish_at' => $this->finish_at,
+            'start_at' => CrmDateTime::fromLocal($this->start_at, 'start_at'),
+            'finish_at' => CrmDateTime::fromLocal($this->finish_at, 'finish_at'),
             'location' => $this->location,
         ]);
 

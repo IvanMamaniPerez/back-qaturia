@@ -10,6 +10,7 @@ use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Models\Phone;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Models\SmsCampaignRecipient;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class SmsCampaignService
 {
@@ -57,7 +58,7 @@ class SmsCampaignService
         $timezone = $this->resolveTimezone();
 
         if ($localScheduledAt) {
-            $scheduledAt = Carbon::parse($localScheduledAt, $timezone)->setTimezone('UTC');
+            $scheduledAt = CrmDateTime::futureLocal($localScheduledAt, 'scheduled_at', $timezone);
         } else {
             $scheduledAt = Carbon::now('UTC');
         }

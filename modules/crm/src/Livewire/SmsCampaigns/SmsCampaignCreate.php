@@ -10,6 +10,7 @@ use VentureDrake\LaravelCrm\Models\SmsTemplate;
 use VentureDrake\LaravelCrm\Services\ClickSendService;
 use VentureDrake\LaravelCrm\Services\SmsCampaignService;
 use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class SmsCampaignCreate extends Component
 {
@@ -44,7 +45,7 @@ class SmsCampaignCreate extends Component
             'from' => 'nullable|string|max:32',
             'body' => 'required|string|max:1530',
             'send_mode' => 'required|in:now,schedule',
-            'scheduled_at' => 'required_if:send_mode,schedule|nullable|date|after:now',
+            'scheduled_at' => 'required_if:send_mode,schedule|nullable|date',
         ];
     }
 
@@ -71,6 +72,10 @@ class SmsCampaignCreate extends Component
         $this->authorize('create', SmsCampaign::class);
 
         $this->validate();
+
+        if ($this->send_mode === 'schedule') {
+            CrmDateTime::futureLocal($this->scheduled_at, 'scheduled_at');
+        }
 
         $campaign = $service->create([
             'name' => $this->name,

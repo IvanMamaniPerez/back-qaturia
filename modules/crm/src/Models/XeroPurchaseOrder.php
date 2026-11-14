@@ -12,6 +12,8 @@ class XeroPurchaseOrder extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = ['xero_updated_at' => 'datetime'];
+
     public function getTable()
     {
         return config('laravel-crm.db_table_prefix').'xero_purchase_orders';

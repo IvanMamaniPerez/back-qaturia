@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Services;
 
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrm\Repositories\TaskRepository;
+use VentureDrake\LaravelCrm\Support\CrmDateTime;
 
 class TaskService
 {
@@ -25,8 +26,8 @@ class TaskService
         return Task::create([
             'name' => $request->name,
             'description' => $request->description,
-            'start_at' => $request->start_at,
-            'due_at' => $request->due_at,
+            'start_at' => CrmDateTime::fromLocal($request->start_at, 'start_at'),
+            'due_at' => CrmDateTime::fromLocal($request->due_at, 'due_at'),
             'user_owner_id' => $request->user_owner_id,
             'user_assigned_id' => $request->user_assigned_id,
         ]);
@@ -37,8 +38,8 @@ class TaskService
         $task->update([
             'name' => $request->name,
             'description' => $request->description,
-            'start_at' => $request->start_at,
-            'due_at' => $request->due_at,
+            'start_at' => CrmDateTime::fromLocal($request->start_at, 'start_at'),
+            'due_at' => CrmDateTime::fromLocal($request->due_at, 'due_at'),
             'user_owner_id' => $request->user_owner_id,
             'user_assigned_id' => $request->user_assigned_id,
         ]);

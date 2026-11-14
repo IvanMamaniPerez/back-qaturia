@@ -67,8 +67,8 @@ class LaravelCrmReminders extends Command
 
         foreach (Task::whereNull('completed_at')
             ->where('reminder_email', 0)
-            ->where('due_at', '>=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->subMinutes(5)->format('Y-m-d H:i:\\00'))
-            ->where('due_at', '<=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->addMinutes(15)->format('Y-m-d H:i:\\00'))
+            ->where('due_at', '>=', Carbon::now('UTC')->subMinutes(5)->format('Y-m-d H:i:s'))
+            ->where('due_at', '<=', Carbon::now('UTC')->addMinutes(15)->format('Y-m-d H:i:s'))
             ->orderBy('due_at', 'asc')
             ->get() as $task) {
             if ($task->user_assigned_id) {
@@ -86,8 +86,8 @@ class LaravelCrmReminders extends Command
         }
 
         foreach (Call::where('reminder_email', 0)
-            ->where('start_at', '>=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->subMinutes(5)->format('Y-m-d H:i:\\00'))
-            ->where('start_at', '<=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->addMinutes(15)->format('Y-m-d H:i:\\00'))
+            ->where('start_at', '>=', Carbon::now('UTC')->subMinutes(5)->format('Y-m-d H:i:s'))
+            ->where('start_at', '<=', Carbon::now('UTC')->addMinutes(15)->format('Y-m-d H:i:s'))
             ->orderBy('start_at', 'asc')
             ->get() as $call) {
             if ($call->user_assigned_id) {
@@ -105,8 +105,8 @@ class LaravelCrmReminders extends Command
         }
 
         foreach (Meeting::where('reminder_email', 0)
-            ->where('start_at', '>=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->subMinutes(5)->format('Y-m-d H:i:\\00'))
-            ->where('start_at', '<=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->addMinutes(15)->format('Y-m-d H:i:\\00'))
+            ->where('start_at', '>=', Carbon::now('UTC')->subMinutes(5)->format('Y-m-d H:i:s'))
+            ->where('start_at', '<=', Carbon::now('UTC')->addMinutes(15)->format('Y-m-d H:i:s'))
             ->orderBy('start_at', 'asc')
             ->get() as $meeting) {
             if ($meeting->user_assigned_id) {
@@ -124,8 +124,8 @@ class LaravelCrmReminders extends Command
         }
 
         foreach (Lunch::where('reminder_email', 0)
-            ->where('start_at', '>=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->subMinutes(5)->format('Y-m-d H:i:\\00'))
-            ->where('start_at', '<=', Carbon::now()->timezone($this->settingService->get('timezone')->value ?? 'UTC')->addMinutes(15)->format('Y-m-d H:i:\\00'))
+            ->where('start_at', '>=', Carbon::now('UTC')->subMinutes(5)->format('Y-m-d H:i:s'))
+            ->where('start_at', '<=', Carbon::now('UTC')->addMinutes(15)->format('Y-m-d H:i:s'))
             ->orderBy('start_at', 'asc')
             ->get() as $lunch) {
             if ($lunch->user_assigned_id) {
