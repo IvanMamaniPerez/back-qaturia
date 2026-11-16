@@ -11,6 +11,7 @@ class ProductResource extends JsonResource
     {
         return [
             'id' => $this->external_id,
+            'options_version' => $this->options_version,
             'name' => $this->name,
             'code' => $this->code,
             'barcode' => $this->barcode,
@@ -27,7 +28,13 @@ class ProductResource extends JsonResource
                 'unit_price' => $price->unit_price !== null ? $price->unit_price / 100 : null,
                 'default' => (bool) $price->default,
             ])->values()),
-            'variations' => ProductVariationResource::collection($this->whenLoaded('productVariations')),
+            'variations' => $this->whenLoaded('productVariations', function () {
+                $this->productVariations->each(fn ($v) => $v->setRelation('product', $this->resource));
+
+                return ProductVariationResource::collection($this->productVariations);
+            }),
+            'variations_count' => $this->whenCounted('productVariations'),
+            'variations_truncated' => $this->whenCounted('productVariations', fn () => $this->product_variations_count > 100),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'deleted_at' => $this->deleted_at?->toIso8601String(),

@@ -3,11 +3,15 @@
 namespace VentureDrake\LaravelCrm\Livewire\Products;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Modelable;
 use Livewire\Component;
 use VentureDrake\LaravelCrm\Livewire\Products\Traits\HasProductCommon;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\TaxRate;
+use VentureDrake\LaravelCrm\Services\ProductVariantMatrixService;
 
 class ProductCreate extends Component
 {
@@ -49,7 +53,23 @@ class ProductCreate extends Component
         // Create a request object to pass to services
         $request = \VentureDrake\LaravelCrm\Http\Helpers\PublicProperties\asRequest($this);
 
-        $product = $this->productService->create($request);
+        $product = DB::transaction(function () use ($request) {
+            $matrix = app(ProductVariantMatrixService::class);
+            if ($this->withOptions) {
+                $preview = $matrix->previewNew($this->creationCommand());
+                if (! hash_equals($preview['plan_hash'], $this->creationPreviewHash)) {
+                    throw ValidationException::withMessages(['catalog' => 'Previsualiza las variantes antes de guardar.']);
+                }
+                $request->variations = [];
+            }
+            $product = $this->productService->create($request);
+            if ($this->withOptions) {
+                $plan = $matrix->preview($product, $this->creationCommand());
+                $matrix->apply($product, $this->creationCommand(), $plan['options_version'], $plan['plan_hash'], (string) Str::uuid());
+            }
+
+            return $product;
+        });
 
         $this->saveCustomFields($product);
 

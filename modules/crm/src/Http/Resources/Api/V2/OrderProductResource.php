@@ -3,7 +3,6 @@
 namespace VentureDrake\LaravelCrm\Http\Resources\Api\V2;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\ProductBriefResource;
 
 class OrderProductResource extends JsonResource
 {
@@ -12,12 +11,20 @@ class OrderProductResource extends JsonResource
         return [
             'id' => $this->external_id,
             'product_id' => $this->whenLoaded('product', fn () => $this->product?->external_id),
-            'product' => $this->whenLoaded('product', fn () => $this->product ? new ProductBriefResource($this->product) : null),
+            'display_name' => $this->displayName(),
+            'display_code' => $this->displayCode(),
+            'catalog_snapshot' => $this->catalogSnapshot(),
+            'catalog_snapshot_source' => $this->catalog_snapshot_source,
+            'product' => $this->whenLoaded('product', fn () => $this->product ? [
+                'id' => $this->product->external_id,
+                'name' => $this->catalogSnapshot()['product_name'] ?? $this->product->name,
+                'code' => $this->catalogSnapshot() ? ($this->catalogSnapshot()['product_code'] ?? null) : $this->product->code,
+            ] : null),
             'product_variation_id' => $this->whenLoaded('productVariation', fn () => $this->productVariation?->external_id),
             'variation' => $this->whenLoaded('productVariation', fn () => $this->productVariation ? [
                 'id' => $this->productVariation->external_id,
-                'name' => $this->productVariation->name,
-                'code' => $this->productVariation->code,
+                'name' => $this->catalogSnapshot() ? $this->catalogSnapshot()['variation_name'] : $this->productVariation->name,
+                'code' => $this->catalogSnapshot() ? ($this->catalogSnapshot()['variation_code'] ?? null) : $this->productVariation->code,
             ] : null),
             'quantity' => $this->quantity !== null ? (float) $this->quantity : null,
             'unit_price' => $this->price !== null ? $this->price / 100 : null,

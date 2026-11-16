@@ -17,6 +17,9 @@ class StoreProductVariationRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:255'],
             'barcode' => ['nullable', 'string', 'max:255'],
+            'published' => ['sometimes', 'boolean'],
+            'image_file_id' => ['sometimes', 'nullable', 'uuid'],
+            'options_version' => ['sometimes', 'integer', 'min:0'],
             'active' => ['sometimes', 'boolean'],
             'order' => ['nullable', 'integer', 'min:0'],
             // Major units, like every other API amount. Null or absent leaves

@@ -7,6 +7,7 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\ProductCategory;
 use VentureDrake\LaravelCrm\Models\TaxRate;
 use VentureDrake\LaravelCrm\Services\ProductService;
+use VentureDrake\LaravelCrm\Services\ProductVariantMatrixService;
 use VentureDrake\LaravelCrm\Traits\HasCustomFormFields;
 
 trait HasProductCommon
@@ -56,6 +57,41 @@ trait HasProductCommon
      * ProductService::syncVariations() persists them on save.
      */
     public array $variations = [];
+
+    public bool $withOptions = false;
+
+    public array $optionDrafts = [['name' => '', 'values' => '']];
+
+    public array $creationPreview = [];
+
+    public string $creationPreviewHash = '';
+
+    public function addOptionDraft(): void
+    {
+        if (count($this->optionDrafts) < 3) {
+            $this->optionDrafts[] = ['name' => '', 'values' => ''];
+        }
+    }
+
+    public function removeOptionDraft(int $index): void
+    {
+        unset($this->optionDrafts[$index]);
+        $this->optionDrafts = array_values($this->optionDrafts);
+    }
+
+    protected function creationCommand(): array
+    {
+        return ['action' => 'create_options', 'strategy' => 'CREATE', 'options' => array_map(fn ($o) => [
+            'name' => $o['name'], 'values' => array_values(array_filter(array_map('trim', explode(',', $o['values'])), fn ($v) => $v !== '')),
+        ], $this->optionDrafts)];
+    }
+
+    public function previewNewVariants(): void
+    {
+        $this->authorize('create', Product::class);
+        $this->creationPreview = app(ProductVariantMatrixService::class)->previewNew($this->creationCommand());
+        $this->creationPreviewHash = $this->creationPreview['plan_hash'];
+    }
 
     protected function customFieldsModel(): string
     {

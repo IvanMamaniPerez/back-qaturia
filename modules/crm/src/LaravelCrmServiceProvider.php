@@ -187,6 +187,7 @@ use VentureDrake\LaravelCrm\Livewire\Products\ProductCreate;
 use VentureDrake\LaravelCrm\Livewire\Products\ProductEdit;
 use VentureDrake\LaravelCrm\Livewire\Products\ProductIndex;
 use VentureDrake\LaravelCrm\Livewire\Products\ProductShow;
+use VentureDrake\LaravelCrm\Livewire\Products\ProductVariantEditor;
 use VentureDrake\LaravelCrm\Livewire\Profile\DeleteUserForm;
 use VentureDrake\LaravelCrm\Livewire\Profile\LogoutOtherBrowserSessionsForm;
 use VentureDrake\LaravelCrm\Livewire\Profile\TwoFactorAuthenticationForm;
@@ -769,6 +770,7 @@ class LaravelCrmServiceProvider extends ServiceProvider
         Blade::component('crm-get-link-button', GetLinkButton::class);
 
         // Livewire components
+        Livewire::component('product-variant-editor', ProductVariantEditor::class);
         Livewire::component('phone-edit', LivePhoneEdit::class);
         Livewire::component('email-edit', LiveEmailEdit::class);
         Livewire::component('address-edit', LiveAddressEdit::class);

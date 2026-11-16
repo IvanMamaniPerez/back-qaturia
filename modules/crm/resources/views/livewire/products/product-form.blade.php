@@ -35,6 +35,26 @@
     </div>
     <x-crm-custom-fields :model="$product ?? new \VentureDrake\LaravelCrm\Models\Product()" :group="true" />
 </div>
+@if(isset($product) && $product->exists)
+<div class="lg:col-span-2"><livewire:product-variant-editor :product="$product" :key="'matrix-'.$product->id" /></div>
+@else
+<div class="lg:col-span-2 grid gap-3">
+    <x-mary-toggle label="Con opciones (desactivado: sin variantes o variantes de texto libre)" wire:model.live="withOptions" />
+    @if($withOptions)
+        @foreach($optionDrafts as $i => $draft)
+            <div class="grid lg:grid-cols-2 gap-2" wire:key="new-option-{{ $i }}">
+                <x-mary-input label="Opción: Color, Talla, Material…" wire:model="optionDrafts.{{ $i }}.name" />
+                <x-mary-input label="Valores separados por comas" wire:model="optionDrafts.{{ $i }}.values" />
+                <button type="button" class="btn btn-sm" wire:click="removeOptionDraft({{ $i }})">Quitar opción pendiente</button>
+            </div>
+        @endforeach
+        <button type="button" class="btn btn-sm" wire:click="addOptionDraft">Agregar opción (máximo 3)</button>
+        <button type="button" class="btn btn-outline" wire:click="previewNewVariants">Previsualizar variantes</button>
+        @if($creationPreview)<p>{{ $creationPreview['counts']['created'] }} combinaciones nuevas, despublicadas, sin control de inventario. Precio heredado solo en la misma moneda.</p>@endif
+        @error('catalog')<p class="text-error">{{ $message }}</p>@enderror
+    @endif
+</div>
+@if(!$withOptions)
 <div class="lg:col-span-2" wire:key="product-variations">
     <x-mary-card title="{{ ucfirst(__('laravel-crm::lang.variations')) }}" separator class="{{ ($layout == 'full') ? null : 'p-0' }}">
         <x-slot:menu>
@@ -75,3 +95,6 @@
         </div>
     </x-mary-card>
 </div>
+@endif
+
+@endif
