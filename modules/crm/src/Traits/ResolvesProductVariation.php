@@ -3,7 +3,10 @@
 namespace VentureDrake\LaravelCrm\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\ProductVariation;
+use VentureDrake\LaravelCrm\Support\CatalogIdentity;
 
 /**
  * Turns a submitted variation id into one that is safe to store on a line.
@@ -18,7 +21,18 @@ trait ResolvesProductVariation
 {
     protected function variationIdFor(?string $productId, ?string $variationId, ?string $currentId = null): ?string
     {
-        if (! $productId || ! $variationId) {
+        if (($productId && ! Str::isUuid($productId))
+            || ($variationId && ! Str::isUuid($variationId))) {
+            CatalogIdentity::reject('INVALID_PRODUCT_VARIATION');
+        }
+        if ($variationId && ! $productId) {
+            CatalogIdentity::reject('INVALID_PRODUCT_VARIATION');
+        }
+        if (! $variationId) {
+            if ($productId && Product::whereKey($productId)->whereHas('options')->exists()) {
+                CatalogIdentity::reject('STRUCTURED_SELECTION_REQUIRED');
+            }
+
             return null;
         }
 
@@ -30,7 +44,20 @@ trait ResolvesProductVariation
             $query->withTrashed();
         }
 
-        return $query->value('id');
+        if (! $currentId || (string) $currentId !== (string) $variationId) {
+            $query->where('active', true)->where('published', true);
+        }
+        $variation = $query->first();
+        if (! $variation) {
+            CatalogIdentity::reject('INVALID_PRODUCT_VARIATION');
+        }
+        if ((! $currentId || (string) $currentId !== (string) $variationId)
+            && $variation->product->options()->exists()
+            && ($variation->configuration_status !== 'configured' || ! $variation->published)) {
+            CatalogIdentity::reject('VARIANT_NOT_SELLABLE');
+        }
+
+        return $variation->id;
     }
 
     /**
