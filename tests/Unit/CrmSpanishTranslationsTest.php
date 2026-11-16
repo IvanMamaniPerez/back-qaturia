@@ -10,9 +10,34 @@ test('CRM Spanish translations preserve the English file and array structure', f
     sort($englishFiles);
     sort($spanishFiles);
 
+    Assert::assertNotEmpty($englishFiles, 'English CRM locale files are missing.');
     Assert::assertSame($englishFiles, $spanishFiles, 'Spanish locale files must match English locale files.');
 
-    $assertTranslations = function (array $english, array $spanish, string $path) use (&$assertTranslations): void {
+    // These words, brand names, units and literal commands are valid in both locales.
+    // Any newly introduced identical text requires an explicit translation review.
+    $allowedUnchanged = [
+        'lang.php.system_check_db_update_command',
+        'lang.php.no',
+        'lang.php.roles',
+        'lang.php.color',
+        'lang.php.total',
+        'lang.php.chat',
+        'lang.php.chats',
+        'lang.php.linkedin',
+        'lang.php.sku',
+        'lang.php.general',
+        'lang.php.sms',
+        'lang.php.social',
+        'lang.php.clicksend',
+        'lang.php.admin',
+        'lang.php.monitor',
+        'lang.php.url',
+        'lang.php.ms',
+        'lang.php.error',
+        'lang.php.ok',
+    ];
+
+    $assertTranslations = function (array $english, array $spanish, string $path) use (&$assertTranslations, $allowedUnchanged): void {
         Assert::assertCount(count($english), $spanish, 'Different number of elements at '.$path);
         Assert::assertSame(array_keys($english), array_keys($spanish), 'Different keys or order at '.$path);
 
@@ -32,6 +57,10 @@ test('CRM Spanish translations preserve the English file and array structure', f
 
             if ($value !== '') {
                 Assert::assertNotSame('', trim($translation), 'Empty translation at '.$currentPath);
+            }
+
+            if (strcasecmp($value, $translation) === 0) {
+                Assert::assertContains($currentPath, $allowedUnchanged, 'Unreviewed untranslated text at '.$currentPath);
             }
 
             // Compare replacement tokens exactly, including repeated tokens.
