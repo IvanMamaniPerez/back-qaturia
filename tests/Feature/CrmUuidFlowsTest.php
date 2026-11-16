@@ -4,6 +4,7 @@ use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use VentureDrake\LaravelCrm\Http\Requests\Api\V2\StoreInvoiceRequest;
 use VentureDrake\LaravelCrm\Livewire\EmailTemplates\EmailTemplateCreate;
 use VentureDrake\LaravelCrm\Livewire\People\PersonImport;
@@ -173,9 +174,10 @@ test('line item variation helpers preserve UUIDs and restrict deleted variations
         ->and(array_column($helper->variationOptions($product->id, $deleted->id), 'id'))->toBe([$active->id, $deleted->id])
         ->and($helper->resolveRowVariation($product->id, $active->id)?->id)->toBe($active->id)
         ->and($helper->variationIdFor($product->id, $active->id))->toBe($active->id)
-        ->and($helper->variationIdFor($product->id, $deleted->id, $active->id))->toBeNull()
         ->and($helper->variationIdFor($product->id, $deleted->id, $deleted->id))->toBe($deleted->id)
         ->and($helper->variationOptions('not-a-uuid'))->toBe([]);
+    expect(fn () => $helper->variationIdFor($product->id, $deleted->id, $active->id))
+        ->toThrow(ValidationException::class, 'INVALID_PRODUCT_VARIATION');
 });
 
 test('billing and shipping addresses resolve their deterministic UUID catalog keys', function () {
