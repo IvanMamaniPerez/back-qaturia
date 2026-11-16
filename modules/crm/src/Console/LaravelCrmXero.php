@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrm\Console;
 use App\Models\User;
 use Dcblogdev\Xero\Facades\Xero;
 use Illuminate\Console\Command;
+use VentureDrake\LaravelCrm\Console\Traits\RunsForBusinesses;
 use VentureDrake\LaravelCrm\Models\Organization;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Models\Product;
@@ -13,6 +14,8 @@ use VentureDrake\LaravelCrm\Support\XeroIntegration;
 
 class LaravelCrmXero extends Command
 {
+    use RunsForBusinesses;
+
     /**
      * The name and signature of the console command.
      *
@@ -32,7 +35,7 @@ class LaravelCrmXero extends Command
      *
      * @return int
      */
-    public function handle()
+    protected function handleBusiness()
     {
         if (! XeroIntegration::installed()) {
             $this->error('LaravelCRM Xero integration requires the dcblogdev/laravel-xero package. Run: composer require dcblogdev/laravel-xero');

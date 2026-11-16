@@ -27,7 +27,9 @@ class TaxRateCreate extends Component
         ]);
 
         if ($this->default) {
-            TaxRate::where('id', '!=', $taxRate->id)->update(['default' => 0]);
+            TaxRate::where('id', '!=', $taxRate->id)
+                ->when(config('laravel-crm.teams'), fn ($query) => $query->where('team_id', $taxRate->team_id))
+                ->update(['default' => 0]);
         }
 
         $this->success(

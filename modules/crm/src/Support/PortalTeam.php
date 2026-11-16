@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrm\Support;
 
 use VentureDrake\LaravelCrm\Models\Feature;
+use VentureDrake\LaravelCrm\Scopes\BelongsToTeamsScope;
 
 /**
  * Works out which team's public portal the current request is looking at.
@@ -145,15 +146,13 @@ class PortalTeam
      * The only team with a public board, or null when there are none or more
      * than one.
      *
-     * Scopes are dropped deliberately: this runs for anonymous visitors, where
-     * BelongsToTeamsScope is inert anyway, and for signed-in staff, where it
-     * would otherwise narrow the count to their own team and make every
-     * install look single-team.
+     * Only the business scope is dropped: public, non-deleted features may
+     * establish an anonymous visitor's board across the installation.
      */
     protected static function soleBoardTeamId(): ?string
     {
         $teamIds = Feature::query()
-            ->withoutGlobalScopes()
+            ->withoutGlobalScope(BelongsToTeamsScope::class)
             ->public()
             ->whereNotNull('team_id')
             ->distinct()

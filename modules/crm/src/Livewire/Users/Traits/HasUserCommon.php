@@ -5,10 +5,7 @@ namespace VentureDrake\LaravelCrm\Livewire\Users\Traits;
 use App\Models\Role;
 use Mary\Traits\Toast;
 use Ramsey\Uuid\Uuid;
-use VentureDrake\LaravelCrm\Models\Address;
 use VentureDrake\LaravelCrm\Models\AddressType;
-use VentureDrake\LaravelCrm\Models\Email;
-use VentureDrake\LaravelCrm\Models\Phone;
 use VentureDrake\LaravelCrm\Models\Team;
 
 trait HasUserCommon
@@ -121,7 +118,7 @@ trait HasUserCommon
         $phoneIds = [];
         if ($phones) {
             foreach ($phones as $phoneRequest) {
-                if ($phoneRequest['id'] && $phone = Phone::find($phoneRequest['id'])) {
+                if ($phoneRequest['id'] && $phone = $user->phones()->find($phoneRequest['id'])) {
                     $phone->update([
                         'number' => $phoneRequest['number'],
                         'type' => $phoneRequest['type'],
@@ -153,7 +150,7 @@ trait HasUserCommon
 
         if ($emails) {
             foreach ($emails as $emailRequest) {
-                if ($emailRequest['id'] && $email = Email::find($emailRequest['id'])) {
+                if ($emailRequest['id'] && $email = $user->emails()->find($emailRequest['id'])) {
                     $email->update([
                         'address' => $emailRequest['address'],
                         'type' => $emailRequest['type'],
@@ -187,7 +184,7 @@ trait HasUserCommon
 
         if ($addresses) {
             foreach ($addresses as $addressRequest) {
-                if ($addressRequest['id'] && $address = Address::find($addressRequest['id'])) {
+                if ($addressRequest['id'] && $address = $user->addresses()->find($addressRequest['id'])) {
                     $address->update([
                         'address_type_id' => $addressRequest['type'] ?? null,
                         'address' => $addressRequest['address'] ?? null,

@@ -2,12 +2,10 @@
 
 namespace VentureDrake\LaravelCrm\Console;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Ramsey\Uuid\Uuid;
+use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmTablesSeeder;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class LaravelCrmOrganizationTypes extends Command
 {
@@ -50,39 +48,8 @@ class LaravelCrmOrganizationTypes extends Command
      */
     public function handle()
     {
-        $this->info('Updating LaravelCRM Organization Types...');
-
-        if (! Schema::hasColumn('organization_types', 'team_id')) {
-            $this->info('Team ID column not present — skipping team organization type duplication.');
-
-            return;
-        }
-
-        foreach (DB::table('teams')->get() as $team) {
-            foreach (DB::table('organization_types')
-                ->whereNull('team_id')
-                ->get() as $organizationType) {
-                $this->info('Inserting organization type '.$organizationType->name.' for team '.$team->name);
-
-                $teamOrganizationType = DB::table('organization_types')->where([
-                    'name' => $organizationType->name,
-                    'description' => $organizationType->description,
-                    'team_id' => $team->id,
-                ])->first();
-
-                if (! $teamOrganizationType) {
-                    DB::table('organization_types')->insert([
-                        'id' => Uuid::uuid4()->toString(),
-                        'name' => $organizationType->name,
-                        'description' => $organizationType->description,
-                        'team_id' => $team->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
-                }
-            }
-        }
-
-        $this->info('LaravelCRM Organization Types Update Complete.');
+        return app(BusinessContext::class)->system(
+            fn () => $this->call('db:seed', ['--class' => LaravelCrmTablesSeeder::class, '--force' => true])
+        );
     }
 }

@@ -80,6 +80,13 @@ class AuthController extends ApiController
             'id' => $user->getKey(),
             'name' => $user->name,
             'email' => $user->email,
+            'team_id' => $user->team_id,
+            'business' => $user->business ? [
+                'id' => $user->business->id,
+                'name' => $user->business->name,
+                'legal_name' => $user->business->legal_name,
+                'tax_id' => $user->business->tax_id,
+            ] : null,
         ];
     }
 }

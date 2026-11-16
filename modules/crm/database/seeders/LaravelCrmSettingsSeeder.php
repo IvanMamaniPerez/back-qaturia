@@ -15,7 +15,6 @@ class LaravelCrmSettingsSeeder extends Seeder
             'app_url' => config('app.url'),
             'version' => config('laravel-crm.version'),
             'team' => 'related',
-            'organization_name' => config('app.name'),
             'currency' => config('laravel-crm.currency') ?? 'USD',
             'country' => config('laravel-crm.country') ?? 'United States',
             'language' => config('laravel-crm.language') ?? 'english',

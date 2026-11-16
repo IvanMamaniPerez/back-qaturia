@@ -40,15 +40,8 @@ class ChatMessageSent implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        return [
-            'id' => $this->message->id,
-            'external_id' => $this->message->external_id,
-            'conversation_id' => $this->message->chat_conversation_id,
-            'sender_type' => $this->message->sender_type,
-            'sender_id' => $this->message->sender_id,
-            'sender_name' => $this->message->senderName(),
-            'body' => $this->message->body,
-            'created_at' => $this->message->created_at?->toIso8601String(),
-        ];
+        // A public event is only a refresh hint. Both agents and visitors
+        // fetch message bodies through their authenticated/visitor-token API.
+        return ['refresh' => true];
     }
 }

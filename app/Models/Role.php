@@ -41,14 +41,9 @@ class Role extends SpatieRole
      */
     public function scopeAssignable(Builder $query): Builder
     {
-        return $query->where('crm_role', 1)->when(config('laravel-crm.teams'), function ($query) {
-            $currentTeamId = auth()->user()?->currentTeam?->id;
-
-            $query->where(function ($query) use ($currentTeamId) {
-                $query->whereNull('team_id')
-                    ->orWhere('team_id', $currentTeamId);
-            });
-        });
+        return $query->where('crm_role', 1)->when(
+            config('permission.teams'), fn ($query) => $query->whereNull('team_id')
+        );
     }
 
     /**

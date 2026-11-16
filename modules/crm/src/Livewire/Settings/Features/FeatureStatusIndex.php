@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Mary\Traits\Toast;
 use VentureDrake\LaravelCrm\Models\Feature;
 use VentureDrake\LaravelCrm\Models\FeatureStatus;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 use VentureDrake\LaravelCrm\Traits\ClearsProperties;
 use VentureDrake\LaravelCrm\Traits\ResetsPaginationWhenPropsChanges;
 
@@ -62,7 +63,10 @@ class FeatureStatusIndex extends Component
         $this->authorize('manageStatuses', Feature::class);
 
         foreach ($orderedIds as $index => $id) {
-            FeatureStatus::whereKey($id)->update(['order' => $index + 1]);
+            FeatureStatus::whereKey($id)
+                ->when(config('laravel-crm.teams'), fn ($query) => $query
+                    ->whereNotNull('team_id')->where('team_id', app(BusinessContext::class)->id()))
+                ->update(['order' => $index + 1]);
         }
 
         $this->success(ucfirst(trans('laravel-crm::lang.updated')));

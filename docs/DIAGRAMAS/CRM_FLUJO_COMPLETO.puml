@@ -1,0 +1,1217 @@
+' QATURIA CRM — Flujo funcional completo
+' Instantánea anterior a la implementación SaaS: ver CRM_MULTIEMPRESA.puml y ../MULTIEMPRESA.md.
+' Revisión: 2026-11-15, America/Lima. Fuente: código local de back-qaturia.
+' Inspección estática, sin ejecutar operaciones CRM ni consultar datos de clientes.
+' Archivo maestro con 22 vistas. Plan UML muestra aquí el panorama principal.
+' Para abrir cada vista por separado con esa extensión, usar vistas/*.puml.
+' Renderizar este maestro por CLI sigue generando todas las vistas.
+' No utiliza includes remotos, temas externos ni datos reales.
+'
+' CONVENCIONES
+' [ACTUAL] = código/estructura encontrado; no certifica prerrequisitos configurados.
+' [PROPUESTA] = diseño conversado, todavía no implementado.
+' [BRECHA] = inconsistencia o integración pendiente observada en el código.
+' Las conversiones comerciales son acciones explícitas, no automatismos implícitos.
+' Los módulos dependen de configuración, permisos y credenciales cuando corresponda.
+'
+' ÍNDICE
+' 00 Panorama y navegación                   11 Compras / proveedores
+' 01 Business, Organization, Person, Customer 12 Productos, variantes, precios e impuestos
+' 02 Autenticación y autorización actuales   13 Actividades, tareas, archivos y campos
+' 03 Registro empresarial PROPUESTO          14 Campañas de email y SMS
+' 04 Usuarios, invitaciones y equipos        15 Chat y conversión a lead
+' 05 Directorio de organizaciones/personas   16 Funcionalidades / roadmap público
+' 06 Leads y oportunidades                  17 Monitoreo HTTP / SSL
+' 07 Cotizaciones y aceptación              18 Ajustes, identidad y documentos PDF
+' 08 Pedidos y ramificaciones               19 Integraciones Xero y ClickSend
+' 09 Facturas y registro de pago             20 API v2
+' 10 Entregas                               21 Operación, jobs y persistencia
+'
+' Render: java -jar plantuml.jar -charset UTF-8 -tsvg CRM_FLUJO_COMPLETO.puml
+' Sintaxis: https://plantuml.com/activity-diagram-beta
+' CLI: https://plantuml.com/command-line
+
+@startuml
+title 00 · Qaturia CRM — Panorama funcional [ACTUAL + propuesta identificada]
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam activityBorderColor #315C85
+skinparam noteBackgroundColor #FFF4CF
+skinparam wrapWidth 250
+start
+:Seleccionar canal de entrada;
+switch (Canal)
+case (Personal interno)
+  :Login CRM / recuperación de contraseña\nVer acceso y permisos [02];
+case (Integración externa)
+  :API v2 / token Sanctum\nPrerrequisitos pendientes [20];
+  :Consumir recursos JSON autorizados\nsin navegar al dashboard web;
+  stop
+case (Destinatario de documento)
+  :Enlace firmado /p/quotes, /p/invoices\no /p/purchase-orders [07,09,11];
+  :Ver documento / descargar PDF\nCotización: aceptar o rechazar;
+  stop
+case (Visitante web)
+  :Widget público /p/chat [15]\no roadmap /p/features [16];
+  :Conversación, lead o solicitud de funcionalidad\nsegún acción y autenticación;
+  stop
+case (Nuevo negocio)
+  #FFF4CF:Registro de negocio + primer Owner [03]\n[PROPUESTA: aún no existe];
+endswitch
+:Dashboard\nIndicadores, series temporales, tareas\ny actividad reciente;
+note right
+  El dashboard resume registros existentes.
+  No certifica cobros bancarios ni concilia monedas.
+  El aislamiento multiempresa está incompleto.
+end note
+:Seleccionar módulo habilitado\ny acción autorizada;
+switch (Área de trabajo)
+case (Agenda comercial)
+  :Organizaciones + personas [05]\nTipos, etiquetas, emails, teléfonos, direcciones;
+  :Crear lead, oportunidad, cotización o pedido\ndesde el registro o directamente;
+case (Ventas)
+  :Lead -> Deal -> Quote -> Order\nAcciones explícitas y alternativas [06-08];
+  :Desde Order: Invoice, Delivery\no PurchaseOrder [09-11];
+case (Catálogo)
+  :Productos, categorías, variantes\nprecios por moneda e impuestos [12];
+case (Trabajo diario)
+  :Tareas, llamadas, reuniones, almuerzos\nnotas, archivos y actividad [13];
+case (Marketing y atención)
+  :Campañas email/SMS [14]\nChat y captura de leads [15];
+case (Producto y operación)
+  :Roadmap / solicitudes y votos [16]\nMonitoreo de sitios y SSL [17];
+case (Administración)
+  :Usuarios, invitaciones, equipos, roles [04]\nAjustes y PDFs [18], integraciones [19];
+endswitch
+:Persistir registros y relaciones\nObservers: UUID, numeración y auditoría\nJobs/notificaciones cuando corresponda [21];
+:Actualizar listados, detalle, tablero\ny métricas relacionadas;
+stop
+legend bottom
+  Azul: flujo localizado en el código. Amarillo: propuesta o brecha explicada.
+  Las referencias [NN] remiten a las otras vistas de este mismo archivo.
+endlegend
+@enduml
+
+@startuml crm_01_entidades_comerciales
+title 01 · Qué es cada entidad y quién es dueño de los datos
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+left to right direction
+class "Business [PROPUESTA]\nbusinesses" as Business #FFF4CF {
+  id : UUID
+  name : nombre comercial
+  legal_name : razón social
+  tax_id : RUC / identificador fiscal (texto)
+  fiscal_address : dirección fiscal
+  email / phone
+  owner_user_id : propietario
+}
+class "User [ACTUAL]\nusers" as User {
+  id : UUID
+  name / email / password
+  crm_access
+  team_id : FK empresarial PROPUESTA
+}
+class "Role [ACTUAL]\nroles" as Role {
+  id : UUID
+  name : Owner / Admin / Manager / Employee
+  guard_name : web
+  team_id : null en roles globales
+}
+class "Asignación de rol [ACTUAL]\nmodel_has_roles" as RoleAssignment {
+  model_id / model_type
+  role_id
+  team_id : contexto empresarial obligatorio
+}
+class "Permission [ACTUAL]\npermissions" as Permission {
+  name : verbo + crm + módulo
+  guard_name
+}
+class "Equipo interno [ACTUAL]\ncrm_teams" as CrmTeam {
+  id / name / user_id
+  team_id : contexto externo legado
+}
+class "Organization [ACTUAL]\ncrm_organizations" as Org {
+  id / name / vat_number
+  organization_type_id / website_url
+  industry_id / timezone_id
+  team_id : dueño del registro comercial
+}
+class "Person [ACTUAL]\ncrm_people" as Person {
+  id / first_name / last_name
+  organization_id : opcional
+  team_id
+}
+class "Customer [ACTUAL, integración parcial]\ncrm_customers" as Customer {
+  id / customerable_type / customerable_id
+  team_id
+}
+class "Contact [ACTUAL]\ncrm_contacts" as Contact {
+  contactable_type / contactable_id
+  entityable_type / entityable_id
+  tipos mediante pivote
+}
+class "Datos de contacto [ACTUAL]" as Details {
+  Email : emailable + dirección + subscribed
+  Phone : phoneable + número + subscribed
+  Address : addressable + tipo + ubicación
+}
+class "Documento comercial [ACTUAL]" as Document {
+  Lead / Deal / Quote / Order
+  Invoice / PurchaseOrder / Delivery
+  vínculos según cada modelo
+}
+Business "1" .. "0..*" User : pertenencia propuesta\nusers.team_id
+Business "1" .. "0..*" Org : dueño propuesto\ncrm_organizations.team_id
+Business "1" .. "0..*" CrmTeam : agrupación propuesta\ncrm_teams.team_id
+User "1" -- "0..*" RoleAssignment
+RoleAssignment "0..*" -- "1" Role
+Role "0..*" -- "0..*" Permission : role_has_permissions
+User "0..*" -- "0..*" CrmTeam : crm_team_user
+Org "0..1" -- "0..*" Person : organization_id
+Org -- Details : relaciones polimórficas
+Person -- Details : relaciones polimórficas
+Customer .. Org : posible customerable\nrevisar nombres del morph
+Customer .. Person : posible customerable\nrevisar nombres del morph
+Contact .. Org : entityable / contactable
+Contact .. Person : entityable / contactable
+Contact .. Customer : contactable
+Document .. Org : contraparte comercial
+Document .. Person : persona relacionada
+Document .. Customer : algunos modelos exponen\ncustomer() o client()
+note bottom of Org
+  Ejemplo: tu negocio vende a "Acme SAC".
+  Acme es Organization. Puede ser prospecto, cliente,
+  proveedor o socio según uso comercial y clasificación.
+  No se convierte en cliente automáticamente por existir.
+  Su contacto "Ana, compras" es Person.
+end note
+note bottom of Customer
+  [BRECHA] Customer usa customerable().
+  Person::client() y Organization::client() usan clientable.
+  La migración actual define customerable_*.
+  OrderObserver tiene comentada la creación automática.
+  No hay un flujo uniforme "Organization -> Customer" operativo
+  demostrado por esta revisión estática.
+end note
+note top of Role
+  Decisión del usuario: roles generales compartidos.
+  roles.team_id = null no significa pertenencia a una empresa.
+  La asignación sí lleva el UUID empresarial.
+  Cambiar permisos de un rol global afecta a quienes lo usan.
+end note
+note top of Business
+  [PROPUESTA] Business aún no existe en app/Models.
+  No confundirlo con Organization ni con crm_teams.
+  Business y users.team_id en este dibujo son futuros.
+  Hoy la identidad comercial está parcialmente en Setting:
+  organization_name / vat_number / datos relacionados.
+end note
+@enduml
+
+@startuml crm_02_acceso_actual
+title 02 · Login, contexto de equipo y autorización [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Abrir ruta privada del CRM;
+if (¿Sesión autenticada?) then (no)
+  :Mostrar Login\nRate limit y validación de credenciales;
+  if (¿Olvidó contraseña?) then (sí)
+    :ForgotPassword valida email\nPassword::sendResetLink;
+    :Abrir enlace con token\nResetPassword valida email y contraseña confirmada;
+    if (¿Token y datos válidos?) then (sí)
+      :Guardar password hashed y nuevo remember_token\nEmitir PasswordReset y volver a Login;
+    else (no)
+      :Mostrar error de recuperación;
+    endif
+    stop
+  endif
+  if (¿Credenciales válidas?) then (no)
+    :Mostrar error de autenticación;
+    stop
+  endif
+  :Autenticar y regenerar sesión;
+endif
+:Ejecutar middlewares CRM\ny cargar ajustes del contexto;
+if (¿crm_access o excepción de crm_owner?) then (no)
+  :Responder 403;
+  stop
+endif
+if (¿Teams habilitado y existe currentTeam?) then (sí)
+  :TeamsPermission establece\nPermissionRegistrar::setPermissionsTeamId;
+  :BelongsToTeamsScope filtra por team_id\nen modelos que usan el trait;
+  :HasCrmAccess puede asignar Owner\nsi el usuario es propietario de currentTeam;
+else (no)
+  #FFF4CF:El contexto de permisos puede quedar sin team_id\ny el scope comercial no añade filtro empresarial;
+  note right
+    [BRECHA] User no define currentTeam(), allTeams()
+    ni switchTeam(). HasCrmTeams aporta agrupaciones
+    internas, no el contrato de tenancy.
+    Activar el flag no completa ese contrato.
+    Con teams desactivado hay bootstrap de Owner
+    basado en el email LARAVEL_CRM_OWNER.
+  end note
+endif
+:Resolver registro solicitado\ny ejecutar policy de la acción;
+if (¿Permiso funcional autorizado?) then (no)
+  :Responder 403\no 404 si el binding no encuentra el recurso;
+  stop
+endif
+:Controlador / componente Livewire\nValida entrada y ejecuta operación;
+:Servicio / Eloquent / observer\nPersistencia y respuesta;
+stop
+legend bottom
+  Permiso funcional y pertenencia empresarial son controles distintos.
+  [BRECHA] El modo multiempresa actual no garantiza aislamiento completo.
+  Fuentes: User, HasCrmAccess, TeamsPermission, BelongsToTeamsScope, policies.
+endlegend
+@enduml
+
+@startuml crm_03_registro_empresarial_propuesto
+title 03 · Registro de negocio + primer usuario [PROPUESTA, NO IMPLEMENTADO]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #FFF4CF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Visitante solicita crear su negocio;
+:Formulario: nombre del usuario, email\ncontraseña + confirmación y nombre comercial;
+:Validar datos, email único\ny protección ante reintentos del alta;
+if (¿Entrada válida?) then (no)
+  :Devolver errores sin crear registros;
+  stop
+endif
+:Iniciar transacción de base de datos;
+:Crear Business con UUID;
+:Crear User con users.team_id = Business.id\ny crm_access habilitado;
+:Vincular propietario: owner_user_id;
+:Guardar contexto de permisos anterior\ny establecer team_id = Business.id;
+:Limpiar relaciones roles / permissions del usuario;
+:Resolver rol global Owner\nname = Owner, guard_name = web, team_id = null;
+if (¿Rol global disponible?) then (no)
+  :Registrar fallo de provisión;
+  :Revertir transacción y restaurar contexto;
+  stop
+endif
+:Asignar Owner al usuario\nmodel_has_roles.team_id = Business.id;
+:Preparar catálogos y configuración empresarial\nque requieran pertenencia explícita;
+note right
+  Roles globales: no clonarlos por negocio.
+  No usar TeamObserver interno como alta SaaS.
+  La región sigue el alcance vigente de instancia por país.
+  RUC / razón social / dirección son datos empresariales.
+end note
+if (¿Falló alguna escritura del alta?) then (sí)
+  :Revertir negocio, usuario y asignación de rol\nRestaurar contexto en finally;
+  :Mostrar error recuperable\nsin dejar empresa o usuario incompletos;
+  stop
+endif
+:Confirmar transacción;
+:Restaurar contexto temporal\ny activar negocio del usuario en su sesión;
+:Notificar después del commit\ny autenticar con sesión regenerada;
+:Mostrar perfil de empresa\nCompletar razón social, RUC y dirección fiscal;
+:Acceder al dashboard\nBloquear operaciones sin negocio válido;
+stop
+legend bottom
+  Un usuario pertenece a una empresa en el alcance inicial.
+  Invitados se unen a la empresa de su invitación [04].
+  /p/register crea identidad de portal: no sustituye este flujo.
+endlegend
+@enduml
+
+@startuml crm_04_colaboradores
+title 04 · Usuarios, invitaciones, equipos y roles [ACTUAL + brechas]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Administrador abre usuarios\nPolicy según acción solicitada;
+switch (Operación)
+case (Crear / editar)
+  :Validar nombre, email y campos\nResolver rol permitido para el actor;
+  if (¿Concede Owner sin ser Owner?) then (sí)
+    :Rechazar con 403;
+    stop
+  endif
+  :Crear / actualizar User y crm_access\nAsignar rol y datos de contacto;
+case (Invitar)
+  :Crear UserInvitation\nemail, role_id, invited_by, team_id\ncódigo, expires_at y last_sent_at;
+  :Enviar enlace de invitación;
+  :Destinatario abre enlace público\nBuscar código vigente y no aceptado;
+  if (¿Invitación válida?) then (no)
+    :Mostrar invitación inválida / expirada;
+    stop
+  endif
+  if (¿Existe usuario por email?) then (sí)
+    :Pedir login si falta sesión;
+    if (¿Email autenticado coincide?) then (no)
+      :Rechazar con 403;
+      stop
+    endif
+  else (no)
+    :Pedir nombre y contraseña confirmada\nCrear identidad;
+  endif
+  :En transacción: activar crm_access\nEstablecer contexto antes de resolver rol;
+  :Revalidar facultad de quien invitó\npara conferir Owner;
+  :Asignar rol, aplicar membresía del host\ny marcar accepted_at;
+case (Importar CSV)
+  :Validar archivo / columnas\nGenerar vista previa por fila;
+  :Importar usuarios / roles / datos\nCorreo de recuperación según flujo;
+case (CLI laravelcrm:add-user)
+  :Buscar email o crear User\nHabilitar crm_access;
+  :Elegir rol y ejecutar assignRole;
+  #FFF4CF:[BRECHA] No establece contexto de Spatie\nni engloba el alta en una transacción\nPuede fallar por team_id null;
+case (Administrar roles)
+  :RoleCreate / RoleEdit / RoleShow / RoleIndex\nNombre, descripción y selección de permisos;
+  :Autorizar operación y limpiar cache de Spatie\nAsignar / sincronizar permisos según componente;
+  note right
+    RoleEdit actual bloquea editar Owner/Admin
+    y roles con usuarios asociados.
+    Roles globales compartidos no son perfiles
+    independientes personalizables por empresa.
+  end note
+case (Equipo interno)
+  :TeamCreate / TeamEdit\nNombre, creador y selección de integrantes;
+  :Sincronizar crm_team_user\nTeamCreate incorpora al creador;
+  #FFF4CF:[BRECHA] TeamCreate intenta switchTeam / current_team_id\nademás del agrupamiento interno;
+case (Equipo del host)
+  :HostTeamController intenta resolver\nhost_team_model / ownedTeams / App\Models\Team;
+  :Si falta modelo del host, aborta\nSi existe: crear y cambiar contexto;
+  note right
+    Este flujo heredado depende del contrato del host.
+    No equivale al Business propuesto ni a una
+    pantalla de perfil fiscal ya implementada.
+  end note
+endswitch
+if (¿Teams del host habilitado?) then (sí)
+  #FFF4CF:Varias rutas usan team_user y current_team_id\n[BRECHA] El host no completa ese esquema;
+endif
+:Opcional: asignar agrupaciones internas\ncrmTeams() <-> crm_team_user <-> crm_teams;
+note right
+  Equipo interno = Ventas / Soporte, no empresa.
+  [BRECHA] TeamObserver clona roles, asigna Owner
+  y siembra datos al crear crm_teams con teams activo.
+  Debe adaptarse a Business + roles globales.
+end note
+:Mostrar usuario, invitación o equipo actualizado;
+stop
+legend bottom
+  Seeder: Owner/Admin = 152 permisos, Manager = 101, Employee = 82.
+  Manager añade campañas/plantillas, gestión de chat y estados de features.
+  Employee incluye borrado de muchos registros: no significa solo lectura.
+  Fuente: LaravelCrmPermissionsSeeder y flujos Users / TeamObserver.
+endlegend
+@enduml
+
+@startuml crm_05_agenda_comercial
+title 05 · Organizaciones, personas, contactos y clientes [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Registrar contraparte comercial;
+switch (¿Qué se registra?)
+case (Entidad / empresa)
+  :Crear Organization\nNombre, vat_number, web, descripción\ntipo y demás atributos habilitados;
+  :Añadir teléfonos, emails y direcciones\nAddressType distingue clase de dirección\nClasificar mediante etiquetas y tipo;
+  :Catálogos relacionados: OrganizationType\nIndustry y Timezone según atributos/formulario;
+  :Ejemplo: Acme SAC\nProspecto al que ofreces servicios\no proveedor al que compras;
+case (Persona)
+  :Crear Person\nNombres, apellidos y datos personales;
+  :Añadir emails, teléfonos y direcciones;
+  if (¿Vinculada a organización?) then (sí)
+    :Asignar person.organization_id\nEjemplo: Ana, compradora de Acme;
+  else (no)
+    :Persona independiente\nPuede ser contraparte de venta;
+  endif
+case (CSV)
+  :Importar People u Organizations\nValidar archivo y vista previa\nResolver campos y crear registros;
+endswitch
+:Abrir ficha comercial\nRelaciones, etiquetas, campos y actividad;
+if (¿Necesita vínculos de contactos?) then (sí)
+  :Contact como vínculo polimórfico\ncontactable = dueño de la relación\nentityable = entidad relacionada;
+  :Clasificar con ContactType y pivote;
+endif
+switch (Siguiente acción)
+case (Captación)
+  :Crear Lead con Person / Organization [06];
+case (Negociación)
+  :Crear Deal con Person / Organization [06];
+case (Venta directa)
+  :Crear Quote u Order\nNo exige Lead previo [07-08];
+case (Compra)
+  :Usar Organization como proveedor\nen PurchaseOrder [11];
+case (Seguimiento)
+  :Task / Note / Call / Meeting\nLunch / File según módulo [13];
+endswitch
+note right
+  Organization no es la empresa dueña del CRM.
+  Existir en agenda no acredita que ya haya comprado.
+  Su condición comercial depende de operaciones
+  y clasificación, no de una conversión universal.
+  Customer es una capa adicional con brechas [01].
+  Person no es automáticamente un User de login.
+end note
+stop
+legend bottom
+  Fuentes: Organization, Person, Contact, Customer; PersonService::linkToOrganization;
+  OrganizationService; Livewire People/Organizations y sus importadores.
+endlegend
+@enduml
+
+@startuml crm_06_leads_deals
+title 06 · Captación y oportunidades — Lead / Deal [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Origen: alta manual, Person / Organization\nchat convertido a lead [15] o API [20];
+if (¿Registrar prospecto como Lead?) then (sí)
+  :Autorizar create crm leads;
+  :Elegir / crear Person y Organization\nVincular persona si procede;
+  :Guardar Lead\ntítulo, descripción, importe, moneda\nlead_source_id, lead_status_id\npipeline_id, pipeline_stage_id, propietario;
+  :LeadSource registra procedencia\nLeadStatus ofrece clasificación del lead;
+  :Añadir contacto, etiquetas y campos\nsegún formulario;
+  :Listar / buscar / filtrar\nMover entre etapas del tablero;
+  if (¿Convertir a Deal?) then (sí)
+    :DealCreate desde Lead\nPrecargar contraparte e importe;
+    :Guardar Deal con lead_id;
+    :Marcar lead.converted_at;
+  else (no)
+    if (¿Cotizar desde Lead?) then (sí)
+      :QuoteCreate desde Lead [07]\nPermite omitir Deal;
+    else (no)
+      :Conservar Lead para seguimiento\nEditar, añadir actividad o eliminar;
+    endif
+    stop
+  endif
+else (no)
+  :Crear Deal directamente\no desde Person / Organization;
+endif
+:Guardar / editar Deal\nContraparte, importe, moneda, productos\netiquetas, campos y propietario;
+:DealProduct conserva las líneas de oportunidad\nproducto, variante, cantidad e importes;
+:Seleccionar Pipeline y PipelineStage\nPipelineStageProbability cuando aplica;
+:Seguimiento con actividades [13]\nListado y kanban;
+switch (Resultado)
+case (Negociación)
+  :Cambiar etapa / editar oportunidad;
+case (Ganada)
+  :DealShow::won\nclosed_status = won + closed_at;
+case (Perdida)
+  :DealShow::lost\nclosed_status = lost + closed_at;
+case (Reabrir)
+  :DealShow::reopen\nLimpiar cierre y resultado;
+endswitch
+if (¿Emitir cotización?) then (sí)
+  :QuoteCreate desde Deal [07]\nPrecargar contraparte y moneda;
+endif
+note right
+  Ganar un Deal no crea factura, pedido o Customer
+  automáticamente. Son acciones separadas.
+  Las etapas se configuran: no hay nombres fijos
+  inventados en este diagrama.
+end note
+stop
+@enduml
+
+@startuml crm_07_cotizaciones
+title 07 · Cotización — elaboración, envío y decisión [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Crear Quote directa\no desde Lead / Deal / Person / Organization;
+:Autorizar, validar y resolver contraparte;
+:Elegir productos / variantes [12]\nCantidad, precio, comentarios y moneda;
+:Calcular importes e impuestos\nGuardar Quote + QuoteProduct;
+:Guardar lead_id / deal_id según origen\npipeline/etapa, términos, etiquetas y campos;
+:Elegir plantilla PDF\nPrevisualizar / descargar [18];
+if (¿Enviar al destinatario?) then (sí)
+  :QuoteSend valida destinatarios\nGenera URL firmada y envía correo;
+  :Abrir /p/quotes/{external_id};
+  if (¿Firma URL válida?) then (no)
+    :Rechazar acceso;
+    stop
+  endif
+  :Ajustes del equipo del documento\nMostrar cotización y acciones públicas;
+else (no)
+  :Gestionar decisión desde QuoteShow\nsegún autorización interna;
+endif
+switch (Decisión)
+case (Aceptar)
+  :Guardar accepted_at\nLimpiar rechazo según acción;
+case (Rechazar)
+  :Guardar rejected_at\nLimpiar aceptación según acción;
+case (Consultar / descargar)
+  :Mostrar documento / PDF\nMantener decisión vigente;
+endswitch
+if (¿Personal interno crea pedido?) then (sí)
+  :OrderCreate desde Quote [08]\nPrecargar referencias, contraparte y moneda\nLíneas mediante formulario de productos;
+else (no)
+  :Continuar seguimiento\nEditar o revertir decisión según permiso;
+endif
+note right
+  Aceptar no equivale a cobrar.
+  Crear Order es una acción separada.
+  No se afirma aceptación obligatoria
+  en toda ruta de creación de pedidos.
+end note
+stop
+@enduml
+
+@startuml crm_08_pedidos
+title 08 · Pedido — núcleo de venta y ramificaciones [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Crear Order directo\no desde Quote / Person / Organization;
+:Autorizar y validar;
+:Seleccionar / crear Person / Organization\nVincular person.organization_id si procede;
+:Productos / variantes y cantidades\nPrecios, impuestos, descuentos y ajustes;
+:Direcciones billing / shipping\nsegún opciones del formulario;
+:OrderService guarda Order + OrderProduct\nlead_id / deal_id / quote_id\nTotales, moneda, comentarios, quote_product_id;
+:Observer asigna external_id\nnúmero, prefijo e identificador visible;
+:Mostrar detalle, líneas y documentos relacionados;
+note right
+  Order tiene hasMany facturas, entregas y compras.
+  Esto no garantiza validación de cantidades
+  acumuladas o conciliación entre documentos.
+  OrderObserver tiene comentada la creación
+  automática de Customer.
+end note
+:Seleccionar acción adicional\nIndependiente y repetible;
+switch (Acción)
+case (Facturar)
+  :InvoiceCreate desde Order [09]\ninvoice.order_id\nLíneas con order_product_id;
+case (Entregar)
+  :Delivery desde Order [10]\nLíneas, cantidades y dirección;
+case (Comprar a proveedor)
+  :PurchaseOrderCreate desde Order [11]\nOrganization proveedora y líneas;
+case (Documentar)
+  :PDF [18]\nActividades / campos [13];
+case (Editar / eliminar)
+  :Validar policy\nActualizar o borrar lógicamente;
+endswitch
+:Volver al pedido y sus relaciones\nActualizar métricas relacionadas;
+stop
+@enduml
+
+@startuml crm_09_facturacion
+title 09 · Factura — emisión, envío y registro de pago [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Crear Invoice directa\no precargar desde Order;
+:Autorizar y validar\nContraparte, moneda y propietario;
+:Fechas de emisión y vencimiento\nTérminos, instrucciones de pago y líneas;
+:InvoiceService guarda Invoice + InvoiceLine\nProducto, variante, cantidad, precio, impuesto\norder_product_id cuando aplica;
+:Observer genera numeración e identificador\nGuardar importes y saldos según modelo;
+if (¿Xero habilitado y conectado?) then (sí)
+  :Rama de integración [19]\nReferencia XeroInvoice según servicio;
+endif
+if (¿Enviar factura?) then (sí)
+  :InvoiceSend genera enlace firmado\ny envía correo;
+  :Abrir /p/invoices/{external_id};
+  :Validar firma y fijar ajustes\nsegún documento, no sesión del destinatario;
+  :Consultar / descargar PDF;
+endif
+if (¿Registrar pago interno?) then (sí)
+  :Abrir InvoicePay\nAutorizar update y validar amount;
+  #FFF4CF:Validación exige amount = saldo pendiente\nNo es un flujo general de pagos parciales;
+  :Actualizar amount_paid / amount_due\nSi saldo calculado = 0, fully_paid_at;
+  note right
+    Registro manual: no hay pasarela de pago
+    ni conciliación bancaria en este flujo.
+    La fórmula mezcla saldo e importe pagado:
+    revisar escenarios con pagos previos.
+    No se ejecutaron cobros para validar el diagrama.
+  end note
+else (no)
+  :Conservar factura y saldo\nConsultar / editar según permiso;
+endif
+:Dashboard agrega facturas pagadas\ny otros indicadores;
+stop
+legend bottom
+  Invoice es un documento CRM. No se identificó aquí emisión electrónica SUNAT,
+  firma fiscal ni libros contables. Guardar RUC no implementa esas capacidades.
+endlegend
+@enduml
+
+@startuml crm_10_entregas
+title 10 · Entregas asociadas a pedidos [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Abrir creación de Delivery\nNormalmente desde un pedido;
+:Autorizar y seleccionar Order;
+:Elegir OrderProduct y cantidades;
+:Definir dirección de entrega\ny delivered_on si el formulario lo habilita;
+:DeliveryService guarda Delivery\norder_id, propietario y fecha cuando aplica;
+:Crear DeliveryProduct\norder_product_id + quantity positiva;
+:Guardar direcciones polimórficas;
+:Observer aplica identificación y auditoría;
+:Consultar / editar / eliminar\nPrevisualizar o descargar PDF;
+note right
+  No se identificó en este módulo un libro de stock,
+  kardex, almacenes o movimientos de inventario.
+  Crear entrega no prueba una salida contable de stock.
+  El atajo legado OrderController::createDelivery
+  no prepara quantity como espera DeliveryService:
+  no se presenta como conversión validada.
+end note
+:Regresar a entregas del pedido;
+stop
+@enduml
+
+@startuml crm_11_compras
+title 11 · Compra a proveedor — PurchaseOrder [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Crear PurchaseOrder directa\no precargar desde Order;
+:Organization proveedora\nPerson de contacto opcional;
+:Autorizar y validar emisión, entrega\nmoneda y referencia;
+:Productos / variantes\nCantidad, precio, impuestos y comentarios;
+:Modalidad e instrucciones de entrega;
+if (¿delivery_type = deliver?) then (sí)
+  :Copiar dirección elegida\na Address del PurchaseOrder;
+endif
+:PurchaseOrderService guarda PurchaseOrder\ncon PurchaseOrderLine\norder_id opcional, proveedor y términos\norder_product_id cuando aplica;
+:Calcular subtotal / impuestos / total\nAsignar numeración y auditoría;
+if (¿Usa storeMultiple legado?) then (sí)
+  :Agrupar líneas por organization_id\nCrear PurchaseOrder por proveedor;
+  note right
+    Controlador localizado en el código.
+    No se afirma que sea la misma UI que Livewire.
+  end note
+endif
+if (¿Xero habilitado y conectado?) then (sí)
+  :Referencia XeroPurchaseOrder\nsegún rama de integración [19];
+endif
+if (¿Enviar al proveedor?) then (sí)
+  :PurchaseOrderSend envía enlace firmado;
+  :Abrir /p/purchase-orders/{external_id};
+  :Validar firma y ajustes del documento\nMostrar / descargar PDF;
+endif
+:Consultar / editar / eliminar\nRegresar a compras o pedido de origen;
+note right
+  Organization puede ser proveedor en esta compra
+  y comprador en otra operación.
+  No se identificó aquí un flujo integral de cuentas
+  por pagar, recepción de almacén o pago al proveedor.
+end note
+stop
+@enduml
+
+@startuml crm_12_catalogo
+title 12 · Productos, variantes, precios e impuestos [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Autorizar administración de productos;
+:Crear / editar ProductCategory;
+:Crear Product\nDatos comerciales y categoría;
+:TaxRate del producto\no valores predeterminados;
+if (¿Tiene variantes?) then (sí)
+  :Crear ProductVariation\nAtributos, código, orden y precios;
+endif
+:Registrar ProductPrice\nProducto, variante opcional, moneda e importe;
+:Guardar y consultar catálogo\nListar / filtrar / editar / borrar;
+:Añadir producto a Deal / Quote / Order\nInvoice / PurchaseOrder;
+:Resolver variante y precio\npor producto y moneda del documento;
+note right
+  [BRECHA] Product::unitPriceFor puede recurrir
+  al precio de moneda predeterminada si falta el solicitado.
+  Eso no es conversión monetaria.
+  Money y formularios usan escala 100:
+  no inferir soporte completo de todas las monedas.
+end note
+if (¿Producto nuevo desde documento\ny opción dinámica habilitada?) then (sí)
+  :Servicios pueden crear producto\ndesde los datos de la línea;
+endif
+:Guardar snapshot de línea\nCantidad, precio, moneda, importe e impuesto\nReferencia a producto / variante;
+note right
+  Líneas usan withTrashed para acceder a productos
+  y variantes borrados lógicamente.
+  El catálogo no demuestra gestión de stock físico.
+end note
+:Con Xero disponible: sincronizar productos\ny mantener XeroItem [19];
+stop
+@enduml
+
+@startuml crm_13_actividades
+title 13 · Seguimiento, tareas, archivos y campos [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Abrir ficha compatible con actividades\nPerson / Organization / Lead / Deal\no documento/entidad que use los traits;
+:Elegir operación y validar policy;
+switch (Seguimiento)
+case (Task)
+  :Crear tarea\nDescripción, inicio/vencimiento\npropietario y responsable;
+  :Relacionar taskable_type / taskable_id;
+  if (¿Finalizar?) then (sí)
+    :Actualizar completed_at;
+  endif
+case (Call / Meeting / Lunch)
+  :Registrar llamada, reunión o almuerzo\nHorario, responsables y contactos;
+  :Vincular callable / meetingable / lunchable;
+case (Note)
+  :Crear Note mediante noteable\nrelated_note_id cuando corresponde;
+case (File)
+  :Validar y subir archivo\nMetadatos, ubicación y fileable;
+  :Descargar / eliminar según permiso\nrelated_file_id cuando corresponde;
+case (Campos)
+  :FieldGroup / Field\nFieldOption y FieldModel: opciones y uso;
+  :FieldValue vinculado al campo\ny entidad polimórfica;
+case (Etiquetas)
+  :Seleccionar Label\nRelacionar mediante labelable y pivote;
+endswitch
+:Observers / traits registran Activity\ncauseable, timelineable, recordable;
+:Mostrar feed y pestañas de actividad\npor registro y en dashboard;
+if (¿Evento con recordatorio y responsable?) then (sí)
+  :laravelcrm:reminders cada minuto [21];
+  :Buscar tareas pendientes y eventos\nen ventana UTC, reminder_email = 0;
+  :Notificar a user_assigned_id\nMarcar reminder_email = 1;
+endif
+note right
+  Traits y relaciones habilitados difieren por modelo.
+  No todas las entidades admiten cada acción.
+  Auditoría: created / updated / deleted / restored,
+  propietario y responsable donde la tabla los contempla.
+end note
+stop
+@enduml
+
+@startuml crm_14_campanas
+title 14 · Campañas email / SMS y tracking [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Autorizar campaña y seleccionar canal;
+:EmailTemplate / SmsTemplate\no contenido específico;
+:Crear EmailCampaign / SmsCampaign\nstatus = draft;
+:Editar mientras isEditable lo permita\nAsunto/preview email o remitente SMS;
+if (¿Programar?) then (no)
+  :Mantener borrador;
+  stop
+endif
+:Interpretar fecha local con setting timezone\nValidar futuro o enviar ahora\nscheduled_at UTC + timezone;
+:Actualizar status = scheduled;
+switch (Canal)
+case (Email)
+  :Materializar en servicio\nEmail subscribed = true, dueño Person;
+  :Normalizar / deduplicar direcciones\nEmailCampaignRecipient pending;
+case (SMS)
+  :Encolar MaterialiseSmsCampaignRecipients;
+  :Phone subscribed = true, dueño Person\nNormalizar / deduplicar números;
+  :SmsCampaignRecipient pending\ntracking_token y team_id de campaña;
+endswitch
+:Scheduler: email-campaigns-dispatch\no sms-campaigns-dispatch;
+:Campañas scheduled cuyo horario venció\nstatus = sending, job por pending;
+if (¿Se cancela?) then (sí)
+  :Servicio cambia a cancelled si lo permite;
+  note right
+    Comprobación al enviar difiere por canal.
+    No afirmar que todos los jobs ya encolados
+    se anulan automáticamente.
+  end note
+endif
+:Job carga destinatario y condiciones del canal;
+if (¿Sigue suscrito?) then (no)
+  :Marcar skipped y motivo;
+else (sí)
+  :Personalizar variables y enlaces\nEmail: Laravel Mail\nSMS: ClickSendService;
+  if (¿Envío completado?) then (sí)
+    :Recipient sent + sent_at\nContadores según canal;
+  else (no)
+    :Reintentos según job\nfailed al fallar definitivamente;
+  endif
+endif
+:Tracking público por token\nEmail: aperturas / clics / baja\nSMS: clics / baja;
+:EmailCampaignClick / SmsCampaignClick\nActualizar métricas;
+:Sin pending, dispatcher finaliza\nEmail: sent\nSMS: sent o failed según contadores;
+:Mostrar métricas y estado;
+stop
+legend bottom
+  Destinatarios: emails/teléfonos suscritos de Person, no todos los User de login.
+  Jobs/consultas sin sesión necesitan contexto empresarial al completar tenancy.
+endlegend
+@enduml
+
+@startuml crm_15_chat
+title 15 · Chat embebido, atención y conversión a Lead [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Configurar ChatWidget\nClave pública, apariencia y comportamiento;
+:Insertar script /p/chat/{publicKey}.js;
+:Mostrar iframe /p/chat/{publicKey};
+:init busca / crea ChatVisitor\nvisitor_token opaco en navegador;
+note right
+  Fuera del middleware web.
+  Usa token de visitante, no login CRM
+  ni CSRF de sesión.
+end note
+:Buscar conversación abierta\no crear ChatConversation open;
+:Registrar contexto y ChatVisitorPageView;
+:Identificar nombre/email opcionalmente\nEnviar ChatMessage;
+if (¿Hay agentes disponibles?) then (no)
+  :Respuesta offline y notificaciones\nsegún ajustes;
+endif
+:Eventos / Reverb y consulta de mensajes;
+:Agente abre bandeja CRM\nview crm chat / reply crm chat;
+:Leer historial y páginas visitadas\nResponder, marcar lectura o cerrar;
+if (¿Convertir en Lead?) then (sí)
+  :Autorizar creación de Lead\nComprobar lead_id contra duplicación;
+  :Reutilizar / crear Person del visitante\ncon datos de contacto;
+  :Crear Lead con datos de conversación;
+  :Guardar conversation.lead_id\nContinuar embudo [06];
+endif
+if (¿Cerrar atención?) then (sí)
+  :ChatService::close\nstatus = closed y fecha;
+endif
+:Conservar historial y relación comercial;
+stop
+@enduml
+
+@startuml crm_16_roadmap
+title 16 · Funcionalidades, votos y portal público [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Seleccionar canal de funcionalidades;
+if (¿Usuario interno CRM?) then (sí)
+  :Autorizar Feature\nCrear / editar título, descripción\nis_public y FeatureStatus;
+  :Listado / tablero interno\nVotantes y comentarios;
+  :Gestionar estados con permiso\nmanage crm feature statuses;
+else (visitante)
+  :Abrir /p/features\no /p/features/team/{portalTeam};
+  :Resolver PortalTeam\nContexto exigido ausente: 404;
+  :Mostrar features públicas del tablero\nFiltrar estado y ordenar;
+  if (¿Abrir detalle?) then (sí)
+    :Comprobar is_public y contexto\nRegistrar FeatureView;
+  endif
+  if (¿Proponer, votar o comentar?) then (sí)
+    if (¿Existe sesión?) then (no)
+      :Login portal\nRegistro opcional si está habilitado;
+      :PortalAuthService crea User de portal\nIntención: crm_access deshabilitado;
+      note right
+        [BRECHA] User solo permite mass assignment de
+        name/email/password. El create del portal incluye
+        crm_access, ausente de Fillable: comprobar default.
+        No crea Business ni convierte automáticamente
+        al usuario en Person / Organization / Customer.
+      end note
+    endif
+    :Validar acción y rate limit;
+    switch (Acción pública)
+    case (Proponer)
+      :Crear Feature pública\nteam_id del tablero y submitted_by_user_id;
+    case (Votar / retirar)
+      :Crear / retirar FeatureVote;
+    case (Comentar)
+      :Crear FeatureComment\nparent_id / respuestas cuando aplica;
+    endswitch
+  endif
+endif
+:Equipo revisa, responde y cambia estado;
+:Publicar progreso\nConservar comentarios, votos y vistas;
+stop
+@enduml
+
+@startuml crm_17_monitoreo
+title 17 · Disponibilidad HTTP, rendimiento y SSL [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Autorizar creación / edición de Monitor;
+:URL, nombre, intervalo\nuptime/SSL y responsables;
+:Validar mediante MonitorUrlGuard;
+:Guardar Monitor y campos;
+:laravelcrm:monitor-check cada minuto\nsi módulo habilitado;
+:Seleccionar monitores activos vencidos;
+:Encolar RunMonitorCheck con monitor.id;
+if (¿Uptime habilitado?) then (sí)
+  :Validar destino\nSolicitud HTTP con timeout;
+  :Medir status_code y tiempo;
+  switch (Resultado)
+  case (Aceptada y rápida)
+    :status = up;
+  case (Aceptada pero lenta)
+    :status = slow;
+  case (Error / no aceptada)
+    :status = down, registrar error;
+  endswitch
+  :Guardar MonitorCheck\nActualizar resumen y checked_at;
+  :Evaluar transición y umbrales\nAlertar caída / lentitud / recuperación\nsegún duración y avisos previos;
+endif
+if (¿SSL habilitado y pendiente?) then (sí)
+  :Comprobar certificado TLS\nValidez y expiración;
+  :Guardar MonitorCheck SSL\ny resumen del Monitor;
+  :Alertar invalidez / vencimiento\nsegún umbrales y deduplicación;
+endif
+if (¿Job falla definitivamente?) then (sí)
+  :Registrar error según failed;
+endif
+:Notificar destinatarios\nMostrar historial y resumen;
+stop
+@enduml
+
+@startuml crm_18_ajustes_documentos
+title 18 · Ajustes, identidad comercial y PDF [ACTUAL + propuesta]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Abrir Settings\nAutorizar view / edit crm settings;
+:SettingEdit carga SettingService\nPares nombre / valor de crm_settings;
+:Elegir grupo visible según módulos;
+switch (Grupo funcional)
+case (Identidad actual)
+  :organization_name / vat_number\nLogo, emails, teléfonos, direcciones;
+  #FFF4CF:Configuración parcial\nNo hay Business ni separación dedicada\nentre razón social y nombre comercial;
+case (Región)
+  :País, moneda, idioma, timezone\nFormatos de fecha y hora;
+  :CrmDateTime: entradas locales -> UTC\nPresentación en zona configurada;
+case (Documentos)
+  :Prefijos, términos de cotización/factura/compra\nInstrucciones de pago y contacto PDF;
+case (Catálogos)
+  :Pipelines, etapas, probabilidades\nEtiquetas, fuentes, categorías, impuestos\nFieldGroup / Field / FieldOption / FieldModel;
+case (Formularios)
+  :Opciones por tipo de documento\nProductos dinámicos / actividad relacionada;
+endswitch
+:Validar / guardar\nInvalidar cache cuando corresponde;
+note right
+  SettingService combina globales y contexto.
+  [PROPUESTA] Business será autoridad de razón social,
+  RUC y dirección fiscal. Evitar dos fuentes editables
+  del mismo dato al adaptar ajustes y PDFs.
+end note
+:Abrir Quote / Order / Invoice\nDelivery / PurchaseOrder;
+:PdfTemplateRegistry resuelve plantilla\nPreferencia del documento y defaults;
+:Preparar contraparte, líneas, moneda y totales\nIdentidad emisora y logo del contexto;
+if (¿Portal firmado?) then (sí)
+  :Validar firma\nSettingService::forTeam con\nPortalTeam::forDocument;
+endif
+switch (Salida)
+case (Preview)
+  :Renderizar HTML\nVista previa / selector;
+case (Descarga)
+  :Generar PDF con renderer de la ruta\nFuentes y logo preparados para PDF;
+case (Envío)
+  :Correo con enlace firmado\nsegún componente Send;
+endswitch
+stop
+@enduml
+
+@startuml crm_19_integraciones
+title 19 · Integraciones externas [ACTUAL, condicional]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Abrir Integrations;
+switch (Proveedor)
+case (Xero)
+  :Comprobar paquete y configuración\nXeroIntegration / credenciales;
+  if (¿Disponible?) then (no)
+    :Mostrar estado no disponible\nSin llamadas externas;
+    stop
+  endif
+  :Conectar OAuth\nAutorizar cuenta y guardar token;
+  :Comprobar conexión antes de sincronizar;
+  switch (Acción independiente solicitada)
+  case (Contactos)
+    :Contactos / organizaciones / personas\nsegún comando/controlador\nXeroContact / XeroPerson;
+  case (Productos)
+    :Productos\nXeroItem vinculado a Product;
+  case (Factura)
+    :Factura externa cuando aplica\nXeroInvoice vinculado a Invoice;
+  case (Compra)
+    :Compra externa cuando aplica\nXeroPurchaseOrder vinculado a PurchaseOrder;
+  endswitch
+  :Scheduler condicional\nkeep-alive 5 min, contactos/productos 10 min;
+  :Consultar estado / desconectar;
+case (ClickSend)
+  :Credenciales en ClickSendConnect;
+  :Campaña SMS y destinatarios [14];
+  :Job usa ClickSendService\nEnviar y guardar resultado/error;
+case (Correo)
+  :Laravel Mail / transporte configurado\nDocumentos, invitaciones, notificaciones\ncampañas y recuperación de acceso;
+  :Mailpit en compose local\nNo acredita entrega real de producción;
+case (Tiempo real)
+  :Broadcast / Reverb\nEventos y canales de chat;
+  :Consumir desde UI\nAutorización según código del host;
+endswitch
+note right
+  Código de integración no implica paquete instalado,
+  credenciales válidas o sincronización probada.
+  No se hicieron envíos ni llamadas comerciales.
+  Tokens/jobs/consultas requieren contexto empresarial
+  al completar la integración multiempresa.
+end note
+stop
+@enduml
+
+@startuml crm_20_api
+title 20 · API v2 — identidad, contexto y recursos [ACTUAL + brechas]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Cliente llama {prefijo CRM}/api/v2\nHabitual crm/api/v2, configurable;
+:Middleware api + JSON\nthrottle:laravel-crm-api;
+if (¿Solicita token?) then (sí)
+  :POST auth/token\nemail, password, device_name;
+  :Rate limit por ruta/cuenta\nComprobar contraseña y crm_access;
+  if (¿Credenciales / acceso válidos?) then (no)
+    :Error de validación\no 429 por límite;
+    stop
+  endif
+  #FFF4CF:AuthController llama User::createToken\n[BRECHA] User no usa HasApiTokens\nNo se localizó migración personal_access_tokens;
+  :Con prerrequisitos resueltos:\ndevolver token y usuario;
+  stop
+endif
+:auth:sanctum\ncrm-api y laravel-crm.api.team;
+if (¿Header X-Team-ID?) then (sí)
+  :Validar contra allTeams del usuario;
+  if (¿Pertenece al solicitado?) then (no)
+    :403;
+    stop
+  endif
+  :Fijar currentTeam para esta solicitud\ny contexto de permisos Spatie;
+else (no)
+  :Aplicar currentTeam cuando existe;
+endif
+note right
+  [BRECHA] User no define allTeams/currentTeam.
+  El header no crea membresía ni empresa.
+  Rutas localizadas, no API SaaS certificada.
+end note
+switch (Recurso)
+case (Identidad)
+  :GET auth/me\nDELETE auth/token;
+  :Devolver usuario o revocar token actual\nsin pasar por CRUD de recursos comerciales;
+  stop
+case (Agenda)
+  :people / organizations;
+case (Catálogo)
+  :products\nproducts/{product}/variations;
+case (Ventas)
+  :leads / deals / quotes / orders / invoices;
+endswitch
+:Recursos: index / show / store / update / destroy\nsegún apiResource y controlador;
+:Resolver external_id\nVariación debe pertenecer al Product;
+:Policy y FormRequest\nScopedExists / OwnerInCurrentTeam cuando aplica;
+:Servicios compartidos con UI\nTransformar con API Resource;
+:JSON, orden y filtros permitidos\nPaginación default 25, máximo 100;
+stop
+legend bottom
+  No hay apiResource v2 para cada módulo de la UI.
+  No inventar API de compras/entregas/campañas por simetría.
+  El widget tiene otra superficie pública [15].
+endlegend
+@enduml
+
+@startuml crm_21_operacion
+title 21 · Persistencia, scheduler, colas y mantenimiento [ACTUAL]
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam activityBackgroundColor #EAF3FF
+skinparam noteBackgroundColor #FFF4CF
+start
+:Laravel + CRM embebido\nServiceProvider registra rutas, policies\nobservers, comandos y recursos;
+:Instalación / actualización explícita\nlaravelcrm:install / upgrade / permissions\nMigraciones y seeders del host/módulo;
+note right
+  Se documentan comandos, no se ejecutan.
+  Reinstalar no completa tenancy.
+  Seeders globales no crean el Business propuesto.
+end note
+:Solicitud web / Livewire / API\no comando de consola;
+:Validación y autorización\nServicio / repositorio / Eloquent;
+:Observers preparan UUID externos\nnumeración, prefijos, auditoría y actividad;
+:NumberGeneratorService usa lock de cache\ny contador del modelo;
+note right
+  [BRECHA] Clave organizada por modelo,
+  sin partición empresarial explícita.
+  No asumir secuencia independiente por empresa.
+end note
+:PostgreSQL\nPK/FK UUID, pivotes, relaciones polimórficas\nSoftDeletes donde está implementado;
+:Redis en compose\nCache / sesiones / cola\nArchivos y logos en storage configurado;
+fork
+  :Scheduler periódico;
+  :Cada minuto: reminders\nemail-campaigns-dispatch\nsms-campaigns-dispatch\nmonitor-check si habilitado;
+  :Diario: laravelcrm:archive;
+  #FFF4CF:Archive solo imprime mensajes\nSu handle no implementa archivado real;
+  :Xero configurado: keep-alive 5 min\ncontacts / products 10 min;
+fork again
+  :Worker procesa jobs\nSendEmailCampaignRecipient\nSendSmsCampaignRecipient\nMaterialiseSmsCampaignRecipients\nRunMonitorCheck;
+  :SendImportPasswordReset\nRecuperación de acceso de importados;
+  :Errores / reintentos y notificaciones\nsegún job;
+fork again
+  :Reverb distribuye eventos de chat\nUI actualiza mensajes y lectura;
+fork again
+  :SystemCheckService / banner\nDiagnóstico de prerrequisitos y esquema\nActualizaciones;
+  :UsageRequest: solicitudes de uso del módulo\nNo es Business ni documento comercial;
+end fork
+:Dashboard, listados y métricas\nLogs y estado de procesos;
+note right
+  Completar multiempresa requiere contexto en jobs,
+  CLI, portales, cache y numeración, no solo login.
+  En Octane limpiar contexto entre solicitudes.
+  Esta documentación no certifica aislamiento:
+  probar dos empresas y fallos transaccionales.
+end note
+stop
+@enduml
+
+' TRAZABILIDAD
+' Rutas relativas a la raíz del repositorio:
+' modules/crm/src/Http/routes.php, auth-routes.php, api-routes.php,
+' portal-routes.php, chat-embed-routes.php, email-tracking-routes.php.
+' Entidades: modules/crm/src/Models/*.php y app/Models/{User,Role,Permission}.php.
+' Operaciones: modules/crm/src/Livewire/*, Services/*, Http/Controllers/*.
+' Automatización: Console/*, Jobs/*, Observers/* y LaravelCrmServiceProvider.php.
+' Configuración: config/laravel-crm.php y config/permission.php.
+' Esquema: database/migrations y modules/crm/database/updates.
+' Contexto previo: docs/PLANIFICACION/PLN-MULTIEMPRESA-QAT-01.md.
+' Decisión reciente: roles generales, roles.team_id = null; prevalece sobre
+' propuestas previas de clonarlos por empresa. TeamObserver aún puede clonarlos.
+' Business, users.team_id y el alta de la vista 03 son propuestas.
+' Conteos de permisos: defaults del seeder, no consulta a una base en ejecución.

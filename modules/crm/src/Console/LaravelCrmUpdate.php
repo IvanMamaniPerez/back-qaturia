@@ -3,6 +3,8 @@
 namespace VentureDrake\LaravelCrm\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Invoice;
@@ -13,9 +15,9 @@ use VentureDrake\LaravelCrm\Models\OrderProduct;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrm\Models\QuoteProduct;
-use VentureDrake\LaravelCrm\Models\Setting;
-use VentureDrake\LaravelCrm\Observers\TeamObserver;
+use VentureDrake\LaravelCrm\Services\NumberGeneratorService;
 use VentureDrake\LaravelCrm\Services\SettingService;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 /**
  * The half of the update that touches the database.
@@ -39,10 +41,8 @@ class LaravelCrmUpdate extends Command
     /**
      * The setting the database schema version is stamped into on success.
      *
-     * Distinct from `version`, which Http/Middleware/Settings overwrites with
-     * config('laravel-crm.version') on the first web request after a deploy and
-     * therefore always reads as current. This one only moves when this command
-     * completes, so "code is ahead of database" is detectable.
+     * This marker only moves when the installation command completes, so
+     * "code is ahead of database" remains detectable after a partial deploy.
      */
     public const DB_VERSION_SETTING = 'db_version';
 
@@ -139,24 +139,20 @@ class LaravelCrmUpdate extends Command
 
         $this->seedLookupData();
 
-        // The db_update_* markers below are written with setInstallWide rather
-        // than set. A console command has no authenticated user, so a plain
-        // set() stamps no team_id and writes a row that web requests — which
-        // read Settings through BelongsToTeamsScope — cannot see, leaving the
-        // system check reporting an update this command has just completed.
-        // setInstallWide also rewrites every row of the same name, so per-team
-        // duplicates written by older versions of this package clear too.
-        if ($this->settingService->get('db_update_0180') == 0) {
+        // Historical data migrations are an explicit installation operation.
+        // Ordinary console reads remain tenant-scoped and fail closed.
+        return app(BusinessContext::class)->system(fn () => DB::transaction(fn () => $this->applyLegacyBackfills()));
+    }
+
+    protected function applyLegacyBackfills(): int
+    {
+        if ($this->settingService->getInstallWide('db_update_0180') == 0) {
             $this->info('Updating Laravel CRM quote numbers...');
 
             foreach (Quote::whereNull('number')->get() as $quote) {
                 $this->info('Updating Laravel CRM quote #'.$quote->id);
 
-                $quote->update([
-                    'quote_id' => $this->settingService->get('quote_prefix').(1000 + $quote->id),
-                    'prefix' => $this->settingService->get('quote_prefix'),
-                    'number' => 1000 + $quote->id,
-                ]);
+                $this->backfillNumber($quote, 'quote');
             }
 
             $this->info('Updating Laravel CRM quote numbers complete');
@@ -166,18 +162,14 @@ class LaravelCrmUpdate extends Command
             foreach (Order::whereNull('number')->get() as $order) {
                 $this->info('Updating Laravel CRM order #'.$order->id);
 
-                $order->update([
-                    'order_id' => $this->settingService->get('order_prefix').(1000 + $order->id),
-                    'prefix' => $this->settingService->get('order_prefix'),
-                    'number' => 1000 + $order->id,
-                ]);
+                $this->backfillNumber($order, 'order');
             }
 
             $this->settingService->setInstallWide('db_update_0180', 1);
             $this->info('Updating Laravel CRM orders numbers complete');
         }
 
-        if ($this->settingService->get('db_update_0181') == 0) {
+        if ($this->settingService->getInstallWide('db_update_0181') == 0) {
             $this->info('Updating Laravel CRM organization linked to person...');
 
             foreach (Person::whereNotNull('organization_id')->get() as $person) {
@@ -196,7 +188,7 @@ class LaravelCrmUpdate extends Command
             $this->info('Updating Laravel CRM organization linked to person complete.');
         }
 
-        if ($this->settingService->get('db_update_0191') == 0) {
+        if ($this->settingService->getInstallWide('db_update_0191') == 0) {
             $this->info('Updating Laravel CRM split orders, invoices & deliveries...');
 
             foreach (Order::whereNotNull('quote_id')->get() as $order) {
@@ -237,7 +229,7 @@ class LaravelCrmUpdate extends Command
             $this->info('Updating Laravel CRM split orders, invoices & deliveries complete.');
         }
 
-        if ($this->settingService->get('db_update_0193') == 0) {
+        if ($this->settingService->getInstallWide('db_update_0193') == 0) {
             $this->info('Updating Laravel CRM split deliveries...');
 
             foreach (Delivery::whereNotNull('order_id')->get() as $delivery) {
@@ -260,24 +252,20 @@ class LaravelCrmUpdate extends Command
             $this->info('Updating Laravel CRM split deliveries complete.');
         }
 
-        if ($this->settingService->get('db_update_0194') == 0) {
+        if ($this->settingService->getInstallWide('db_update_0194') == 0) {
             $this->info('Updating Laravel CRM delivery numbers...');
 
             foreach (Delivery::whereNull('number')->get() as $delivery) {
                 $this->info('Updating Laravel CRM delivery #'.$delivery->id);
 
-                $delivery->update([
-                    'delivery_id' => $this->settingService->get('delivery_prefix').(1000 + $delivery->id),
-                    'prefix' => $this->settingService->get('delivery_prefix'),
-                    'number' => 1000 + $delivery->id,
-                ]);
+                $this->backfillNumber($delivery, 'delivery');
             }
 
             $this->settingService->setInstallWide('db_update_0194', 1);
             $this->info('Updating Laravel CRM delivery numbers complete');
         }
 
-        if ($this->settingService->get('db_update_0199') == 0) {
+        if ($this->settingService->getInstallWide('db_update_0199') == 0) {
             $this->info('Updating Laravel CRM tax amounts...');
 
             foreach (QuoteProduct::whereNull('tax_amount')->get() as $quoteProduct) {
@@ -288,7 +276,7 @@ class LaravelCrmUpdate extends Command
                 } elseif ($quoteProduct->product && $quoteProduct->product->tax_rate) {
                     $taxRate = $quoteProduct->product->tax_rate;
                 } else {
-                    $taxRate = optional(Setting::where('name', 'tax_rate')->first())->value ?? 0;
+                    $taxRate = app(BusinessContext::class)->run($quoteProduct->team_id, fn () => $this->settingService->get('tax_rate', 0));
                 }
 
                 $quoteProduct->update([
@@ -305,7 +293,7 @@ class LaravelCrmUpdate extends Command
                 } elseif ($orderProduct->product && $orderProduct->product->tax_rate) {
                     $taxRate = $orderProduct->product->tax_rate;
                 } else {
-                    $taxRate = optional(Setting::where('name', 'tax_rate')->first())->value ?? 0;
+                    $taxRate = app(BusinessContext::class)->run($orderProduct->team_id, fn () => $this->settingService->get('tax_rate', 0));
                 }
 
                 $orderProduct->update([
@@ -322,7 +310,7 @@ class LaravelCrmUpdate extends Command
                 } elseif ($invoiceLine->product && $invoiceLine->product->tax_rate) {
                     $taxRate = $invoiceLine->product->tax_rate;
                 } else {
-                    $taxRate = optional(Setting::where('name', 'tax_rate')->first())->value ?? 0;
+                    $taxRate = app(BusinessContext::class)->run($invoiceLine->team_id, fn () => $this->settingService->get('tax_rate', 0));
                 }
 
                 $invoiceLine->update([
@@ -335,7 +323,7 @@ class LaravelCrmUpdate extends Command
             $this->info('Updating Laravel CRM tax amounts complete');
         }
 
-        if ($this->settingService->get('db_update_1200') == 0) {
+        if ($this->settingService->getInstallWide('db_update_1200') == 0) {
             $this->info('Updating Laravel CRM pipeline tables');
 
             $this->callSilent('db:seed', [
@@ -346,58 +334,22 @@ class LaravelCrmUpdate extends Command
             foreach (Lead::whereNull('number')->get() as $lead) {
                 $this->info('Updating Laravel CRM lead #'.$lead->id);
 
-                $lead->update([
-                    'lead_id' => $this->settingService->get('lead_prefix').(1000 + $lead->id),
-                    'prefix' => $this->settingService->get('lead_prefix'),
-                    'number' => 1000 + $lead->id,
-                ]);
+                $this->backfillNumber($lead, 'lead');
             }
 
             foreach (Deal::whereNull('number')->get() as $deal) {
                 $this->info('Updating Laravel CRM deal #'.$deal->id);
 
-                $deal->update([
-                    'deal_id' => $this->settingService->get('deal_prefix').(1000 + $deal->id),
-                    'prefix' => $this->settingService->get('deal_prefix'),
-                    'number' => 1000 + $deal->id,
-                ]);
+                $this->backfillNumber($deal, 'deal');
             }
 
             $this->settingService->setInstallWide('db_update_1200', 1);
             $this->info('Updating Laravel CRM pipeline tables complete.');
         }
 
-        if ($this->settingService->get('db_update_1201') == 0) {
-            // Back-fill per-team CRM lookup data + pipelines for every pre-existing
-            // team (e.g. a Jetstream personal team created before the CRM was
-            // installed). Without this, `/leads/create` on a teams-enabled host
-            // renders against an empty per-team pipeline and trips the null-pipeline
-            // bug. Idempotent — every block upserts on team_id + the row's natural
-            // key, so a team that already holds this data is refreshed rather than
-            // given a second copy. Skipped entirely when teams are off,
-            // but the marker still flips so subsequent runs don't re-check.
-            if (config('permission.teams')) {
-                $this->info('Back-filling per-team CRM data for existing teams');
-
-                $teamClass = class_exists('App\Models\Team')
-                    ? 'App\Models\Team'
-                    : (class_exists('VentureDrake\LaravelCrm\Models\Team') ? 'VentureDrake\LaravelCrm\Models\Team' : null);
-
-                if ($teamClass !== null) {
-                    foreach ($teamClass::all() as $team) {
-                        $this->info('Back-filling per-team CRM data for team #'.$team->id);
-                        TeamObserver::seedCrmDataForTeam($team->id);
-                        TeamObserver::repointCrmRecordsToTeamPipelines($team->id);
-                    }
-                } else {
-                    $this->warn('Teams enabled but no Team model found at App\Models\Team or VentureDrake\LaravelCrm\Models\Team. Skipping per-team back-fill.');
-                }
-
-                $this->info('Back-filling per-team CRM data complete.');
-            }
-
-            $this->settingService->setInstallWide('db_update_1201', 1);
-        }
+        // SaaS catalogs are shared read-only defaults. Internal employee
+        // teams must never provision tenants, roles or duplicate pipelines.
+        $this->settingService->setInstallWide('db_update_1201', 1);
 
         // Only stamped on the success path, and install-wide for the same
         // reason as the db_update_* markers above. SystemCheckService reads it
@@ -414,6 +366,18 @@ class LaravelCrmUpdate extends Command
         return self::SUCCESS;
     }
 
+    protected function backfillNumber(Model $model, string $type): void
+    {
+        if (config('laravel-crm.teams') && ! $model->team_id) {
+            throw new \LogicException('Adopt legacy records into their business before backfilling document numbers.');
+        }
+        app(BusinessContext::class)->run($model->team_id, function () use ($model, $type) {
+            $number = NumberGeneratorService::next($model::class);
+            $prefix = $this->settingService->get($type.'_prefix');
+            $model->update([$type.'_id' => $prefix.$number, 'prefix' => $prefix, 'number' => $number]);
+        });
+    }
+
     /**
      * Re-run the lookup-data seeders that upgrading hosts previously had to
      * know about and run by hand.
@@ -424,8 +388,8 @@ class LaravelCrmUpdate extends Command
      * that has customised its own lookup rows should not have its deploy fail
      * over one of them.
      *
-     * laravelcrm:permissions and friends only do anything with teams on; they
-     * fan the global CRM roles and lookup data out to each team.
+     * Roles and lookup defaults remain installation-wide. Business-specific
+     * customizations are never overwritten by these commands.
      */
     protected function seedLookupData(): void
     {

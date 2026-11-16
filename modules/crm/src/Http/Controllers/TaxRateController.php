@@ -55,7 +55,9 @@ class TaxRateController extends Controller
         ]);
 
         if ($request->default == 'on') {
-            TaxRate::where('id', '!=', $taxRate->id)->update(['default' => 0]);
+            TaxRate::where('id', '!=', $taxRate->id)
+                ->when(config('laravel-crm.teams'), fn ($query) => $query->where('team_id', $taxRate->team_id))
+                ->update(['default' => 0]);
         }
 
         flash()->success(ucfirst(trans('laravel-crm::lang.tax_rate_stored')));
@@ -107,7 +109,9 @@ class TaxRateController extends Controller
         ]);
 
         if ($request->default == 'on') {
-            TaxRate::where('id', '!=', $taxRate->id)->update(['default' => 0]);
+            TaxRate::where('id', '!=', $taxRate->id)
+                ->when(config('laravel-crm.teams'), fn ($query) => $query->where('team_id', $taxRate->team_id))
+                ->update(['default' => 0]);
         }
 
         flash()->success(ucfirst(trans('laravel-crm::lang.tax_rate_updated')));

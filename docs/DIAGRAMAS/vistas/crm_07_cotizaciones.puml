@@ -1,0 +1,5 @@
+' Vista generada por generar_vistas.py. Editar el archivo maestro.
+' Versión de origen: 3a88a5837927
+@startuml
+!include ../CRM_FLUJO_COMPLETO.puml!7
+@enduml

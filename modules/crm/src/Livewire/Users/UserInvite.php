@@ -49,7 +49,7 @@ class UserInvite extends Component
                 function (string $attribute, $value, $fail) {
                     $teamId = $this->currentTeamId();
 
-                    $userExists = User::query()
+                    $userExists = User::withoutGlobalScopes()
                         ->where('email', $value)
                         ->exists();
 
@@ -106,8 +106,8 @@ class UserInvite extends Component
                 'last_sent_at' => now(),
             ]);
 
-            Notification::route('mail', $data['email'])
-                ->notify(new UserInvitationNotification($invitation));
+            DB::afterCommit(fn () => Notification::route('mail', $data['email'])
+                ->notify(new UserInvitationNotification($invitation)));
 
             return $invitation;
         });

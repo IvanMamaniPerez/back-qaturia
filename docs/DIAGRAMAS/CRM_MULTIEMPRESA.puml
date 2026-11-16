@@ -1,0 +1,83 @@
+@startuml
+title Qaturia SaaS · Multiempresa implementada
+skinparam shadowing false
+skinparam activityBackgroundColor #EAF3FF
+skinparam activityBorderColor #315C85
+skinparam noteBackgroundColor #FFF4CF
+skinparam wrapWidth 270
+start
+partition "Registro de una empresa" {
+  :GET /crm/register;
+  :Nombre y email del propietario\nContraseña y confirmación\nNombre comercial obligatorio\nRazón social y RUC opcionales;
+  :Validar email único y formulario;
+  :Iniciar transacción;
+  :Crear Business con UUID propio;
+  :Establecer BusinessContext\nSpatie permissionsTeamId = Business.id;
+  :Crear User\nusers.team_id = Business.id\ncrm_access = true;
+  :Asignar rol Owner compartido\nroles.team_id = NULL\nmodel_has_roles.team_id = Business.id;
+  :Business.owner_user_id = User.id;
+  if (¿Operación completa?) then (sí)
+    :Commit, autenticar y regenerar sesión;
+  else (no)
+    :Rollback de empresa, usuario y rol;
+    stop
+  endif
+}
+partition "Configuración y colaboradores" {
+  :Completar perfil en Ajustes\nBusiness: RUC, razón social, dirección,\nemail, teléfono, web y logo;
+  note right
+    Business = empresa suscriptora.
+    Organization = cliente, prospecto o proveedor.
+    Person = contacto de la agenda.
+    crm_teams = grupos internos de colaboradores.
+  end note
+  :Preferencias propias en crm_settings.team_id\nDefaults regionales heredados de la instancia;
+  :Crear, invitar o importar colaboradores;
+  :Asignar la misma empresa y un rol global\nOwner / Admin / Manager / Employee;
+  note right
+    Cada usuario interno pertenece a una empresa.
+    Sin selector ni traslado entre empresas.
+    El propietario conserva acceso y rol Owner.
+    Los roles globales no se editan desde un tenant.
+  end note
+}
+partition "Entrada y resolución de contexto" {
+  switch (¿Canal?)
+  case (Web / Livewire)
+    :Empresa del usuario autenticado;
+  case (API)
+    :Token Sanctum → usuario → empresa\nX-Team-ID solo puede confirmar esa empresa;
+  case (Documento firmado)
+    :Validar firma → buscar documento → su empresa;
+  case (Portal / widget / tracking)
+    :Resolver empresa desde board público,\nfeature público, clave de widget o token;
+  case (Invitación)
+    :Código pendiente y vigente → empresa invitante;
+  case (Job)
+    :Restaurar business_id del payload;
+  case (Comando programado)
+    :Recorrer empresas bajo contexto explícito;
+  endswitch
+  :Resolver contexto antes de los bindings;
+}
+partition "Operación y aislamiento" {
+  if (¿Contexto empresarial válido?) then (sí)
+    :Scopes limitan consultas a la empresa\nPolicies verifican pertenencia y permisos;
+    :BusinessIntegrity valida escrituras,\nreferencias y relaciones polimórficas;
+    :Pivotes rechazan relaciones con otra empresa\nFKs compuestas protegen relaciones declaradas;
+    :Operar CRM: clientes, leads, oportunidades,\nventas, compras, productos, actividades,\ncampañas, chat, roadmap e integraciones;
+    :Emitir documentos con identidad fiscal propia\nCache, numeración y ajustes por empresa;
+    :Restaurar contexto al terminar petición o job;
+  else (no)
+    :Sin acceso a datos empresariales\nEscrituras rechazadas;
+  endif
+}
+note right
+  Excepciones explícitas:
+  catálogos globales de referencia de solo lectura;
+  metadatos de instalación;
+  operaciones de infraestructura en modo system.
+  El portal externo no crea un negocio ni otorga CRM.
+end note
+stop
+@enduml

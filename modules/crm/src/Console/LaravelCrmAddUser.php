@@ -2,105 +2,92 @@
 
 namespace VentureDrake\LaravelCrm\Console;
 
+use App\Models\Business;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class LaravelCrmAddUser extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'laravelcrm:add-user';
+    protected $signature = 'laravelcrm:add-user {--business= : Existing business UUID} {--business-name= : Name for a new business}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Add or grant CRM access to a user';
+    protected $description = 'Create a business owner or add a collaborator to an existing business';
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): int
     {
-        $this->info('**************************************************************************');
-        $this->info('*                    ADD A LARAVEL CRM USER                              *');
-        $this->info('**************************************************************************');
-
-        $userClass = class_exists('App\Models\User') ? 'App\Models\User' : 'App\Models\User';
-
-        if (! class_exists($userClass)) {
-            $this->error('Laravel CRM requires the user model. See https://laravel.com/docs/authentication');
-
-            return 1;
+        $email = $this->ask("Enter the user's email address");
+        $data = ['email' => $email];
+        $user = User::withoutGlobalScopes()->where('email', $email)->first();
+        if (! $user) {
+            $data['name'] = trim($this->ask('First name').' '.$this->ask('Last name'));
+            $data['password'] = $this->secret('Password');
         }
+        $validation = Validator::make($data, [
+            'email' => 'required|email|max:255',
+            'name' => $user ? 'nullable' : 'required|string|max:255',
+            'password' => $user ? 'nullable' : 'required|string|min:8',
+        ]);
+        if ($validation->fails()) {
+            $this->error($validation->errors()->first());
 
-        $roles = Role::where('crm_role', 1)->pluck('name')->toArray();
-
-        if (empty($roles)) {
-            $this->error('No CRM roles found. Please run php artisan laravelcrm:permissions first.');
-
-            return 1;
+            return self::FAILURE;
         }
+        $business = null;
+        $businessName = null;
+        if (config('laravel-crm.teams')) {
+            $id = $this->option('business') ?: $user?->team_id;
+            if ($id) {
+                $business = Business::find($id);
+                if (! $business || ($user?->team_id && $user->team_id !== $business->id)) {
+                    $this->error('Invalid business, or user already belongs to another business.');
 
-        $email = $this->ask('Enter the user\'s email address');
+                    return self::FAILURE;
+                }
+            } else {
+                $businessName = $this->option('business-name') ?: $this->ask('Business name (creates a new business)');
+                if (! is_string($businessName) || trim($businessName) === '' || strlen($businessName) > 255) {
+                    $this->error('A business name is required.');
 
-        $user = $userClass::where('email', $email)->first();
-
-        if ($user) {
-            $this->info("User found: {$user->name} ({$user->email})");
-
-            if (! $this->confirm('Grant this user CRM access?', true)) {
-                $this->info('Aborted. No changes were made.');
-
-                return 0;
+                    return self::FAILURE;
+                }
             }
+        }
+        $roles = Role::where('crm_role', true)->where('guard_name', 'web')
+            ->when(config('permission.teams'), fn ($q) => $q->whereNull('team_id'))->pluck('name')->all();
+        if ($roles === []) {
+            $this->error('Run php artisan laravelcrm:permissions first.');
 
-            $user->forceFill(['crm_access' => 1])->save();
-
-            $this->info('CRM access granted.');
-        } else {
-            $this->info('No existing user found with that email. Creating a new user...');
-
-            $firstname = $this->ask('First name');
-            $lastname = $this->ask('Last name');
-            $password = $this->secret('Password');
-
-            if (! $password) {
-                $this->error('A password is required.');
-
-                return 1;
+            return self::FAILURE;
+        }
+        $selected = $businessName ? 'Owner' : $this->choice('Assign a CRM role', $roles, array_search('Employee', $roles) ?: 0);
+        DB::transaction(function () use ($user, $business, $businessName, $data, $selected) {
+            if ($businessName) {
+                $business = Business::create(['name' => $businessName]);
             }
+            app(BusinessContext::class)->run($business?->id, function () use ($user, $business, $businessName, $data, $selected) {
+                $target = $user ?? User::forceCreate([
+                    'name' => $data['name'], 'email' => $data['email'],
+                    'password' => Hash::make($data['password']), 'team_id' => $business?->id,
+                    'crm_access' => true,
+                ]);
+                $target->forceFill(['crm_access' => true, 'team_id' => $business?->id])->save();
+                $role = Role::where('name', $selected)->where('guard_name', 'web')
+                    ->when(config('permission.teams'), fn ($q) => $q->whereNull('team_id'))->firstOrFail();
+                foreach ($target->roles()->where('crm_role', true)->whereKeyNot($role->id)->get() as $previous) {
+                    $target->removeRole($previous);
+                }
+                $target->assignRole($role);
+                if ($businessName) {
+                    $business->forceFill(['owner_user_id' => $target->id])->save();
+                }
+            });
+        });
+        $this->info('User and business role saved successfully.');
 
-            $user = $userClass::forceCreate([
-                'name' => trim($firstname.' '.$lastname),
-                'email' => $email,
-                'password' => Hash::make($password),
-                'crm_access' => 1,
-            ]);
-
-            $this->info("User created: {$user->name} ({$user->email})");
-        }
-
-        $selectedRole = $this->choice('Assign a CRM role', $roles, array_search('Employee', $roles) ?: 0);
-
-        if ($existingCrmRole = $user->roles()->where('crm_role', 1)->first()) {
-            $user->removeRole($existingCrmRole);
-        }
-
-        if ($role = Role::where('name', $selectedRole)->where('crm_role', 1)->first()) {
-            $user->assignRole($role);
-            $this->info("Role '{$selectedRole}' assigned.");
-        }
-
-        $this->info('✅ Done! The user now has CRM access.');
-
-        return 0;
+        return self::SUCCESS;
     }
 }

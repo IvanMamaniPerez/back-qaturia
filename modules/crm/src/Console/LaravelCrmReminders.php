@@ -6,6 +6,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
+use VentureDrake\LaravelCrm\Console\Traits\RunsForBusinesses;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrm\Models\Lunch;
 use VentureDrake\LaravelCrm\Models\Meeting;
@@ -18,6 +19,8 @@ use VentureDrake\LaravelCrm\Services\SettingService;
 
 class LaravelCrmReminders extends Command
 {
+    use RunsForBusinesses;
+
     /**
      * @var SettingService
      */
@@ -61,7 +64,7 @@ class LaravelCrmReminders extends Command
      *
      * @return mixed
      */
-    public function handle()
+    protected function handleBusiness()
     {
         $this->info('Sending Laravel CRM Reminders...');
 

@@ -96,9 +96,10 @@
                     }
                 }
             @endphp
+            @php($newTeamRoute = null)
             @if ($crmCurrentTeam || $crmAllTeams->isNotEmpty() || $newTeamRoute)
-                <x-mary-dropdown label="{{ $crmCurrentTeam?->name ?? __('Enterprises') }}" class="btn-neutral btn-sm" right>
-                    <x-mary-menu-item title="{{ __('Enterprises') }}" class="menu-title" />
+                <x-mary-dropdown label="{{ $crmCurrentTeam?->name ?? __('Business') }}" class="btn-neutral btn-sm" right>
+                    <x-mary-menu-item title="{{ __('Business') }}" class="menu-title" />
                     @if (Route::has('current-team.update'))
                         @foreach ($crmAllTeams as $team)
                             <li>

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use VentureDrake\LaravelCrm\Livewire\Auth\ForgotPassword;
 use VentureDrake\LaravelCrm\Livewire\Auth\Login;
+use VentureDrake\LaravelCrm\Livewire\Auth\Register;
 use VentureDrake\LaravelCrm\Livewire\Auth\ResetPassword;
 
 /*
@@ -17,6 +18,11 @@ use VentureDrake\LaravelCrm\Livewire\Auth\ResetPassword;
 */
 
 Route::middleware('guest')->group(function () {
+    if (config('laravel-crm.teams')) {
+        Route::get('register', Register::class)
+            ->middleware('throttle:10,1')->name('laravel-crm.register');
+    }
+
     Route::get('login', Login::class)
         ->name('laravel-crm.login');
 

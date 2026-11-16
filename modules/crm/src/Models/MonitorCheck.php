@@ -2,8 +2,12 @@
 
 namespace VentureDrake\LaravelCrm\Models;
 
+use VentureDrake\LaravelCrm\Traits\BelongsToTeams;
+
 class MonitorCheck extends Model
 {
+    use BelongsToTeams;
+
     protected $guarded = ['id'];
 
     protected $casts = [

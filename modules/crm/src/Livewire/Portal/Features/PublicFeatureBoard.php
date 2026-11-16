@@ -10,6 +10,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use VentureDrake\LaravelCrm\Models\Feature;
 use VentureDrake\LaravelCrm\Models\FeatureStatus;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 use VentureDrake\LaravelCrm\Support\PortalTeam;
 
 class PublicFeatureBoard extends Component
@@ -34,38 +35,24 @@ class PublicFeatureBoard extends Component
 
     public function statuses(): Collection
     {
-        $portalTeamId = $this->portalTeamId();
-
-        return FeatureStatus::query()
-            ->withoutGlobalScopes()
-            ->when(config('laravel-crm.teams'), function ($q) use ($portalTeamId) {
-                if ($portalTeamId === null) {
-                    $q->whereRaw('1 = 0');
-                } else {
-                    $q->where('team_id', $portalTeamId);
-                }
-            })
+        return app(BusinessContext::class)->run($this->portalTeamId(), fn () => FeatureStatus::query()
             ->orderBy('order')
             ->orderBy('id')
-            ->get();
+            ->get());
     }
 
     public function features(): LengthAwarePaginator
     {
+        return app(BusinessContext::class)->run($this->portalTeamId(), fn () => $this->boardFeatures());
+    }
+
+    private function boardFeatures(): LengthAwarePaginator
+    {
         $userId = auth()->id();
-        $portalTeamId = $this->portalTeamId();
 
         $query = Feature::query()
-            ->withoutGlobalScopes()
             ->public()
             ->with('status')
-            ->when(config('laravel-crm.teams'), function ($q) use ($portalTeamId) {
-                if ($portalTeamId === null) {
-                    $q->whereRaw('1 = 0');
-                } else {
-                    $q->where('team_id', $portalTeamId);
-                }
-            })
             ->when($this->feature_status_id, fn (Builder $q) => $q->where('feature_status_id', $this->feature_status_id));
 
         if ($userId) {

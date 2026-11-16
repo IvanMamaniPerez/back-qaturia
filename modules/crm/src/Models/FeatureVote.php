@@ -4,9 +4,11 @@ namespace VentureDrake\LaravelCrm\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use VentureDrake\LaravelCrm\Traits\BelongsToTeams;
 
 class FeatureVote extends Pivot
 {
+    use BelongsToTeams;
     use HasUuids;
 
     protected $guarded = ['id'];

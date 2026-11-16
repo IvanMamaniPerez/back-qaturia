@@ -73,6 +73,21 @@ class PdfContactDetails
             return $value;
         }
 
-        return filled($shared = $settings->get(self::SHARED_KEY)) ? $shared : null;
+        if (filled($shared = $settings->get(self::SHARED_KEY))) {
+            return $shared;
+        }
+        if (config('laravel-crm.teams')) {
+            $details = array_filter([
+                $settings->get('legal_name') ?: $settings->get('organization_name'),
+                $settings->get('vat_number') ? 'RUC / Tax ID: '.$settings->get('vat_number') : null,
+                $settings->get('fiscal_address'),
+                $settings->get('business_email'),
+                $settings->get('business_phone'),
+            ]);
+
+            return $details ? implode("\n", array_map(fn ($value) => e($value), $details)) : null;
+        }
+
+        return null;
     }
 }

@@ -28,8 +28,13 @@
                 <div role="tabpanel" class="tab-content bg-base-100 border-base-300 p-6" wire:key="setting-tab-panel-general">
                     <div class="grid lg:grid-cols-2 gap-5 items-start">
                         <div class="grid gap-3">
-                            <x-mary-input wire:model="organizationName" label="{{ ucfirst(__('laravel-crm::lang.organization_name')) }}" required />
-                            <x-mary-input wire:model="vatNumber" label="{{ ucfirst(__('laravel-crm::lang.vat_number')) }}" />
+                            <x-mary-input wire:model="organizationName" label="{{ ucfirst(__('laravel-crm::lang.business_name')) }}" required />
+                            <x-mary-input wire:model="vatNumber" label="{{ ucfirst(__('laravel-crm::lang.tax_id')) }}" />
+                            <x-mary-input wire:model="legalName" label="{{ ucfirst(__('laravel-crm::lang.legal_name')) }}" />
+                            <x-mary-textarea wire:model="fiscalAddress" label="{{ ucfirst(__('laravel-crm::lang.fiscal_address')) }}" />
+                            <x-mary-input wire:model="businessEmail" label="{{ ucfirst(__('laravel-crm::lang.business_email')) }}" type="email" />
+                            <x-mary-input wire:model="businessPhone" label="{{ ucfirst(__('laravel-crm::lang.business_phone')) }}" />
+                            <x-mary-input wire:model="websiteUrl" label="Website" type="url" />
                             {{-- Preview, file input and remove button are one field, so they
                                  share a single fieldset under one legend — the same
                                  `fieldset` / `fieldset-legend` pair MaryUI puts around its

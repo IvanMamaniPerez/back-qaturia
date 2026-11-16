@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use VentureDrake\LaravelCrm\Models\UsageRequest;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class LogUsage
 {
@@ -20,6 +21,10 @@ class LogUsage
     public function handle($request, Closure $next)
     {
         $response = $next($request);
+
+        if (config('laravel-crm.teams') && ! app(BusinessContext::class)->id()) {
+            return $response;
+        }
 
         try {
             $requestTime = Carbon::createFromTimestamp($_SERVER['REQUEST_TIME']);

@@ -2,12 +2,10 @@
 
 namespace VentureDrake\LaravelCrm\Observers;
 
-use App\Models\Role;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Schema;
 use Ramsey\Uuid\Uuid;
-use Spatie\Permission\PermissionRegistrar;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Invoice;
@@ -36,52 +34,7 @@ class TeamObserver
      */
     public function created(Team $team)
     {
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-        $tableNames = config('permission.table_names');
-
-        if (config('laravel-crm.teams')) {
-            // Get the roles
-            foreach (DB::table($tableNames['roles'])
-                ->where('crm_role', 1)
-                ->whereNull('team_id')
-                ->get() as $role) {
-                $newRole = Role::query()->firstOrCreate([
-                    'name' => $role->name,
-                    'guard_name' => $role->guard_name,
-                    'description' => $role->description,
-                    'crm_role' => $role->crm_role,
-                    'team_id' => $team->id,
-                ]);
-
-                if ($newRole) {
-                    foreach (DB::table($tableNames['permissions'])
-                        ->leftJoin($tableNames['role_has_permissions'], $tableNames['permissions'].'.id', '=', $tableNames['role_has_permissions'].'.permission_id')
-                        ->where($tableNames['role_has_permissions'].'.role_id', $role->id)
-                        ->get() as $permission) {
-                        DB::table($tableNames['role_has_permissions'])->updateOrInsert([
-                            'permission_id' => $permission->id,
-                            'role_id' => $newRole->getKey(),
-                        ]);
-                    }
-                }
-            }
-
-            if ($role = Role::where([
-                'name' => 'Owner',
-                'team_id' => $team->id,
-                'crm_role' => 1,
-            ])->first()) {
-                DB::table($tableNames['model_has_roles'])->insert([
-                    'role_id' => $role->id,
-                    'model_type' => auth()->user()->getMorphClass(),
-                    'model_id' => auth()->user()->id,
-                    'team_id' => $team->id,
-                ]);
-            }
-
-            static::seedCrmDataForTeam($team->id);
-        }
+        // Internal teams only group collaborators; they never provision a tenant.
     }
 
     /**

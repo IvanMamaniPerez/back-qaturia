@@ -43,6 +43,9 @@
                 class="btn-primary w-full mt-6"
                 spinner="login"
             />
+            @if (config('laravel-crm.teams'))
+                <a href="{{ route('laravel-crm.register') }}" class="link block mt-4">Create a business account</a>
+            @endif
         </form>
     </x-mary-card>
 </div>

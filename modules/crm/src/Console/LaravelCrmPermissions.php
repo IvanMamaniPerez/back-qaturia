@@ -2,11 +2,8 @@
 
 namespace VentureDrake\LaravelCrm\Console;
 
-use App\Models\Role;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\PermissionRegistrar;
 use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmPermissionsSeeder;
 
@@ -62,52 +59,8 @@ class LaravelCrmPermissions extends Command
             return $result;
         }
 
-        if (config('laravel-crm.teams') === false) {
-            $this->info('LaravelCRM Permissions Update Complete.');
-        } else {
-            $this->comment('Clearing permissions cache');
-
-            app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-            $tableNames = config('permission.table_names');
-
-            foreach (DB::table('teams')->get() as $team) {
-                $rolesQuery = DB::table($tableNames['roles'])
-                    ->where('crm_role', 1);
-
-                if (Schema::hasColumn($tableNames['roles'], 'team_id')) {
-                    $rolesQuery->whereNull('team_id');
-                }
-
-                foreach ($rolesQuery->get() as $role) {
-                    $this->info('Inserting role '.$role->name.' for team '.$team->name);
-
-                    $newRole = Role::query()->firstOrCreate([
-                        'name' => $role->name,
-                        'guard_name' => $role->guard_name,
-                        'description' => $role->description,
-                        'crm_role' => $role->crm_role,
-                        'team_id' => $team->id,
-                    ]);
-
-                    if ($newRole) {
-                        foreach (DB::table($tableNames['permissions'])
-                            ->leftJoin($tableNames['role_has_permissions'], $tableNames['permissions'].'.id', '=', $tableNames['role_has_permissions'].'.permission_id')
-                            ->where($tableNames['role_has_permissions'].'.role_id', $role->id)
-                            ->get() as $permission) {
-                            $this->info('Assigning permission '.$permission->name.' for role '.$role->name);
-
-                            DB::table($tableNames['role_has_permissions'])->updateOrInsert([
-                                'permission_id' => $permission->id,
-                                'role_id' => $newRole->getKey(),
-                            ]);
-                        }
-                    }
-                }
-            }
-
-            $this->info('LaravelCRM Permissions Update Complete.');
-        }
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->info('Global CRM roles and permissions updated.');
 
         return self::SUCCESS;
     }

@@ -39,7 +39,7 @@ class FeatureComment extends Model
 
     public function createdByUser()
     {
-        return $this->belongsTo(User::class, 'user_created_id');
+        return $this->belongsTo(User::class, 'user_created_id')->withoutGlobalScope('business');
     }
 
     public function updatedByUser()

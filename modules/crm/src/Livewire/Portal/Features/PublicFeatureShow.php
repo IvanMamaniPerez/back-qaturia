@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Livewire\Portal\Features;
 
 use Livewire\Component;
 use VentureDrake\LaravelCrm\Models\Feature;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 use VentureDrake\LaravelCrm\Support\PortalTeam;
 
 class PublicFeatureShow extends Component
@@ -50,9 +51,19 @@ class PublicFeatureShow extends Component
 
     public function render()
     {
-        return view('laravel-crm::livewire.portal.features.public-feature-show', [
-            'comments' => $this->comments(),
-            'hasVoted' => $this->hasVoted(),
-        ]);
+        abort_unless($this->feature->is_public && ! $this->feature->trashed(), 404);
+        abort_if(PortalTeam::scoped() && ! $this->feature->team_id, 404);
+
+        // Livewire updates have no portal route parameter. The checksummed
+        // public model identifies its board; never use the staff session's
+        // company for its comments, status or voting state.
+        return app(BusinessContext::class)->run($this->feature->team_id, function () {
+            $this->feature->load('status', 'submittedBy');
+
+            return view('laravel-crm::livewire.portal.features.public-feature-show', [
+                'comments' => $this->comments(),
+                'hasVoted' => $this->hasVoted(),
+            ]);
+        });
     }
 }

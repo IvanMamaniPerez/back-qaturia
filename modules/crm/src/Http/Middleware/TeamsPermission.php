@@ -3,27 +3,13 @@
 namespace VentureDrake\LaravelCrm\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Spatie\Permission\PermissionRegistrar;
 
 class TeamsPermission
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Request  $request
-     * @return mixed
-     */
     public function handle($request, Closure $next)
     {
-        if (auth()->guest()) {
-            return $next($request);
-        }
-
-        if (config('laravel-crm.teams') && auth()->user()->currentTeam) {
-            app(PermissionRegistrar::class)->setPermissionsTeamId(auth()->user()->currentTeam->id);
-        }
-
+        // ResolveBusinessContext owns setup and cleanup, including anonymous
+        // signed documents. Do not overwrite it with a staff session here.
         return $next($request);
     }
 }

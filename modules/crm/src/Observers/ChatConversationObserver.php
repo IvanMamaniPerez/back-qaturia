@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrm\Observers;
 use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use VentureDrake\LaravelCrm\Models\ChatConversation;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class ChatConversationObserver
 {
@@ -26,13 +27,17 @@ class ChatConversationObserver
     {
         $key = 'laravel-crm:chat-reference:'.(new ChatConversation)->getTable();
 
+        if (config('laravel-crm.teams')) {
+            $key .= '.business.'.app(BusinessContext::class)->id();
+        }
+
         return Cache::lock($key.':lock', 10)->block(5, function () use ($key): string {
             $last = Cache::get($key);
 
             if ($last === null) {
                 $last = 1000;
 
-                foreach (ChatConversation::withoutGlobalScopes()->withTrashed()->select('chat_id')->cursor() as $conversation) {
+                foreach (ChatConversation::withTrashed()->select('chat_id')->cursor() as $conversation) {
                     if (preg_match('/^C(\d+)$/', $conversation->chat_id ?? '', $matches)) {
                         $last = max($last, (int) $matches[1]);
                     }

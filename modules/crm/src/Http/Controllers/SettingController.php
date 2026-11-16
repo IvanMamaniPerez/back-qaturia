@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Ramsey\Uuid\Uuid;
 use VentureDrake\LaravelCrm\Http\Requests\UpdateSettingRequest;
-use VentureDrake\LaravelCrm\Models\Address;
-use VentureDrake\LaravelCrm\Models\Email;
-use VentureDrake\LaravelCrm\Models\Phone;
 use VentureDrake\LaravelCrm\Services\SettingService;
 use VentureDrake\LaravelCrm\Support\PdfContactDetails;
 
@@ -45,8 +42,13 @@ class SettingController extends Controller
     public function update(UpdateSettingRequest $request)
     {
         $this->settingService->set('organization_name', $request->organization_name);
+        foreach (['legal_name', 'fiscal_address', 'business_email', 'business_phone', 'website_url'] as $key) {
+            if ($request->has($key)) {
+                $this->settingService->set($key, $request->input($key));
+            }
+        }
 
-        if ($request->vat_number) {
+        if ($request->has('vat_number')) {
             $this->settingService->set('vat_number', $request->vat_number);
         }
 
@@ -151,16 +153,7 @@ class SettingController extends Controller
             $this->settingService->set('logo_file_name', $file->getClientOriginalName());
         }
 
-        if ($request->organization_name && config('laravel-crm.teams') && auth()->user()->currentTeam) {
-            DB::table('teams')
-                ->where('id', auth()->user()->currentTeam->id)
-                ->update(['name' => $request->organization_name]);
-        }
-
-        $this->settingService->set('dynamic_products', (($request->dynamic_products == 'on') ? 1 : 0));
-        $this->settingService->set('show_related_activity', (($request->show_related_activity == 'on') ? 1 : 0));
-
-        $related = $this->settingService->get('team');
+        $related = $this->settingService->first('team');
         $this->updateRelatedPhones($related, $request->phones);
         $this->updateRelatedEmails($related, $request->emails);
         $this->updateRelatedAddresses($related, $request->addresses);
@@ -175,7 +168,7 @@ class SettingController extends Controller
         $phoneIds = [];
         if ($phones) {
             foreach ($phones as $phoneRequest) {
-                if ($phoneRequest['id'] && $phone = Phone::find($phoneRequest['id'])) {
+                if ($phoneRequest['id'] && $phone = $setting->phones()->find($phoneRequest['id'])) {
                     $phone->update([
                         'number' => $phoneRequest['number'],
                         'type' => $phoneRequest['type'],
@@ -207,7 +200,7 @@ class SettingController extends Controller
 
         if ($emails) {
             foreach ($emails as $emailRequest) {
-                if ($emailRequest['id'] && $email = Email::find($emailRequest['id'])) {
+                if ($emailRequest['id'] && $email = $setting->emails()->find($emailRequest['id'])) {
                     $email->update([
                         'address' => $emailRequest['address'],
                         'type' => $emailRequest['type'],
@@ -241,7 +234,7 @@ class SettingController extends Controller
 
         if ($addresses) {
             foreach ($addresses as $addressRequest) {
-                if ($addressRequest['id'] && $address = Address::find($addressRequest['id'])) {
+                if ($addressRequest['id'] && $address = $setting->addresses()->find($addressRequest['id'])) {
                     $address->update([
                         'address_type_id' => $addressRequest['type'] ?? null,
                         'address' => $addressRequest['address'] ?? null,

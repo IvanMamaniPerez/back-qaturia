@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Console;
 
 use Illuminate\Console\Command;
 use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmLeadSourcesSeeder;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class LaravelCrmLeadSources extends Command
 {
@@ -25,9 +26,9 @@ class LaravelCrmLeadSources extends Command
     {
         $this->info('Seeding default LaravelCRM lead sources...');
 
-        return $this->call('db:seed', [
+        return app(BusinessContext::class)->system(fn () => $this->call('db:seed', [
             '--class' => LaravelCrmLeadSourcesSeeder::class,
             '--force' => true,
-        ]);
+        ]));
     }
 }

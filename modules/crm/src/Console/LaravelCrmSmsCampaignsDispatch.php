@@ -4,16 +4,19 @@ namespace VentureDrake\LaravelCrm\Console;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use VentureDrake\LaravelCrm\Console\Traits\RunsForBusinesses;
 use VentureDrake\LaravelCrm\Jobs\SendSmsCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 
 class LaravelCrmSmsCampaignsDispatch extends Command
 {
+    use RunsForBusinesses;
+
     protected $signature = 'laravelcrm:sms-campaigns-dispatch';
 
     protected $description = 'Dispatch scheduled CRM SMS campaigns whose send time has arrived.';
 
-    public function handle(): int
+    protected function handleBusiness(): int
     {
         $now = Carbon::now('UTC');
 

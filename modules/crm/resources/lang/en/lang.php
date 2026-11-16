@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'business_name' => 'business name',
+    'legal_name' => 'legal name',
+    'tax_id' => 'tax identification number (RUC)',
+    'fiscal_address' => 'fiscal address',
+    'business_email' => 'business email',
+    'business_phone' => 'business phone',
     'profile' => 'profile',
     'profile_subtitle' => 'Manage your account information, password and security settings.',
     'profile_information' => 'profile information',

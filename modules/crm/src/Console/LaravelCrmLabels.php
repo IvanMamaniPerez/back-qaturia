@@ -2,12 +2,10 @@
 
 namespace VentureDrake\LaravelCrm\Console;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Ramsey\Uuid\Uuid;
+use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmTablesSeeder;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class LaravelCrmLabels extends Command
 {
@@ -50,42 +48,8 @@ class LaravelCrmLabels extends Command
      */
     public function handle()
     {
-        $this->info('Updating LaravelCRM Labels...');
-
-        if (! Schema::hasColumn('labels', 'team_id')) {
-            $this->info('Team ID column not present — skipping team label duplication.');
-
-            return;
-        }
-
-        foreach (DB::table('teams')->get() as $team) {
-            foreach (DB::table('labels')
-                ->whereNull('team_id')
-                ->get() as $label) {
-                $this->info('Inserting label '.$label->name.' for team '.$team->name);
-
-                $teamLabel = DB::table('labels')->where([
-                    'name' => $label->name,
-                    'hex' => $label->hex,
-                    'description' => $label->description,
-                    'team_id' => $team->id,
-                ])->first();
-
-                if (! $teamLabel) {
-                    DB::table('labels')->insert([
-                        'id' => Uuid::uuid4()->toString(),
-                        'external_id' => Uuid::uuid4()->toString(),
-                        'name' => $label->name,
-                        'hex' => $label->hex,
-                        'description' => $label->description,
-                        'team_id' => $team->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
-                }
-            }
-        }
-
-        $this->info('LaravelCRM Labels Update Complete.');
+        return app(BusinessContext::class)->system(
+            fn () => $this->call('db:seed', ['--class' => LaravelCrmTablesSeeder::class, '--force' => true])
+        );
     }
 }

@@ -24,7 +24,13 @@ class UpdateSettingRequest extends FormRequest
     public function rules()
     {
         return [
-            'organization_name' => 'required|max:255',
+            'organization_name' => 'required|string|max:255',
+            'legal_name' => 'nullable|string|max:255',
+            'vat_number' => 'nullable|string|max:32',
+            'fiscal_address' => 'nullable|string|max:2000',
+            'business_email' => 'nullable|email|max:255',
+            'business_phone' => 'nullable|string|max:64',
+            'website_url' => 'nullable|url|max:255',
             'country' => 'required',
             'language' => 'required',
             'currency' => 'required',

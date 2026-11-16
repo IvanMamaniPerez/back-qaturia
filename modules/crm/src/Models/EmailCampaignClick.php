@@ -2,9 +2,20 @@
 
 namespace VentureDrake\LaravelCrm\Models;
 
+use VentureDrake\LaravelCrm\Support\BusinessContext;
+
 class EmailCampaignClick extends Model
 {
     protected $guarded = ['id'];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('business', function ($query) {
+            if (config('laravel-crm.teams') && ! app(BusinessContext::class)->isSystem()) {
+                $query->whereHas('recipient');
+            }
+        });
+    }
 
     protected $casts = [
         'clicked_at' => 'datetime',

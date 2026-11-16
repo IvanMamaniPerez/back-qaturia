@@ -16,7 +16,9 @@ trait HasCrmAccess
 
     public function isCrmOwner()
     {
-        return config('laravel-crm.crm_owner') == $this->email;
+        return config('laravel-crm.teams')
+            ? $this->business && $this->business->owner_user_id === $this->id
+            : config('laravel-crm.crm_owner') == $this->email;
     }
 
     public function emails()

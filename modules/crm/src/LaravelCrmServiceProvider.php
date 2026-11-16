@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use VentureDrake\LaravelCrm\Console\AdoptLegacyBusiness;
 use VentureDrake\LaravelCrm\Console\Commands\IssueApiToken;
 use VentureDrake\LaravelCrm\Console\LaravelCrmAddressTypes;
 use VentureDrake\LaravelCrm\Console\LaravelCrmAddUser;
@@ -92,6 +93,7 @@ use VentureDrake\LaravelCrm\Http\Middleware\HasCrmAccess;
 use VentureDrake\LaravelCrm\Http\Middleware\LastOnlineAt;
 use VentureDrake\LaravelCrm\Http\Middleware\LogUsage;
 use VentureDrake\LaravelCrm\Http\Middleware\RedirectToRouteDomain;
+use VentureDrake\LaravelCrm\Http\Middleware\ResolveBusinessContext;
 use VentureDrake\LaravelCrm\Http\Middleware\RouteSubdomain;
 use VentureDrake\LaravelCrm\Http\Middleware\SetApiTeamContext;
 use VentureDrake\LaravelCrm\Http\Middleware\Settings;
@@ -724,6 +726,7 @@ class LaravelCrmServiceProvider extends ServiceProvider
 
             // Registering package commands.
             $this->commands([
+                AdoptLegacyBusiness::class,
                 LaravelCrmInstall::class,
                 LaravelCrmAddUser::class,
                 LaravelCrmUpdate::class,
@@ -1137,7 +1140,7 @@ class LaravelCrmServiceProvider extends ServiceProvider
         // group so it bypasses session/CSRF (visitor uses an opaque token).
         // Also registered without the `crm` route prefix so the embed URL
         // is always /p/chat/{key} regardless of LARAVEL_CRM_ROUTE_PREFIX.
-        Route::group(['domain' => null, 'prefix' => null, 'middleware' => []], function () {
+        Route::group(['domain' => null, 'prefix' => null, 'middleware' => [ResolveBusinessContext::class]], function () {
             if (config('laravel-crm.user_interface')) {
                 $this->loadRoutesFrom(__DIR__.'/Http/chat-embed-routes.php');
             }
@@ -1145,7 +1148,7 @@ class LaravelCrmServiceProvider extends ServiceProvider
 
         // Email campaign tracking routes — also outside `web` middleware so
         // open pixels and one-click unsubscribe links work without session/CSRF.
-        Route::group(['domain' => null, 'prefix' => null, 'middleware' => []], function () {
+        Route::group(['domain' => null, 'prefix' => null, 'middleware' => [ResolveBusinessContext::class]], function () {
             if (config('laravel-crm.user_interface')) {
                 $this->loadRoutesFrom(__DIR__.'/Http/email-tracking-routes.php');
             }

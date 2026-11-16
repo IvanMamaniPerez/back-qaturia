@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 /**
  * Generates the next sequential `number` value for a CRM model in a
@@ -26,6 +27,13 @@ class NumberGeneratorService
     public static function next(string $modelClass, int $startAt = 1000, int $lockSeconds = 10, int $waitSeconds = 5): int
     {
         $key = 'laravel-crm:next-number:'.str_replace('\\', '_', $modelClass);
+        if (config('laravel-crm.teams')) {
+            $id = app(BusinessContext::class)->id();
+            if (! $id) {
+                throw new \LogicException('A business context is required for document numbering.');
+            }
+            $key .= '.business.'.$id;
+        }
         $lockKey = $key.':lock';
         $counterKey = $key.':counter';
 
@@ -60,6 +68,13 @@ class NumberGeneratorService
     public static function reset(string $modelClass): void
     {
         $key = 'laravel-crm:next-number:'.str_replace('\\', '_', $modelClass);
+        if (config('laravel-crm.teams')) {
+            $id = app(BusinessContext::class)->id();
+            if (! $id) {
+                throw new \LogicException('A business context is required for document numbering.');
+            }
+            $key .= '.business.'.$id;
+        }
         Cache::forget($key.':counter');
     }
 }

@@ -7,6 +7,7 @@ use Livewire\Component;
 use VentureDrake\LaravelCrm\Livewire\Settings\Features\Traits\HasFeatureStatusCommon;
 use VentureDrake\LaravelCrm\Models\Feature;
 use VentureDrake\LaravelCrm\Models\FeatureStatus;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class FeatureStatusCreate extends Component
 {
@@ -24,12 +25,9 @@ class FeatureStatusCreate extends Component
         $this->validate();
 
         if ($this->is_default) {
-            $teamId = config('laravel-crm.teams')
-                ? optional(auth()->user()->currentTeam ?? null)->id
-                : null;
-
             FeatureStatus::where('is_default', true)
-                ->when(config('laravel-crm.teams') && $teamId, fn ($q) => $q->where('team_id', $teamId))
+                ->when(config('laravel-crm.teams'), fn ($query) => $query
+                    ->whereNotNull('team_id')->where('team_id', app(BusinessContext::class)->id()))
                 ->update(['is_default' => false]);
         }
 

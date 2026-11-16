@@ -18,7 +18,6 @@ use VentureDrake\LaravelCrm\Http\Requests\StoreUserRequest;
 use VentureDrake\LaravelCrm\Http\Requests\UpdateUserRequest;
 use VentureDrake\LaravelCrm\Models\Address;
 use VentureDrake\LaravelCrm\Models\Email;
-use VentureDrake\LaravelCrm\Models\Phone;
 use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrm\Models\UserInvitation;
 
@@ -75,44 +74,32 @@ class UserController extends Controller
 
         abort_if($role && $role->name === 'Owner' && ! auth()->user()->hasRole('Owner'), 403);
 
-        $user = User::forceCreate([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'crm_access' => (($request->crm_access == 'on') ? 1 : 0),
-        ]);
+        DB::transaction(function () use ($request, $role) {
+            $user = User::forceCreate([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'crm_access' => (($request->crm_access == 'on') ? 1 : 0),
+            ]);
 
-        if ($role) {
-            if ($removeRole = $user->roles()->where('crm_role', 1)->first()) { // THIS COULD BE A BUG
-                $user->removeRole($removeRole);
+            if ($role) {
+                if (($removeRole = $user->roles()->where('crm_role', 1)->first()) && $removeRole->id !== $role->id) { // THIS COULD BE A BUG
+                    $user->removeRole($removeRole);
+                }
+
+                $user->assignRole($role);
             }
 
-            $user->assignRole($role);
-        }
+            $this->updateUserPhones($user, $request->phones);
+            $this->updateUserEmails($user, $request->emails);
+            $this->updateUserAddresses($user, $request->addresses);
 
-        $this->updateUserPhones($user, $request->phones);
-        $this->updateUserEmails($user, $request->emails);
-        $this->updateUserAddresses($user, $request->addresses);
-
-        if (config('laravel-crm.teams')) {
-            if ($team = auth()->user()->currentTeam) {
-                DB::table('team_user')->insert([
-                    'team_id' => $team->id,
-                    'user_id' => $user->id,
-                    'role' => 'editor', // Default Jetstream role
-                ]);
-
-                $user->forceFill([
-                    'current_team_id' => $team->id,
-                ])->save();
+            if ($request->user_teams) {
+                $user->crmTeams()->sync($request->user_teams);
+            } else {
+                $user->crmTeams()->sync([]);
             }
-        }
-
-        if ($request->user_teams) {
-            $user->crmTeams()->sync($request->user_teams);
-        } else {
-            $user->crmTeams()->sync([]);
-        }
+        });
 
         flash()->success(ucfirst(trans('laravel-crm::lang.user_stored')));
 
@@ -165,29 +152,31 @@ class UserController extends Controller
 
         abort_if($role && $role->name === 'Owner' && ! auth()->user()->hasRole('Owner'), 403);
 
-        $user->forceFill([
-            'name' => $request->name,
-            'email' => $request->email,
-            'crm_access' => (($request->crm_access == 'on') ? 1 : 0),
-        ])->save();
+        DB::transaction(function () use ($request, $role, $user) {
+            $user->forceFill([
+                'name' => $request->name,
+                'email' => $request->email,
+                'crm_access' => (($request->crm_access == 'on') ? 1 : 0),
+            ])->save();
 
-        $this->updateUserPhones($user, $request->phones);
-        $this->updateUserEmails($user, $request->emails);
-        $this->updateUserAddresses($user, $request->addresses);
+            $this->updateUserPhones($user, $request->phones);
+            $this->updateUserEmails($user, $request->emails);
+            $this->updateUserAddresses($user, $request->addresses);
 
-        if ($role) {
-            if ($removeRole = $user->roles()->where('crm_role', 1)->first()) {
-                $user->removeRole($removeRole);
+            if ($role) {
+                if (($removeRole = $user->roles()->where('crm_role', 1)->first()) && $removeRole->id !== $role->id) {
+                    $user->removeRole($removeRole);
+                }
+
+                $user->assignRole($role);
             }
 
-            $user->assignRole($role);
-        }
-
-        if ($request->user_teams) {
-            $user->crmTeams()->sync($request->user_teams);
-        } else {
-            $user->crmTeams()->sync([]);
-        }
+            if ($request->user_teams) {
+                $user->crmTeams()->sync($request->user_teams);
+            } else {
+                $user->crmTeams()->sync([]);
+            }
+        });
 
         flash()->success(ucfirst(trans('laravel-crm::lang.user_updated')));
 
@@ -363,12 +352,10 @@ class UserController extends Controller
      *    view with a 'please log out and sign back in as {email}'
      *    message.
      *  - logged in as the invitee: run the accept logic inline
-     *    (crm_access, role, team_user, accepted_at) inside a
+     *    (crm_access, business, role, accepted_at) inside a
      *    DB::transaction and redirect to the CRM dashboard.
      *
-     * The no-existing-user path is out of scope for US-005 and
-     * still renders the accept-invite placeholder for US-006+ to
-     * build a real signup form on top of.
+     * A new identity receives the invitation's company on signup.
      */
     public function showAcceptInvite(string $code)
     {
@@ -378,7 +365,7 @@ class UserController extends Controller
             return response()->view('laravel-crm::users.invalid-invite', [], 404);
         }
 
-        $existingUser = User::whereRaw('LOWER(email) = ?', [strtolower($invitation->email)])->first();
+        $existingUser = User::withoutGlobalScopes()->whereRaw('LOWER(email) = ?', [strtolower($invitation->email)])->first();
 
         if ($existingUser) {
             if (! auth()->check()) {
@@ -391,6 +378,7 @@ class UserController extends Controller
                 return response()->view('laravel-crm::users.invalid-invite', [
                     'message' => trans('laravel-crm::lang.user_invitation_wrong_user', [
                         'email' => $invitation->email,
+                        'team_id' => $invitation->team_id,
                     ]),
                 ], 403);
             }
@@ -423,7 +411,7 @@ class UserController extends Controller
             return null;
         }
 
-        if ($role->name === 'Owner' && ! optional(User::find($invitation->invited_by))->hasRole('Owner')) {
+        if ($role->name === 'Owner' && ! optional(User::withoutGlobalScopes()->find($invitation->invited_by))->hasRole('Owner')) {
             return null;
         }
 
@@ -449,7 +437,7 @@ class UserController extends Controller
             return response()->view('laravel-crm::users.invalid-invite', [], 404);
         }
 
-        $existingUser = User::whereRaw('LOWER(email) = ?', [strtolower($invitation->email)])->first();
+        $existingUser = User::withoutGlobalScopes()->whereRaw('LOWER(email) = ?', [strtolower($invitation->email)])->first();
 
         if ($existingUser) {
             if (! auth()->check()) {
@@ -462,6 +450,7 @@ class UserController extends Controller
                 return response()->view('laravel-crm::users.invalid-invite', [
                     'message' => trans('laravel-crm::lang.user_invitation_wrong_user', [
                         'email' => $invitation->email,
+                        'team_id' => $invitation->team_id,
                     ]),
                 ], 403);
             }
@@ -473,15 +462,17 @@ class UserController extends Controller
     }
 
     /**
-     * Grant an existing host user CRM access for the invitation's
-     * team+role, then mark the invitation accepted. Wraps in a
-     * DB::transaction so a mid-way failure rolls back cleanly.
-     * The team_user + current_team_id block mirrors
-     * UserController@store verbatim.
+     * Grant CRM access within the invitation's business, rejecting
+     * identities already belonging to another company.
      */
     protected function acceptExistingUser(UserInvitation $invitation, User $user): RedirectResponse
     {
         DB::transaction(function () use ($invitation, $user) {
+            abort_if(config('laravel-crm.teams') && $user->team_id && $user->team_id !== $invitation->team_id, 403);
+            if (config('laravel-crm.teams')) {
+                $user->forceFill(['team_id' => $invitation->team_id]);
+            }
+
             $user->forceFill(['crm_access' => 1])->save();
 
             // Set the permissions team context before resolving the role:
@@ -492,32 +483,11 @@ class UserController extends Controller
             }
 
             if ($role = $this->invitationRole($invitation)) {
-                if ($removeRole = $user->roles()->where('crm_role', 1)->first()) {
+                if (($removeRole = $user->roles()->where('crm_role', 1)->first()) && $removeRole->id !== $role->id) {
                     $user->removeRole($removeRole);
                 }
 
                 $user->assignRole($role);
-            }
-
-            if (config('laravel-crm.teams') && $invitation->team_id) {
-                $alreadyMember = DB::table('team_user')
-                    ->where('team_id', $invitation->team_id)
-                    ->where('user_id', $user->id)
-                    ->exists();
-
-                if (! $alreadyMember) {
-                    DB::table('team_user')->insert([
-                        'team_id' => $invitation->team_id,
-                        'user_id' => $user->id,
-                        'role' => 'editor',
-                    ]);
-                }
-
-                if (is_null($user->current_team_id)) {
-                    $user->forceFill([
-                        'current_team_id' => $invitation->team_id,
-                    ])->save();
-                }
             }
 
             $invitation->forceFill(['accepted_at' => now()])->save();
@@ -537,9 +507,7 @@ class UserController extends Controller
      * grant CRM access for the invitation's team+role, mark the
      * invitation accepted, log the user in, and redirect them to
      * the CRM dashboard. Wraps in a DB::transaction so a mid-way
-     * failure rolls back cleanly. The role + team_user blocks
-     * mirror acceptExistingUser() (and UserController@store)
-     * verbatim.
+     * failure rolls back cleanly.
      */
     protected function acceptNewUser(Request $request, UserInvitation $invitation): RedirectResponse
     {
@@ -552,6 +520,7 @@ class UserController extends Controller
             $user = User::forceCreate([
                 'name' => $data['name'],
                 'email' => $invitation->email,
+                'team_id' => $invitation->team_id,
                 'password' => Hash::make($data['password']),
                 'crm_access' => 1,
             ]);
@@ -563,18 +532,6 @@ class UserController extends Controller
 
             if ($role = $this->invitationRole($invitation)) {
                 $user->assignRole($role);
-            }
-
-            if (config('laravel-crm.teams') && $invitation->team_id) {
-                DB::table('team_user')->insert([
-                    'team_id' => $invitation->team_id,
-                    'user_id' => $user->id,
-                    'role' => 'editor',
-                ]);
-
-                $user->forceFill([
-                    'current_team_id' => $invitation->team_id,
-                ])->save();
             }
 
             $invitation->forceFill(['accepted_at' => now()])->save();
@@ -602,7 +559,7 @@ class UserController extends Controller
         $phoneIds = [];
         if ($phones) {
             foreach ($phones as $phoneRequest) {
-                if ($phoneRequest['id'] && $phone = Phone::find($phoneRequest['id'])) {
+                if ($phoneRequest['id'] && $phone = $user->phones()->find($phoneRequest['id'])) {
                     $phone->update([
                         'number' => $phoneRequest['number'],
                         'type' => $phoneRequest['type'],
@@ -634,7 +591,7 @@ class UserController extends Controller
 
         if ($emails) {
             foreach ($emails as $emailRequest) {
-                if ($emailRequest['id'] && $email = Email::find($emailRequest['id'])) {
+                if ($emailRequest['id'] && $email = $user->emails()->find($emailRequest['id'])) {
                     $email->update([
                         'address' => $emailRequest['address'],
                         'type' => $emailRequest['type'],
@@ -668,7 +625,7 @@ class UserController extends Controller
 
         if ($addresses) {
             foreach ($addresses as $addressRequest) {
-                if ($addressRequest['id'] && $address = Address::find($addressRequest['id'])) {
+                if ($addressRequest['id'] && $address = $user->addresses()->find($addressRequest['id'])) {
                     $address->update([
                         'address_type_id' => $addressRequest['type'] ?? null,
                         'address' => $addressRequest['address'] ?? null,

@@ -177,7 +177,7 @@ class ChatService
     public function agentsOnlineCount(): int
     {
         try {
-            return DB::table('users')
+            return User::query()
                 ->where('crm_access', 1)
                 ->where('last_online_at', '>=', now()->subMinutes(15))
                 ->count();
@@ -232,6 +232,7 @@ class ChatService
 
             $userIds = DB::table($modelHasRoles)
                 ->where('role_id', $ownerRoleId)
+                ->when(config('laravel-crm.teams'), fn ($q) => $q->where('team_id', $conversation->team_id))
                 ->pluck($morphKey);
 
             if ($userIds->isEmpty()) {
@@ -276,6 +277,7 @@ class ChatService
 
             $userIds = DB::table($modelHasRoles)
                 ->where('role_id', $ownerRoleId)
+                ->when(config('laravel-crm.teams'), fn ($q) => $q->where('team_id', $conversation->team_id))
                 ->pluck($morphKey);
 
             if ($userIds->isEmpty()) {

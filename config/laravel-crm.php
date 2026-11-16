@@ -21,24 +21,12 @@ return [
     | Teams Support
     |--------------------------------------------------------------------------
     |
-    | This value relates to the "teams" feature in Laravel Jetstream or Spark.
-    | Only set this to true if you are using this feature as it will break
-    | your installation if not. It basically allows you to run a multi-tenant
-    | crm, and the teams can be different "accounts". You can switch between
-    | different teams/accounts and have different users, contacts, leads, etc
-    | in each account.
+    | Enables SaaS business isolation. Each internal user belongs to one
+    | App\Models\Business through users.team_id. Functional roles are shared;
+    | their assignments carry the business ID. No Jetstream dependency or
+    | business switching is required. See docs/MULTIEMPRESA.md for migration.
     |
-    | PLEASE NOTE! This has nothing to do with the user teams feature within
-    | the crm itself, which is simply a way of grouping users within the crm.
-    |
-    | For Jetstream see https://jetstream.laravel.com/2.x/features/teams.html
-    |
-    | For Spark Classic see https://spark-classic.laravel.com/docs/11.0/teams
-    |
-    | IMPORTANT! This package uses the Spatie Permissions package which as of
-    | version 5 supports teams. PLease check you have version 5 or higher
-    | installed and follow this additional step when installing the package:
-    | https://spatie.be/docs/laravel-permission/v5/basic-usage/teams-permissions
+    | CRM teams are internal groups of employees within the same business.
     |
     */
 
@@ -49,11 +37,8 @@ return [
     | Host Team Model
     |--------------------------------------------------------------------------
     |
-    | The Eloquent model in the host application that represents a team the
-    | user can switch to (typically Jetstream or a starter kit's App\Models\Team).
-    | When set, the "+ New team" link in the CRM header uses this model to
-    | create the team, then switches the user's current team to it.
-    | Leave null to auto-detect via the user's ownedTeams() relationship.
+    | Legacy package compatibility option. SaaS registration provisions
+    | App\Models\Business; users cannot create or switch host teams.
     |
     */
 
@@ -64,8 +49,8 @@ return [
     | Default Settings
     |--------------------------------------------------------------------------
     |
-    | These are some default settings. They are also used each time a user
-    | creates a new team when team support is enabled above.
+    | Installation defaults inherited by businesses until overridden in
+    | their settings. Corporate identity is stored on Business instead.
     |
     */
 

@@ -4,16 +4,19 @@ namespace VentureDrake\LaravelCrm\Console;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use VentureDrake\LaravelCrm\Console\Traits\RunsForBusinesses;
 use VentureDrake\LaravelCrm\Jobs\RunMonitorCheck;
 use VentureDrake\LaravelCrm\Models\Monitor;
 
 class LaravelCrmMonitorCheck extends Command
 {
+    use RunsForBusinesses;
+
     protected $signature = 'laravelcrm:monitor-check';
 
     protected $description = 'Dispatch RunMonitorCheck jobs for every monitor whose next check is due.';
 
-    public function handle(): int
+    protected function handleBusiness(): int
     {
         $now = Carbon::now();
         $dispatched = 0;

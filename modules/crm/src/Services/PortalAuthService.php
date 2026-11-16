@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class PortalAuthService
 {
@@ -19,12 +20,13 @@ class PortalAuthService
     {
         $userModel = config('auth.providers.users.model');
 
-        $user = $userModel::create([
+        $user = app(BusinessContext::class)->run(null, fn () => $userModel::forceCreate([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'crm_access' => 0,
-        ]);
+            'team_id' => null,
+        ]));
 
         Event::dispatch(new Registered($user));
 

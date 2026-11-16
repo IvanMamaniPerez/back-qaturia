@@ -44,7 +44,7 @@ class RoleIndex extends Component
     {
         return Role::crm()
             ->when(config('laravel-crm.teams'), function ($query) {
-                return $query->where('team_id', auth()->user()->currentTeam->id);
+                return $query->whereNull('team_id');
             })->orderBy(...array_values($this->sortBy))
             ->paginate(25);
     }

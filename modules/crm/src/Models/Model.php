@@ -4,12 +4,23 @@ namespace VentureDrake\LaravelCrm\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use VentureDrake\LaravelCrm\Support\BusinessIntegrity;
 use VentureDrake\LaravelCrm\Support\CrmDateTime;
 use VentureDrake\LaravelCrm\Support\UtcDateTime;
+use VentureDrake\LaravelCrm\Traits\GuardsBusinessRelations;
 
 class Model extends EloquentModel
 {
+    use GuardsBusinessRelations;
     use HasUuids;
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::saving(fn ($model) => app(BusinessIntegrity::class)->validate($model));
+        static::deleting(fn ($model) => app(BusinessIntegrity::class)->validate($model, true));
+        static::registerModelEvent('restoring', fn ($model) => app(BusinessIntegrity::class)->validate($model));
+    }
 
     /** @return mixed */
     public function setAttribute($key, $value)
@@ -49,6 +60,8 @@ class Model extends EloquentModel
     /** @param array<string, mixed> $options */
     public function saveQuietly(array $options = [])
     {
+        app(BusinessIntegrity::class)->validate($this);
+
         return static::withoutEvents(function () use ($options) {
             return $this->save($options);
         });

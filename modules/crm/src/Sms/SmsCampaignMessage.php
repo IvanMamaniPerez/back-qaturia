@@ -30,7 +30,7 @@ class SmsCampaignMessage
             'first_name' => $person?->first_name ?? '',
             'last_name' => $person?->last_name ?? '',
             'full_name' => trim(($person?->first_name ?? '').' '.($person?->last_name ?? '')),
-            'company_name' => config('app.name'),
+            'company_name' => app('laravel-crm.settings')->get('organization_name', config('app.name')),
         ];
 
         $body = self::substitute($campaign->body ?? '', $data);
@@ -50,7 +50,7 @@ class SmsCampaignMessage
             'first_name' => 'Jane',
             'last_name' => 'Smith',
             'full_name' => 'Jane Smith',
-            'company_name' => config('app.name'),
+            'company_name' => app('laravel-crm.settings')->get('organization_name', config('app.name')),
         ];
 
         return rtrim(self::substitute($body, $sample))."\nReply STOP to opt out or visit https://example.com/unsubscribe";

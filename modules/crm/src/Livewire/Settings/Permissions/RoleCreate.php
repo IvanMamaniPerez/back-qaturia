@@ -33,7 +33,7 @@ class RoleCreate extends Component
                 'name' => $this->name,
                 'description' => $this->description,
                 'crm_role' => 1,
-                'team_id' => auth()->user()->currentTeam->id,
+                'team_id' => null,
             ]);
         } else {
             $role = Role::create([

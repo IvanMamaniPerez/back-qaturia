@@ -2,14 +2,11 @@
 
 namespace VentureDrake\LaravelCrm\Mail;
 
+use App\Models\Business;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
-use VentureDrake\LaravelCrm\Models\Setting;
-
-use function VentureDrake\LaravelCrm\Http\Helpers\AddressLine\addressSingleLine;
 
 class EmailCampaignMessage extends Mailable
 {
@@ -47,7 +44,7 @@ class EmailCampaignMessage extends Mailable
             'last_name' => $person?->last_name ?? '',
             'full_name' => trim(($person?->first_name ?? '').' '.($person?->last_name ?? '')),
             'email' => $this->recipient->address,
-            'company_name' => config('app.name'),
+            'company_name' => app('laravel-crm.settings')->get('organization_name', config('app.name')),
         ];
 
         $substitute = fn ($text) => preg_replace_callback('/\{(\w+)\}/', function ($m) use ($textData) {
@@ -107,7 +104,7 @@ class EmailCampaignMessage extends Mailable
             'last_name' => 'Smith',
             'full_name' => 'Jane Smith',
             'email' => 'jane.smith@example.com',
-            'company_name' => config('app.name'),
+            'company_name' => app('laravel-crm.settings')->get('organization_name', config('app.name')),
         ];
 
         $bodyContent = preg_replace_callback('/\{(\w+)\}/', function ($m) use ($sampleData) {
@@ -216,7 +213,7 @@ HTML;
     private static function resolveLogoHtml(): string
     {
         $logoFile = app('laravel-crm.settings')->get('logo_file');
-        $companyName = config('app.name');
+        $companyName = app('laravel-crm.settings')->get('organization_name', config('app.name'));
 
         if ($logoFile) {
             return '<img src="'.e(asset('storage/'.$logoFile)).'" alt="'.e($companyName).'" style="max-height:60px;max-width:240px;display:inline-block;border:0;" />';
@@ -229,21 +226,8 @@ HTML;
 
     private static function resolveAddressLine(?string $teamId): string
     {
-        $teamSetting = Setting::withoutGlobalScopes()
-            ->where('name', 'team')
-            ->when($teamId, fn ($q) => $q->where('team_id', $teamId))
-            ->first();
+        $business = $teamId ? Business::find($teamId) : null;
 
-        if (! $teamSetting) {
-            return '';
-        }
-
-        $businessId = AddressType::where('name', 'Business')->value('id');
-        $currentId = AddressType::where('name', 'Current')->value('id');
-
-        $address = ($businessId ? $teamSetting->addresses()->where('address_type_id', $businessId)->first() : null)
-            ?? ($currentId ? $teamSetting->addresses()->where('address_type_id', $currentId)->first() : null);
-
-        return $address ? addressSingleLine($address) : '';
+        return $business?->fiscal_address ?? '';
     }
 }

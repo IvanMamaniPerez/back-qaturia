@@ -2,12 +2,10 @@
 
 namespace VentureDrake\LaravelCrm\Console;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Ramsey\Uuid\Uuid;
+use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmTablesSeeder;
+use VentureDrake\LaravelCrm\Support\BusinessContext;
 
 class LaravelCrmContactTypes extends Command
 {
@@ -50,39 +48,8 @@ class LaravelCrmContactTypes extends Command
      */
     public function handle()
     {
-        $this->info('Updating LaravelCRM Contact Types...');
-
-        if (! Schema::hasColumn('contact_types', 'team_id')) {
-            $this->info('Team ID column not present — skipping team contact type duplication.');
-
-            return;
-        }
-
-        foreach (DB::table('teams')->get() as $team) {
-            foreach (DB::table('contact_types')
-                ->whereNull('team_id')
-                ->get() as $contactType) {
-                $this->info('Inserting contact type '.$contactType->name.' for team '.$team->name);
-
-                $teamContactType = DB::table('contact_types')->where([
-                    'name' => $contactType->name,
-                    'description' => $contactType->description,
-                    'team_id' => $team->id,
-                ])->first();
-
-                if (! $teamContactType) {
-                    DB::table('contact_types')->insert([
-                        'id' => Uuid::uuid4()->toString(),
-                        'name' => $contactType->name,
-                        'description' => $contactType->description,
-                        'team_id' => $team->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
-                }
-            }
-        }
-
-        $this->info('LaravelCRM Contact Types Update Complete.');
+        return app(BusinessContext::class)->system(
+            fn () => $this->call('db:seed', ['--class' => LaravelCrmTablesSeeder::class, '--force' => true])
+        );
     }
 }

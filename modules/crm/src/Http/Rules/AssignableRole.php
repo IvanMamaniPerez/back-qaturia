@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrm\Http\Rules;
 use App\Models\Role;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Str;
 
 /**
  * Reject role ids the caller is not entitled to hand out.
@@ -27,7 +28,7 @@ class AssignableRole implements ValidationRule
             return;
         }
 
-        if (! Role::assignableBy()->whereKey($value)->exists()) {
+        if (! Str::isUuid($value) || ! Role::assignableBy()->whereKey($value)->exists()) {
             $fail(ucfirst(__('laravel-crm::lang.user_invitation_role_invalid')));
         }
     }

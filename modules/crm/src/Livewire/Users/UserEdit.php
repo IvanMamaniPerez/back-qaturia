@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Livewire\Users;
 
 use App\Models\Role;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use VentureDrake\LaravelCrm\Http\Rules\AssignableRole;
 use VentureDrake\LaravelCrm\Livewire\Users\Traits\HasUserCommon;
@@ -98,28 +99,30 @@ class UserEdit extends Component
 
         abort_if($role && $role->name === 'Owner' && ! auth()->user()->hasRole('Owner'), 403);
 
-        $this->user->forceFill([
-            'name' => $this->name,
-            'email' => $this->email,
-            'crm_access' => $this->crm_access,
-        ])->save();
+        DB::transaction(function () use ($role) {
+            $this->user->forceFill([
+                'name' => $this->name,
+                'email' => $this->email,
+                'crm_access' => $this->crm_access,
+            ])->save();
 
-        if ($role) {
-            if ($removeRole = $this->user->roles()->where('crm_role', 1)->first()) { // THIS COULD BE A BUG
-                $this->user->removeRole($removeRole);
+            if ($role) {
+                if (($removeRole = $this->user->roles()->where('crm_role', 1)->first()) && $removeRole->id !== $role->id) { // THIS COULD BE A BUG
+                    $this->user->removeRole($removeRole);
+                }
+
+                $this->user->assignRole($role);
             }
 
-            $this->user->assignRole($role);
-        }
+            $this->updateUserPhones($this->user, $this->phones);
+            $this->updateUserAddresses($this->user, $this->addresses);
 
-        $this->updateUserPhones($this->user, $this->phones);
-        $this->updateUserAddresses($this->user, $this->addresses);
-
-        if ($this->userTeams) {
-            $this->user->crmTeams()->sync($this->userTeams);
-        } else {
-            $this->user->crmTeams()->sync([]);
-        }
+            if ($this->userTeams) {
+                $this->user->crmTeams()->sync($this->userTeams);
+            } else {
+                $this->user->crmTeams()->sync([]);
+            }
+        });
 
         $this->success(
             ucfirst(trans('laravel-crm::lang.user_updated')),

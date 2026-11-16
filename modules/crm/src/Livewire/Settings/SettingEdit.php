@@ -3,7 +3,6 @@
 namespace VentureDrake\LaravelCrm\Livewire\Settings;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Url;
@@ -14,8 +13,6 @@ use Ramsey\Uuid\Uuid;
 use Throwable;
 use VentureDrake\LaravelCrm\Models\Address;
 use VentureDrake\LaravelCrm\Models\AddressType;
-use VentureDrake\LaravelCrm\Models\Email;
-use VentureDrake\LaravelCrm\Models\Phone;
 use VentureDrake\LaravelCrm\Models\Setting;
 use VentureDrake\LaravelCrm\Support\Modules;
 use VentureDrake\LaravelCrm\Support\PdfContactDetails;
@@ -63,7 +60,7 @@ class SettingEdit extends Component
      */
     protected const TAB_FIELDS = [
         'general' => [
-            'organizationName', 'vatNumber', 'logoFile', 'logo', 'country', 'language',
+            'organizationName', 'vatNumber', 'legalName', 'fiscalAddress', 'businessEmail', 'businessPhone', 'websiteUrl', 'logoFile', 'logo', 'country', 'language',
             'currency', 'timezone', 'dateFormat', 'timeFormat', 'taxName', 'taxRate',
             'pdfContactDetails', 'showRelatedActivity', 'dynamicProducts',
             'phones', 'emails', 'addresses',
@@ -108,6 +105,16 @@ class SettingEdit extends Component
     public $organizationName;
 
     public $vatNumber;
+
+    public ?string $legalName = null;
+
+    public ?string $fiscalAddress = null;
+
+    public ?string $businessEmail = null;
+
+    public ?string $businessPhone = null;
+
+    public ?string $websiteUrl = null;
 
     public $language;
 
@@ -190,6 +197,12 @@ class SettingEdit extends Component
     {
         return [
             'organizationName' => 'required|max:255',
+            'legalName' => 'nullable|string|max:255',
+            'vatNumber' => 'nullable|string|max:32',
+            'fiscalAddress' => 'nullable|string|max:2000',
+            'businessEmail' => 'nullable|email|max:255',
+            'businessPhone' => 'nullable|string|max:64',
+            'websiteUrl' => 'nullable|url|max:255',
             'country' => 'required',
             'language' => 'required',
             'currency' => 'required',
@@ -239,6 +252,11 @@ class SettingEdit extends Component
 
         $this->organizationName = app('laravel-crm.settings')->get('organization_name');
         $this->vatNumber = app('laravel-crm.settings')->get('vat_number');
+        $this->legalName = app('laravel-crm.settings')->get('legal_name');
+        $this->fiscalAddress = app('laravel-crm.settings')->get('fiscal_address');
+        $this->businessEmail = app('laravel-crm.settings')->get('business_email');
+        $this->businessPhone = app('laravel-crm.settings')->get('business_phone');
+        $this->websiteUrl = app('laravel-crm.settings')->get('website_url');
         $this->language = app('laravel-crm.settings')->get('language', 'english');
         $this->country = app('laravel-crm.settings')->get('country', 'United States');
         $this->currency = app('laravel-crm.settings')->get('currency', 'USD');
@@ -353,8 +371,12 @@ class SettingEdit extends Component
 
         app('laravel-crm.settings')->set('organization_name', $this->organizationName);
 
-        if ($this->vatNumber) {
-            app('laravel-crm.settings')->set('vat_number', $this->vatNumber);
+        foreach ([
+            'vat_number' => $this->vatNumber, 'legal_name' => $this->legalName,
+            'fiscal_address' => $this->fiscalAddress, 'business_email' => $this->businessEmail,
+            'business_phone' => $this->businessPhone, 'website_url' => $this->websiteUrl,
+        ] as $key => $value) {
+            app('laravel-crm.settings')->set($key, $value);
         }
 
         app('laravel-crm.settings')->set('language', $this->language);
@@ -456,12 +478,6 @@ class SettingEdit extends Component
             $file->storePubliclyAs(path: $filePath, name: $file->getClientOriginalName(), options: 'public');
             app('laravel-crm.settings')->set('logo_file', $filePath.'/'.$file->getClientOriginalName());
             app('laravel-crm.settings')->set('logo_file_name', $file->getClientOriginalName());
-        }
-
-        if ($this->organizationName && config('laravel-crm.teams') && auth()->user()->currentTeam) {
-            DB::table('teams')
-                ->where('id', auth()->user()->currentTeam->id)
-                ->update(['name' => $this->organizationName]);
         }
 
         app('laravel-crm.settings')->set('dynamic_products', $this->dynamicProducts);
@@ -585,7 +601,7 @@ class SettingEdit extends Component
         $phoneIds = [];
         if ($phones) {
             foreach ($phones as $phoneRequest) {
-                if ($phoneRequest['id'] && $phone = Phone::find($phoneRequest['id'])) {
+                if ($phoneRequest['id'] && $phone = $setting->phones()->find($phoneRequest['id'])) {
                     $phone->update([
                         'number' => $phoneRequest['number'],
                         'type' => $phoneRequest['type'],
@@ -617,7 +633,7 @@ class SettingEdit extends Component
 
         if ($emails) {
             foreach ($emails as $emailRequest) {
-                if ($emailRequest['id'] && $email = Email::find($emailRequest['id'])) {
+                if ($emailRequest['id'] && $email = $setting->emails()->find($emailRequest['id'])) {
                     $email->update([
                         'address' => $emailRequest['address'],
                         'type' => $emailRequest['type'],
@@ -651,7 +667,7 @@ class SettingEdit extends Component
 
         if ($addresses) {
             foreach ($addresses as $addressRequest) {
-                if ($addressRequest['id'] && $address = Address::find($addressRequest['id'])) {
+                if ($addressRequest['id'] && $address = $setting->addresses()->find($addressRequest['id'])) {
                     $address->update([
                         'address_type_id' => $addressRequest['type'] ?? null,
                         'address' => $addressRequest['address'] ?? null,

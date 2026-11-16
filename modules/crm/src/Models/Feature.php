@@ -60,7 +60,7 @@ class Feature extends Model
 
     public function submittedBy()
     {
-        return $this->belongsTo(User::class, 'submitted_by_user_id');
+        return $this->belongsTo(User::class, 'submitted_by_user_id')->withoutGlobalScope('business');
     }
 
     public function comments()
@@ -80,7 +80,7 @@ class Feature extends Model
             config('laravel-crm.db_table_prefix').'feature_votes',
             'feature_id',
             'user_id'
-        )->using(FeatureVote::class)->withPivot('team_id')->withTimestamps();
+        )->using(FeatureVote::class)->withPivot('team_id')->withTimestamps()->withoutGlobalScope('business');
     }
 
     public function createdByUser()

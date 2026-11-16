@@ -51,43 +51,31 @@ class UserCreate extends Component
 
         abort_if($role && $role->name === 'Owner' && ! auth()->user()->hasRole('Owner'), 403);
 
-        $user = User::forceCreate([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => Hash::make($this->password),
-            'crm_access' => $this->crm_access,
-        ]);
+        DB::transaction(function () use ($role) {
+            $user = User::forceCreate([
+                'name' => $this->name,
+                'email' => $this->email,
+                'password' => Hash::make($this->password),
+                'crm_access' => $this->crm_access,
+            ]);
 
-        if ($role) {
-            if ($removeRole = $user->roles()->where('crm_role', 1)->first()) { // THIS COULD BE A BUG
-                $user->removeRole($removeRole);
+            if ($role) {
+                if (($removeRole = $user->roles()->where('crm_role', 1)->first()) && $removeRole->id !== $role->id) { // THIS COULD BE A BUG
+                    $user->removeRole($removeRole);
+                }
+
+                $user->assignRole($role);
             }
 
-            $user->assignRole($role);
-        }
+            $this->updateUserPhones($user, $this->phones);
+            $this->updateUserAddresses($user, $this->addresses);
 
-        $this->updateUserPhones($user, $this->phones);
-        $this->updateUserAddresses($user, $this->addresses);
-
-        if (config('laravel-crm.teams')) {
-            if ($team = auth()->user()->currentTeam) {
-                DB::table('team_user')->insert([
-                    'team_id' => $team->id,
-                    'user_id' => $user->id,
-                    'role' => 'editor', // Default Jetstream role
-                ]);
-
-                $user->forceFill([
-                    'current_team_id' => $team->id,
-                ])->save();
+            if ($this->userTeams) {
+                $user->crmTeams()->sync($this->userTeams);
+            } else {
+                $user->crmTeams()->sync([]);
             }
-        }
-
-        if ($this->userTeams) {
-            $user->crmTeams()->sync($this->userTeams);
-        } else {
-            $user->crmTeams()->sync([]);
-        }
+        });
 
         $this->success(
             ucfirst(trans('laravel-crm::lang.user_created')),

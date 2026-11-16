@@ -104,73 +104,60 @@ class UserImport extends Component
             }
 
             try {
-                $now = now();
-                $user = User::forceCreate([
-                    'name' => $row['name'],
-                    'email' => $row['email'],
-                    'password' => Hash::make(Str::password(length: 16, letters: true, numbers: true, symbols: true, spaces: false)),
-                    'crm_access' => $row['crm_access'],
-                    'mailing_list' => $row['mailing_list'] ?? 1,
-                    'email_verified_at' => $this->safeDateValue($row['email_verified_at'] ?? ''),
-                    'created_at' => $this->safeDateValue($row['created_at'] ?? '') ?? $now,
-                    'updated_at' => $this->safeDateValue($row['updated_at'] ?? '') ?? $now,
-                ]);
-
-                // Backdate last_online_at directly — Eloquent guards this column
-                $lastOnline = $this->safeDateValue($row['last_online_at'] ?? '');
-                if ($lastOnline !== null) {
-                    DB::table('users')
-                        ->where('id', $user->id)
-                        ->update(['last_online_at' => $lastOnline]);
-                }
-            } catch (UniqueConstraintViolationException) {
-                $this->skippedCount++;
-
-                continue;
-            }
-
-            $roleName = $row['role'] ?? '';
-
-            // Both role sources are attacker-controlled -- the CSV `role` column and
-            // the wire:model-bound $defaultRole -- so both go through assignableBy(),
-            // the same predicate AssignableRole applies on the create/edit/invite
-            // forms. A bare name match here would let anyone holding `create crm
-            // users` import a row with role=Owner, or assign a host-app role such as
-            // super-admin, or a role belonging to another tenant.
-            //
-            // An unassignable role is dropped rather than failing the row, matching
-            // UserController::invitationRole(): the user is still imported with CRM
-            // access and an Owner can set their role afterwards.
-            if (! empty($roleName)) {
-                $role = Role::assignableBy()->where('name', $roleName)->first();
-            } elseif ($this->defaultRole) {
-                $role = Role::assignableBy()->find($this->defaultRole);
-            } else {
-                $role = null;
-            }
-
-            if ($role) {
-                if ($removeRole = $user->roles()->where('crm_role', 1)->first()) {
-                    $user->removeRole($removeRole);
-                }
-                $user->assignRole($role);
-            }
-
-            if (config('laravel-crm.teams')) {
-                if ($team = auth()->user()->currentTeam) {
-                    DB::table('team_user')->insert([
-                        'team_id' => $team->id,
-                        'user_id' => $user->id,
-                        'role' => 'editor',
+                DB::transaction(function () use ($row) {
+                    $now = now();
+                    $user = User::forceCreate([
+                        'name' => $row['name'],
+                        'email' => $row['email'],
+                        'password' => Hash::make(Str::password(length: 16, letters: true, numbers: true, symbols: true, spaces: false)),
+                        'crm_access' => $row['crm_access'],
+                        'mailing_list' => $row['mailing_list'] ?? 1,
+                        'email_verified_at' => $this->safeDateValue($row['email_verified_at'] ?? ''),
+                        'created_at' => $this->safeDateValue($row['created_at'] ?? '') ?? $now,
+                        'updated_at' => $this->safeDateValue($row['updated_at'] ?? '') ?? $now,
                     ]);
 
-                    $user->forceFill(['current_team_id' => $team->id])->save();
-                }
+                    // Backdate last_online_at directly — Eloquent guards this column
+                    $lastOnline = $this->safeDateValue($row['last_online_at'] ?? '');
+                    if ($lastOnline !== null) {
+                        DB::table('users')
+                            ->where('id', $user->id)
+                            ->update(['last_online_at' => $lastOnline]);
+                    }
+                    $roleName = $row['role'] ?? '';
+
+                    // Both role sources are attacker-controlled -- the CSV `role` column and
+                    // the wire:model-bound $defaultRole -- so both go through assignableBy(),
+                    // the same predicate AssignableRole applies on the create/edit/invite
+                    // forms. A bare name match here would let anyone holding `create crm
+                    // users` import a row with role=Owner, or assign a host-app role such as
+                    // super-admin, or a role belonging to another tenant.
+                    //
+                    // An unassignable role is dropped rather than failing the row, matching
+                    // UserController::invitationRole(): the user is still imported with CRM
+                    // access and an Owner can set their role afterwards.
+                    if (! empty($roleName)) {
+                        $role = Role::assignableBy()->where('name', $roleName)->first();
+                    } elseif ($this->defaultRole) {
+                        $role = Role::assignableBy()->find($this->defaultRole);
+                    } else {
+                        $role = null;
+                    }
+
+                    if ($role) {
+                        if ($removeRole = $user->roles()->where('crm_role', 1)->first()) {
+                            $user->removeRole($removeRole);
+                        }
+                        $user->assignRole($role);
+                    }
+
+                    DB::afterCommit(fn () => SendImportPasswordReset::dispatch($user->email));
+
+                });
+                $this->importedCount++;
+            } catch (UniqueConstraintViolationException) {
+                $this->skippedCount++;
             }
-
-            SendImportPasswordReset::dispatch($user->email);
-
-            $this->importedCount++;
         }
 
         if ($this->pendingOffset < $this->totalToProcess) {
