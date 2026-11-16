@@ -1,0 +1,11 @@
+{
+    "nunito": {
+        "normal": "\/app\/public\/vendor\/laravel-crm\/fonts\/nunito_normal_2a798444dc2a0bd9b099beb7e4c70f4d",
+        "300": "\/app\/public\/vendor\/laravel-crm\/fonts\/nunito_300_192798aa65e2f1e82ac7d5daf7a67cdb",
+        "500": "\/app\/public\/vendor\/laravel-crm\/fonts\/nunito_500_970d0c1f2c5ec2ee3f0cfc6d1387fb3f",
+        "600": "\/app\/public\/vendor\/laravel-crm\/fonts\/nunito_600_a3f078c4ee5b3f4cca11a558ea819578",
+        "bold": "\/app\/public\/vendor\/laravel-crm\/fonts\/nunito_bold_7502a56c51bd6d50d4ca23d3ced64c2a",
+        "italic": "\/app\/public\/vendor\/laravel-crm\/fonts\/nunito_italic_3d9dc1d89f40a99bc72a0ca5e880a9e1",
+        "bold_italic": "nunito_bold_italic_ae7c07b57e207cecb0e2b0c2dece5c1f"
+    }
+}

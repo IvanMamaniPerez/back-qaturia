@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
@@ -19,6 +20,7 @@ use Tests\BusinessTestCase;
 use VentureDrake\LaravelCrm\Console\LaravelCrmUpdate;
 use VentureDrake\LaravelCrm\Database\Seeders\LaravelCrmBootstrapSeeder;
 use VentureDrake\LaravelCrm\Livewire\Auth\Register;
+use VentureDrake\LaravelCrm\Livewire\Files\FileItem;
 use VentureDrake\LaravelCrm\Livewire\Portal\Features\PublicFeatureBoard;
 use VentureDrake\LaravelCrm\Livewire\Portal\Features\PublicFeatureShow;
 use VentureDrake\LaravelCrm\Livewire\Settings\Features\FeatureStatusIndex;
@@ -331,6 +333,32 @@ test('a signed invoice uses its own business even if a different company staff m
     $this->actingAs($a)->get($url)->assertOk()->assertSee('Beta')->assertDontSee('Alpha SAC');
     $this->get($url.'&forged=1')->assertUnauthorized();
     $this->get(route('laravel-crm.invoices.show', $invoice))->assertNotFound();
+});
+
+test('an attachment component cannot download its old company file after the authenticated business changes', function () {
+    $a = newBusinessOwner('Alpha');
+    $b = newBusinessOwner('Beta');
+    $context = app(BusinessContext::class);
+    Storage::fake('local');
+    Storage::disk('local')->put('audit/alpha.txt', 'Alpha private attachment');
+    $file = $context->run($a->team_id, function () {
+        $person = Person::create(['first_name' => 'Alpha contact']);
+
+        return $person->files()->create([
+            'disk' => 'local', 'file' => 'audit/alpha.txt', 'name' => 'alpha.txt',
+            'mime' => 'text/plain', 'filesize' => 24,
+        ]);
+    });
+    $this->actingAs($a);
+    $context->set($a->team_id);
+    $component = Livewire::test(FileItem::class, ['file' => $file])
+        ->call('download')->assertFileDownloaded('alpha.txt');
+
+    // A tab retains its signed Livewire snapshot after logout/login with
+    // another company's account. Every action must recheck the new session.
+    $this->actingAs($b);
+    $context->set($b->team_id);
+    $component->call('download')->assertNotFound();
 });
 
 test('invitations create collaborators in the inviting business without Jetstream tables', function () {

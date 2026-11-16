@@ -20,11 +20,29 @@ class FileItem extends Component
     {
         $this->file = $file;
         $this->related = $related;
+        $this->hydrate();
+    }
+
+    public function hydrate(): void
+    {
+        // A checksummed Livewire model can outlive the authenticated session.
+        // Resolve it again through the current business scope before using it.
+        $this->file = $this->authorizedFile();
     }
 
     public function download(): mixed
     {
-        return Storage::disk($this->file->disk)->download($this->file->file, $this->file->name);
+        $file = $this->authorizedFile();
+
+        return Storage::disk($file->disk)->download($file->file, $file->name);
+    }
+
+    private function authorizedFile(): File
+    {
+        $file = File::query()->findOrFail($this->file->getKey());
+        $this->authorize('view', $file);
+
+        return $file;
     }
 
     public function delete(): void
