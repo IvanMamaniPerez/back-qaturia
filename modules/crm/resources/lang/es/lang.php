@@ -245,7 +245,7 @@ return [
     'import_col_role' => 'Nombre del rol en CRM (p. ej., administrador).',
     'import_password_note' => 'Se generará automáticamente una contraseña segura para cada usuario. Se enviará un correo de bienvenida con un enlace para que establezca su propia contraseña.',
 
-    // Welcome email sent to imported users
+    // Correo de bienvenida enviado a los usuarios importados
     'welcome_email_subject' => 'Te damos la bienvenida a :app',
     'welcome_email_heading' => '¡Te damos la bienvenida a :app!',
     'welcome_email_greeting' => 'Hola, :name:',
@@ -323,17 +323,17 @@ return [
     'updated_version_of_laravel_crm_is_available' => 'Hay una versión más reciente de Laravel CRM disponible.',
     'you_can_update_from_laravel_crm' => 'Puedes actualizar desde Laravel CRM.',
     'upgrade_guide' => 'guía de actualización',
-    // Updates page. The two commands are literal shell strings, not translated —
-    // they are typed verbatim into a terminal.
+    // Página de actualizaciones. Los dos comandos son cadenas literales de terminal:
+    // deben ejecutarse exactamente como aparecen, sin traducirlos.
     'how_to_update' => 'cómo actualizar',
     'run_these_from_your_project_root' => 'Ejecuta estos dos comandos desde la raíz de tu proyecto.',
     'update_step_composer' => 'Descarga la versión. El hook de Composer vuelve a publicar los recursos y limpia las cachés.',
     'update_step_artisan' => 'Aplica las migraciones de base de datos, los datos iniciales y los ajustes de registros pendientes. Nunca se ejecuta por sí solo.',
     'database_update_required' => 'se requiere actualizar la base de datos',
     'your_database_is_behind_the_installed_code' => 'La base de datos no está actualizada con respecto al código instalado. Ejecuta el siguiente comando de actualización para aplicar las migraciones pendientes.',
-    // System check banner. Each sentence is a whole string carrying its links as
-    // placeholders, rather than fragments concatenated in Blade, so translators
-    // control word order — which RTL locales such as fa depend on.
+    // Aviso de comprobación del sistema. Cada mensaje incluye los enlaces mediante
+    // marcadores de sustitución en lugar de fragmentos concatenados en Blade, para
+    // conservar el orden gramatical de cada idioma, incluidos los idiomas RTL.
     'important' => 'importante',
     'dismiss' => 'descartar',
     'system_check_upgrade_required' => 'Tu versión de Laravel CRM necesita algunas actualizaciones para funcionar correctamente. Consulta la :guide en la documentación.',
@@ -341,10 +341,10 @@ return [
     'system_check_update_available' => 'Hay una nueva versión de Laravel CRM disponible. :details o :update.',
     'system_check_view_version_details' => 'Ver detalles de la versión :version',
     'system_check_update_now' => 'actualizar ahora',
-    // :updates_page rather than :update — the substituted :command value ends in
-    // the literal "laravelcrm:update", and Laravel replaces placeholders longest
-    // key first, so a :update placeholder here would go on to eat the colon-word
-    // inside the command it had just inserted.
+    // Se utiliza :updates_page en vez de :update porque el valor de :command
+    // termina literalmente en "laravelcrm:update". Laravel sustituye primero los
+    // marcadores más largos y podría sustituir incorrectamente :update dentro
+    // del comando recién insertado si se empleara ese marcador.
     'system_check_db_update_required' => 'Tu versión de Laravel CRM requiere actualizaciones de la base de datos para funcionar correctamente. Ejecuta :command desde la raíz del proyecto o consulta :updates_page.',
     'system_check_db_update_command' => 'php artisan laravelcrm:update',
     'system_check_update_database' => 'actualizar base de datos',
@@ -423,7 +423,7 @@ return [
     'mark_as_rejected' => 'marcar como rechazada',
     'quote_accepted' => 'cotización aceptada',
     'quote_rejected' => 'cotización rechazada',
-    'quote_unaccepted' => 'aceptación de cotización revertida',
+    'quote_unaccepted' => 'se ha revertido la aceptación de la cotización',
     'task' => 'tarea',
     'tasks' => 'tareas',
     'due' => 'vencimiento',
@@ -506,7 +506,7 @@ return [
     'invoices' => 'facturas',
     'order_invoiced' => 'pedido facturado',
     'invoice_prefix' => 'prefijo de factura',
-    'order_created_from_quote' => 'pedido creado de cotización',
+    'order_created_from_quote' => 'pedido creado a partir de una cotización',
     'ordered' => 'pedido',
     'quote_updated' => 'cotización actualizada',
     'calls' => 'llamadas',
@@ -581,7 +581,7 @@ return [
     'invoice_created' => 'factura creada',
     'quote_stored' => 'cotización guardada',
     'back_to_deliveries' => 'volver a entregas',
-    'delivery_items' => 'artículos de entrega',
+    'delivery_items' => 'artículos de la entrega',
     'shipping_address' => 'dirección de envío',
     'billing_address' => 'dirección de facturación',
     'edit_delivery' => 'editar entrega',
@@ -613,16 +613,16 @@ return [
     'order_prefix' => 'prefijo de pedido',
     'order_number' => 'número de pedido',
     'quote_number' => 'número de cotización',
-    'from_quote' => 'de cotización',
-    'from_order' => 'de pedido',
+    'from_quote' => 'de una cotización',
+    'from_order' => 'de un pedido',
     'show_related_contact_activity' => 'mostrar la actividad de los contactos relacionados',
     'allow_creating_products_when_creating_quotes_orders_and_invoices' => 'Permitir crear productos nuevos al crear o editar cotizaciones, pedidos y facturas.',
     'tax_rate' => 'tasa de impuesto',
     'tax_name' => 'nombre del impuesto',
     'pdf_contact_details' => 'datos de contacto',
-    'pdf_contact_details_hint' => 'Se muestra en el bloque «De» de los PDF de cotizaciones, pedidos, entregas y facturas, salvo que un tipo de documento lo reemplace en su propia pestaña; la plantilla clásica solo muestra este bloque en las facturas.',
+    'pdf_contact_details_hint' => 'Se muestra en el bloque «De» de los PDF de cotizaciones, pedidos, entregas y facturas, salvo que se haya configurado un texto específico en la pestaña del documento correspondiente. La plantilla clásica solo muestra este bloque en las facturas.',
     'invoice_contact_details' => 'datos de contacto de factura',
-    'invoice_contact_details_hint' => 'Reemplaza los datos de contacto comunes de los documentos únicamente en las facturas.',
+    'invoice_contact_details_hint' => 'Reemplaza los datos de contacto compartidos únicamente en las facturas.',
     'overdue' => 'vencido',
     'due_tomorrow' => 'vence mañana',
     'total_invoices' => 'total de facturas',
@@ -635,9 +635,9 @@ return [
     'add_tax_rate' => 'agregar tasa de impuesto',
     'back_to_tax_rates' => 'volver a tasas de impuesto',
     'edit_tax_rate' => 'editar tasa de impuesto',
-    'tax_rate_percent' => 'porcentaje de impuesto %',
+    'tax_rate_percent' => 'tasa de impuesto (%)',
     'delivery_prefix' => 'prefijo de entrega',
-    'vat_number' => 'número de identificación fiscal (RUC/IVA)',
+    'vat_number' => 'número de IVA',
     'total_orders' => 'total de pedidos',
     'total_deliveries' => 'total de entregas',
     'default_tax_rate' => 'tasa de impuesto predeterminada',
@@ -678,9 +678,9 @@ return [
     'delivery_phone' => 'teléfono de entrega',
     'send_purchase_order' => 'enviar orden de compra',
     'delivery_type' => 'tipo de entrega',
-    'pickup' => 'recojo en tienda',
+    'pickup' => 'recojo',
     'unreject' => 'revertir rechazo',
-    'quote_unrejected' => 'rechazo de cotización revertido',
+    'quote_unrejected' => 'se ha revertido el rechazo de la cotización',
     'stage' => 'etapa',
     'edit_custom_field' => 'editar campo personalizado',
     'create_custom_field' => 'crear campo personalizado',
@@ -712,7 +712,7 @@ return [
     'payment' => 'pago',
     'unallocated' => 'sin asignar',
 
-    /* Version 2 */
+    /* Versión 2 */
 
     'lead_created_successfully' => 'prospecto creado correctamente',
     'lead_updated_successfully' => 'prospecto actualizado correctamente',
@@ -794,7 +794,7 @@ return [
     'file_deleted' => 'archivo eliminado',
     'team_created' => 'equipo creado',
 
-    // Auth
+    // Autenticación
     'login' => 'iniciar sesión',
     'logout' => 'cerrar sesión',
     'email_address' => 'correo electrónico',
@@ -813,7 +813,7 @@ return [
     'confirm_password' => 'confirmar contraseña',
     'hello' => 'hola',
 
-    // Dashboard
+    // Panel de control
     'today' => 'hoy',
     'yesterday' => 'ayer',
     'last_x_days' => 'Últimos :days días',
@@ -907,11 +907,11 @@ return [
     'connection_failed' => 'conexión fallida',
     'balance' => 'saldo',
 
-    // Portal auth
+    // Autenticación del portal
     'already_have_account' => '¿Ya tienes una cuenta?',
     'dont_have_account' => "¿No tienes una cuenta?",
 
-    // Features
+    // Funcionalidades
     'feature' => 'funcionalidad',
     'features' => 'funcionalidades',
     'cannot_delete_status_with_features' => 'No se puede eliminar un estado que todavía tenga funcionalidades asignadas.',
@@ -943,7 +943,7 @@ return [
     'user' => 'usuario',
     'submit_feature_intro' => "Comparte lo que te gustaría que se incorporara. Otras personas podrán votar y comentar tu idea.",
 
-    // Monitoring module
+    // Módulo de monitoreo
     'monitors' => 'monitores',
     'monitor' => 'monitor',
     'monitor_status_up' => 'operativo',
@@ -981,14 +981,14 @@ return [
     'failed' => 'fallido',
     'could_not_be_saved' => 'no se pudo guardar',
 
-    // Monitor notifications
+    // Notificaciones del monitoreo
     'monitor_down_subject' => 'monitor caído',
     'monitor_recovered_subject' => 'monitor recuperado',
     'monitor_perf_subject' => 'alerta de rendimiento del monitor',
     'monitor_ssl_expiring_subject' => 'el certificado SSL del monitor vence pronto',
     'monitor_ssl_invalid_subject' => 'certificado SSL del monitor no válido',
 
-    // Feature notifications
+    // Notificaciones de funcionalidades
     'feature_submitted_subject' => 'nueva funcionalidad propuesta',
     'feature_submitted_intro' => 'Se ha enviado una nueva solicitud de funcionalidad.',
     'feature_status_changed_subject' => 'estado de funcionalidad modificado',
@@ -1000,7 +1000,7 @@ return [
     'feature_comment_posted_intro_admin' => 'Se ha publicado un nuevo comentario en una funcionalidad.',
     'view_feature' => 'ver funcionalidad',
 
-    // User invitation notification
+    // Notificación de invitación de usuario
     'user_invitation_subject' => "Te han invitado a :app",
     'user_invitation_greeting' => 'Hola:',
     'user_invitation_intro' => ':inviter te ha invitado a unirte a :app.',
@@ -1016,11 +1016,11 @@ return [
     'user_invitation_invalid_title' => 'La invitación ya no es válida.',
     'user_invitation_invalid_message' => 'Este enlace de invitación no es válido, venció o ya fue utilizado. Si crees que se trata de un error, comunícate con la persona que te invitó y solicita una nueva invitación.',
     'user_invitation_back_to_login' => 'volver a iniciar sesión',
-    'user_invitation_wrong_user' => 'Esta invitación es para :email. Cierra sesión y vuelve a ingresar como :email para aceptarla.',
+    'user_invitation_wrong_user' => 'Esta invitación es para :email. Cierra la sesión y vuelve a iniciar sesión con :email para aceptarla.',
     'user_invitation_accepted' => 'invitación aceptada',
     'user_invitation_new_user_intro' => 'Ingresa tu nombre y una contraseña para terminar de crear tu cuenta.',
 
-    // User invitations UI (Users index tabs + Pending Invitations list)
+    // Interfaz de invitaciones (pestañas de usuarios e invitaciones pendientes)
     'registered_users' => 'usuarios registrados',
     'pending_invitations' => 'invitaciones pendientes',
     'no_pending_invitations' => 'sin invitaciones pendientes',
@@ -1031,7 +1031,7 @@ return [
     'expires' => 'vence',
     'invited_by' => 'invitado por',
 
-    // PDF templates (shared registry entries used across the 5 doc types)
+    // Plantillas PDF (registro compartido entre los cinco tipos de documento)
     'templates' => 'plantillas',
     'template' => 'plantilla',
     'pdf_template' => 'plantilla PDF',
@@ -1052,7 +1052,7 @@ return [
     'zoom_out' => 'alejar',
     'close' => 'cerrar',
 
-    // Get link (portal share modal)
+    // Obtener enlace (ventana para compartir desde el portal)
     'get_link' => 'obtener enlace',
     'get_link_hint' => 'Cualquier persona que tenga este enlace podrá ver el registro :record.',
     'link_expires_days' => 'Este enlace vence en :days días.',
