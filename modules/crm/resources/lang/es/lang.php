@@ -338,14 +338,14 @@ return [
     'dismiss' => 'descartar',
     'system_check_upgrade_required' => 'Tu versión de Laravel CRM necesita algunas actualizaciones para funcionar correctamente. Consulta la :guide en la documentación.',
     'system_check_upgrade_guide' => 'guía de actualización',
-    'system_check_update_available' => 'Hay una nueva versión de Laravel CRM disponible. :details o :update.',
-    'system_check_view_version_details' => 'Ver detalles de la versión :version',
+    'system_check_update_available' => 'Hay una nueva versión de Laravel CRM disponible. Puedes :details o :update.',
+    'system_check_view_version_details' => 'ver detalles de la versión :version',
     'system_check_update_now' => 'actualizar ahora',
     // Se utiliza :updates_page en vez de :update porque el valor de :command
     // termina literalmente en "laravelcrm:update". Laravel sustituye primero los
     // marcadores más largos y podría sustituir incorrectamente :update dentro
     // del comando recién insertado si se empleara ese marcador.
-    'system_check_db_update_required' => 'Tu versión de Laravel CRM requiere actualizaciones de la base de datos para funcionar correctamente. Ejecuta :command desde la raíz del proyecto o consulta :updates_page.',
+    'system_check_db_update_required' => 'Tu versión de Laravel CRM requiere actualizaciones de la base de datos para funcionar correctamente. Ejecuta :command desde la raíz del proyecto o selecciona :updates_page.',
     'system_check_db_update_command' => 'php artisan laravelcrm:update',
     'system_check_update_database' => 'actualizar base de datos',
     'settings_updated' => 'configuración actualizada',
