@@ -54,21 +54,21 @@ return [
     |
     */
 
-    'currency' => env('LARAVEL_CRM_CURRENCY', 'USD'),
+    'currency' => env('LARAVEL_CRM_CURRENCY', 'PEN'),
 
-    'country' => env('LARAVEL_CRM_COUNTRY', 'United States'),
+    'country' => env('LARAVEL_CRM_COUNTRY', 'Peru'),
 
-    'language' => env('LARAVEL_CRM_LANGUAGE', 'english'),
+    'language' => env('LARAVEL_CRM_LANGUAGE', 'spanish'),
 
-    'timezone' => env('LARAVEL_CRM_TIMEZONE', 'UTC'),
+    'timezone' => env('LARAVEL_CRM_TIMEZONE', 'America/Lima'),
 
-    'date_format' => env('LARAVEL_CRM_DATE_FORMAT', 'Y-m-d'),
+    'date_format' => env('LARAVEL_CRM_DATE_FORMAT', 'd/m/Y'),
 
-    'time_format' => env('LARAVEL_CRM_TIME_FORMAT', 'g:i A'),
+    'time_format' => env('LARAVEL_CRM_TIME_FORMAT', 'H:i'),
 
-    'tax_name' => env('LARAVEL_CRM_TAX_NAME', 'Tax'),
+    'tax_name' => env('LARAVEL_CRM_TAX_NAME', 'IGV'),
 
-    'tax_rate' => env('LARAVEL_CRM_TAX_RATE', null),
+    'tax_rate' => env('LARAVEL_CRM_TAX_RATE', 18),
 
     /*
     |--------------------------------------------------------------------------

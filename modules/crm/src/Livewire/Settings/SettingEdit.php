@@ -92,6 +92,10 @@ class SettingEdit extends Component
             'id' => 'english',
             'name' => 'English',
         ],
+        [
+            'id' => 'spanish',
+            'name' => 'Español',
+        ],
     ];
 
     public array $currencies = [];
