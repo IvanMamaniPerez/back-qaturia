@@ -2,7 +2,9 @@
 
 namespace VentureDrake\LaravelCrm\Livewire\Auth;
 
+use App\Rules\PasswordStorageLimit;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
@@ -31,10 +33,11 @@ class Register extends Component
     public function register(BusinessRegistrationService $service): void
     {
         abort_unless(config('laravel-crm.teams'), 404);
+        abort_unless(config('auth.registration_enabled', true), 403);
         $data = $this->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'password' => ['required', 'confirmed', (Password::defaults() ?? Password::min(8))],
+            'password' => ['required', 'string', 'confirmed', new PasswordStorageLimit, Password::defaults()],
             'business_name' => 'required|string|max:255',
             'legal_name' => 'nullable|string|max:255',
             'tax_id' => 'nullable|string|max:32',
@@ -50,7 +53,7 @@ class Register extends Component
         $this->redirect(route('laravel-crm.dashboard'));
     }
 
-    public function render()
+    public function render(): View
     {
         return view('laravel-crm::livewire.auth.register');
     }

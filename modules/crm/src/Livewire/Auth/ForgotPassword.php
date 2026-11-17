@@ -2,7 +2,8 @@
 
 namespace VentureDrake\LaravelCrm\Livewire\Auth;
 
-use Illuminate\Support\Facades\Password;
+use App\Services\AccountPasswordService;
+use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Mary\Traits\Toast;
@@ -14,35 +15,23 @@ class ForgotPassword extends Component
 
     public string $email = '';
 
-    protected function rules()
+    /** @return array<string, mixed> */
+    protected function rules(): array
     {
         return [
-            'email' => 'required|email',
+            'email' => 'required|email|max:255',
         ];
     }
 
-    public function sendResetLink()
+    public function sendResetLink(AccountPasswordService $passwords): void
     {
         $this->validate();
-
-        $status = Password::sendResetLink(['email' => $this->email]);
-
-        if ($status === Password::RESET_LINK_SENT) {
-            $this->email = '';
-
-            $this->success(
-                ucfirst(trans('laravel-crm::lang.password_reset_link_sent'))
-            );
-
-            return;
-        }
-
-        $this->error(
-            trans($status)
-        );
+        $passwords->sendResetLink($this->email);
+        $this->email = '';
+        $this->success('Si el correo está registrado, recibirás las instrucciones para recuperar tu contraseña.');
     }
 
-    public function render()
+    public function render(): View
     {
         return view('laravel-crm::livewire.auth.forgot-password');
     }

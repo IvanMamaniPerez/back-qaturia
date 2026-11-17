@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\AccountPasswordResetNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -42,6 +43,12 @@ use VentureDrake\LaravelCrm\Traits\HasCrmTeams;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    /** @param string $token */
+    public function sendPasswordResetNotification(mixed $token): void
+    {
+        $this->notify(new AccountPasswordResetNotification($token));
+    }
+
     use GuardsBusinessRelations;
     use HasApiTokens, HasCrmAccess, HasCrmTeams, HasUuids;
     use HasRoles {

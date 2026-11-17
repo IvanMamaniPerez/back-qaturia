@@ -1,10 +1,15 @@
 <?php
 
+use App\Http\Middleware\EnsureFrontendSession;
+use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use VentureDrake\LaravelCrm\Http\Middleware\ForceJsonResponse;
 use VentureDrake\LaravelCrm\Http\Middleware\ResolveBusinessContext;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -15,13 +20,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->statefulApi();
+        $middleware->api(replace: [EnsureFrontendRequestsAreStateful::class => EnsureFrontendSession::class]);
+        $middleware->prependToPriorityList(AuthenticatesRequests::class, ForceJsonResponse::class);
+        $middleware->prependToPriorityList(AuthenticatesRequests::class, EnsureFrontendSession::class);
+
         $tenant = ResolveBusinessContext::class;
         $middleware->appendToGroup('web', $tenant);
+        $middleware->appendToGroup('web', AuthenticateSession::class);
         $middleware->appendToGroup('api', $tenant);
         $middleware->prependToPriorityList(SubstituteBindings::class, $tenant);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+            fn (Request $request) => $request->is('api/*', trim(config('laravel-crm.route_prefix', 'crm'), '/').'/api/*')
+                || $request->expectsJson(),
         );
     })->create();

@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\PasswordResetController;
+use App\Http\Controllers\Api\RegistrationController;
+use App\Http\Middleware\EnsureApiTokenSessionIsValid;
+use App\Http\Middleware\EnsureFrontendSession;
 use Illuminate\Support\Facades\Route;
 use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\AuthController;
 use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\DealController;
@@ -23,10 +27,39 @@ use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\QuoteController;
  */
 
 Route::post('auth/token', [AuthController::class, 'issueToken'])
+    ->withoutMiddleware(EnsureFrontendSession::class)
     ->middleware('throttle:6,1')
     ->name('laravel-crm.api.v2.auth.token.issue');
 
-Route::middleware(['auth:sanctum', 'crm-api', 'laravel-crm.api.team'])->group(function () {
+Route::post('auth/register', [RegistrationController::class, 'store'])
+    ->withoutMiddleware(EnsureFrontendSession::class)
+    ->middleware('throttle:5,1')->name('laravel-crm.api.v2.auth.register');
+
+Route::post('auth/forgot-password', [PasswordResetController::class, 'request'])
+    ->withoutMiddleware(EnsureFrontendSession::class)
+    ->middleware('throttle:5,1')->name('laravel-crm.api.v2.auth.password.request');
+
+Route::post('auth/reset-password', [PasswordResetController::class, 'reset'])
+    ->withoutMiddleware(EnsureFrontendSession::class)
+    ->middleware('throttle:6,1')->name('laravel-crm.api.v2.auth.password.reset');
+
+Route::post('auth/refresh', [AuthController::class, 'refresh'])
+    ->withoutMiddleware(EnsureFrontendSession::class)
+    ->middleware('throttle:20,1')->name('laravel-crm.api.v2.auth.refresh');
+
+Route::post('auth/token/logout', [AuthController::class, 'logoutTokenSession'])
+    ->withoutMiddleware(EnsureFrontendSession::class)
+    ->name('laravel-crm.api.v2.auth.token.logout');
+
+Route::post('auth/login', [AuthController::class, 'login'])
+    ->middleware('throttle:6,1')
+    ->name('laravel-crm.api.v2.auth.login');
+
+Route::post('auth/logout', [AuthController::class, 'logout'])
+    ->middleware('auth:sanctum')
+    ->name('laravel-crm.api.v2.auth.logout');
+
+Route::middleware(['auth:sanctum', EnsureApiTokenSessionIsValid::class, 'crm-api', 'laravel-crm.api.team'])->group(function () {
     Route::get('auth/me', [AuthController::class, 'me'])
         ->name('laravel-crm.api.v2.auth.me');
 

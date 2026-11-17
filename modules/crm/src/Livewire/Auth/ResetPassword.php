@@ -2,10 +2,11 @@
 
 namespace VentureDrake\LaravelCrm\Livewire\Auth;
 
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Support\Facades\Hash;
+use App\Rules\PasswordStorageLimit;
+use App\Services\AccountPasswordService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Mary\Traits\Toast;
@@ -23,41 +24,26 @@ class ResetPassword extends Component
 
     public string $password_confirmation = '';
 
-    public function mount(string $token, ?string $email = null)
+    public function mount(string $token, ?string $email = null): void
     {
         $this->token = $token;
         $this->email = $email ?? request()->query('email', '');
     }
 
-    protected function rules()
+    /** @return array<string, mixed> */
+    protected function rules(): array
     {
         return [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => ['required', 'string', 'confirmed', new PasswordStorageLimit, PasswordRule::defaults()],
         ];
     }
 
-    public function resetPassword()
+    public function resetPassword(AccountPasswordService $passwords): void
     {
-        $this->validate();
-
-        $status = Password::reset(
-            [
-                'email' => $this->email,
-                'password' => $this->password,
-                'password_confirmation' => $this->password_confirmation,
-                'token' => $this->token,
-            ],
-            function ($user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-
-                event(new PasswordReset($user));
-            }
-        );
+        $data = $this->validate();
+        $status = $passwords->reset($data);
 
         if ($status === Password::PASSWORD_RESET) {
             session()->flash('status', ucfirst(trans('laravel-crm::lang.password_reset_success')));
@@ -72,7 +58,7 @@ class ResetPassword extends Component
         );
     }
 
-    public function render()
+    public function render(): View
     {
         return view('laravel-crm::livewire.auth.reset-password');
     }

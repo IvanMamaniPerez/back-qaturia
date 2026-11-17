@@ -4,6 +4,9 @@ use App\Models\User;
 
 return [
 
+    'registration_enabled' => (bool) env('AUTH_REGISTRATION_ENABLED', true),
+    'public_url' => (string) env('AUTH_PUBLIC_URL', env('APP_URL', 'http://localhost:8000')),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults

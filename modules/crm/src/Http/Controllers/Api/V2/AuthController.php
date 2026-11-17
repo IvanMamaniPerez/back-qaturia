@@ -2,18 +2,75 @@
 
 namespace VentureDrake\LaravelCrm\Http\Controllers\Api\V2;
 
+use App\Http\Requests\RefreshTokenRequest;
+use App\Models\User;
+use App\Services\ApiTokenSessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use VentureDrake\LaravelCrm\Http\Requests\Api\V2\IssueTokenRequest;
+use VentureDrake\LaravelCrm\Http\Requests\Api\V2\LoginRequest;
 
 class AuthController extends ApiController
 {
-    public function issueToken(IssueTokenRequest $request): JsonResponse
+    public function issueToken(IssueTokenRequest $request, ApiTokenSessionService $sessions): JsonResponse
+    {
+        $user = $this->authenticate($request);
+        $deviceName = $request->validated('device_name') ?? ($request->userAgent() ?: 'api-token');
+        $credentials = $sessions->issue($user, $deviceName);
+
+        return response()->json([
+            ...$credentials,
+            'user' => $this->transformUser($user),
+        ], 201)->header('Cache-Control', 'no-store, private');
+    }
+
+    public function refresh(RefreshTokenRequest $request, ApiTokenSessionService $sessions): JsonResponse
+    {
+        $credentials = $sessions->refresh($request->validated('refresh_token'), $request->validated('rotation_id'));
+        abort_unless($credentials !== null, 401, 'The refresh token is invalid or expired.');
+
+        return response()->json([...$credentials, 'user' => $this->transformUser($credentials['user'])])
+            ->header('Cache-Control', 'no-store, private');
+    }
+
+    public function logoutTokenSession(RefreshTokenRequest $request, ApiTokenSessionService $sessions): Response
+    {
+        $sessions->logout($request->validated('refresh_token'));
+
+        return response()->noContent();
+    }
+
+    public function login(LoginRequest $request): JsonResponse
+    {
+        abort_unless($request->hasSession(), 419, 'A stateful frontend origin and CSRF cookie are required.');
+
+        $user = $this->authenticate($request);
+        Auth::guard('web')->login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        return response()->json(['user' => $this->transformUser($user)])->header('Cache-Control', 'no-store, private');
+    }
+
+    public function logout(Request $request, ApiTokenSessionService $sessions): Response
+    {
+        if (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        } else {
+            return $this->revokeToken($request, $sessions);
+        }
+
+        return response()->noContent();
+    }
+
+    protected function authenticate(IssueTokenRequest $request): User
     {
         $credentials = $request->validated();
 
@@ -32,10 +89,12 @@ class AuthController extends ApiController
         $userModel = config('auth.providers.users.model');
 
         $user = $userModel::where('email', $credentials['email'])->first();
+        $user ??= $userModel::whereRaw('LOWER(email) = ?', [Str::lower($credentials['email'])])->first();
 
         if (! $user
             || ! Hash::check($credentials['password'], $user->password)
             || ! (bool) ($user->crm_access ?? false)
+            || (config('laravel-crm.teams') && (! $user->team_id || ! $user->business))
         ) {
             RateLimiter::hit($perAccountKey, $perAccountDecay);
 
@@ -46,35 +105,27 @@ class AuthController extends ApiController
 
         RateLimiter::clear($perAccountKey);
 
-        $deviceName = $credentials['device_name'] ?? ($request->userAgent() ?: 'api-token');
-
-        $token = $user->createToken($deviceName);
-
-        return response()->json([
-            'token' => $token->plainTextToken,
-            'user' => $this->transformUser($user),
-        ], 201);
+        return $user;
     }
 
     public function me(Request $request): JsonResponse
     {
         return response()->json([
             'user' => $this->transformUser($request->user()),
-        ]);
+        ])->header('Cache-Control', 'no-store, private');
     }
 
-    public function revokeToken(Request $request): Response
+    public function revokeToken(Request $request, ApiTokenSessionService $sessions): Response
     {
-        $token = $request->user()->currentAccessToken();
-
-        if ($token && method_exists($token, 'delete')) {
-            $token->delete();
+        if (! Auth::guard('web')->check()) {
+            $sessions->revokeCurrent($request->user());
         }
 
         return response()->noContent();
     }
 
-    protected function transformUser($user): array
+    /** @return array<string, mixed> */
+    protected function transformUser(User $user): array
     {
         return [
             'id' => $user->getKey(),
