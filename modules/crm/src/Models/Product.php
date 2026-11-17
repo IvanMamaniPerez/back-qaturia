@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrm\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 use VentureDrake\LaravelCrm\Traits\BelongsToTeams;
 use VentureDrake\LaravelCrm\Traits\HasCrmFields;
 use VentureDrake\LaravelCrm\Traits\SearchFilters;
@@ -28,6 +29,7 @@ class Product extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'options_version' => 'integer',
     ];
 
     public function getSearchable()
@@ -95,7 +97,25 @@ class Product extends Model
      */
     public function unitPriceFor(?ProductVariation $variation, ?string $currency): ?int
     {
-        return $variation?->priceFor($currency)?->unit_price ?? $this->getDefaultPrice()?->unit_price;
+        $currency = $currency ?: (app('laravel-crm.settings')->get('currency') ?? 'USD');
+        if ($variation && ((string) $variation->product_id !== (string) $this->id || (string) $variation->team_id !== (string) $this->team_id)) {
+            throw ValidationException::withMessages(['variation' => 'VALUE_NOT_IN_PRODUCT']);
+        }
+        $parentPrice = $this->relationLoaded('productPrices')
+            ? $this->productPrices->firstWhere('currency', $currency)
+            : $this->productPrices()->where('currency', $currency)->first();
+
+        return $variation?->priceFor($currency)?->unit_price ?? $parentPrice?->unit_price;
+    }
+
+    public function files()
+    {
+        return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function options()
+    {
+        return $this->hasMany(ProductOption::class)->orderBy('position')->orderBy('id');
     }
 
     public function productVariations()

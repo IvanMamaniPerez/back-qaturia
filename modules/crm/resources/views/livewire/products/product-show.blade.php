@@ -115,6 +115,7 @@
             </x-mary-card>
             @php($defaultPrice = $product->getPrimaryPrice())
             <x-mary-card title="{{ ucfirst(__('laravel-crm::lang.variations')) }}" shadow separator>
+                @if($product->product_variations_count > 100)<p class="text-warning">Se muestran 100 de {{ $product->product_variations_count }} variantes. Abre Editar para consultar y administrar todas por páginas.</p>@endif
                 @if($product->productVariations->isEmpty())
                     <p class="text-base-content/60">{{ ucfirst(__('laravel-crm::lang.no_variations')) }}</p>
                 @else

@@ -3,6 +3,8 @@
 namespace VentureDrake\LaravelCrm\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
+use VentureDrake\LaravelCrm\Support\CatalogIdentity;
 use VentureDrake\LaravelCrm\Traits\BelongsToTeams;
 
 class ProductVariation extends Model
@@ -14,11 +16,36 @@ class ProductVariation extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'published' => 'boolean',
     ];
 
     public function getTable()
     {
         return config('laravel-crm.db_table_prefix').'product_variations';
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function ($variation) {
+            if ($variation->exists && ($variation->isDirty('product_id') || $variation->isDirty('team_id'))) {
+                CatalogIdentity::reject('MATRIX_IDENTITY_IMMUTABLE');
+            }
+        });
+        static::deleting(function ($variation) {
+            if ($variation->isForceDeleting()) {
+                throw ValidationException::withMessages(['variation' => 'CANNOT_DELETE_HISTORICAL_VARIANT']);
+            }
+        });
+    }
+
+    public function selections()
+    {
+        return $this->hasMany(ProductVariationOptionValue::class);
+    }
+
+    public function imageFile()
+    {
+        return $this->belongsTo(File::class, 'image_file_id');
     }
 
     public function product()

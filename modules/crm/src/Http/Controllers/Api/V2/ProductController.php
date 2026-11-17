@@ -19,7 +19,7 @@ class ProductController extends ApiController
     {
         $this->authorize('viewAny', Product::class);
 
-        $query = Product::query()->with(['ownerUser', 'productCategory', 'productPrices', 'productVariations.productPrices']);
+        $query = Product::query()->withCount('productVariations')->with(['ownerUser', 'productCategory', 'productPrices', 'productVariations' => fn ($q) => $q->limit(100)->with(['productPrices', 'selections.option', 'selections.value', 'imageFile'])]);
 
         if ($request->filled('user_owner_id')) {
             $query->where('user_owner_id', $request->input('user_owner_id'));
@@ -45,7 +45,7 @@ class ProductController extends ApiController
     {
         $this->authorize('view', $product);
 
-        $product->load(['ownerUser', 'productCategory', 'productPrices', 'productVariations.productPrices']);
+        $product->loadCount('productVariations')->load(['ownerUser', 'productCategory', 'productPrices', 'productVariations' => fn ($q) => $q->limit(100)->with(['productPrices', 'selections.option', 'selections.value', 'imageFile'])]);
 
         return new ProductResource($product);
     }
@@ -58,7 +58,7 @@ class ProductController extends ApiController
 
         $product = $this->productService->create($payload);
 
-        $product->refresh()->load(['ownerUser', 'productCategory', 'productPrices', 'productVariations.productPrices']);
+        $product->refresh()->loadCount('productVariations')->load(['ownerUser', 'productCategory', 'productPrices', 'productVariations' => fn ($q) => $q->limit(100)->with(['productPrices', 'selections.option', 'selections.value', 'imageFile'])]);
 
         return (new ProductResource($product))->response()->setStatusCode(201);
     }
@@ -71,7 +71,7 @@ class ProductController extends ApiController
 
         $this->productService->update($product, $payload);
 
-        $product->refresh()->load(['ownerUser', 'productCategory', 'productPrices', 'productVariations.productPrices']);
+        $product->refresh()->loadCount('productVariations')->load(['ownerUser', 'productCategory', 'productPrices', 'productVariations' => fn ($q) => $q->limit(100)->with(['productPrices', 'selections.option', 'selections.value', 'imageFile'])]);
 
         return new ProductResource($product);
     }

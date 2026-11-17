@@ -15,7 +15,7 @@ class ProductShow extends Component
 
     public function mount()
     {
-        $this->product->loadMissing('productPrices', 'productVariations.productPrices');
+        $this->product->loadCount('productVariations')->loadMissing(['productPrices', 'productVariations' => fn ($q) => $q->limit(100)->with('productPrices')]);
     }
 
     public function delete($id)

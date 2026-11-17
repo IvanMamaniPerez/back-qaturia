@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrm\Http\Controllers\Api\V2;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 use VentureDrake\LaravelCrm\Http\Requests\Api\V2\StoreProductVariationRequest;
 use VentureDrake\LaravelCrm\Http\Requests\Api\V2\UpdateProductVariationRequest;
 use VentureDrake\LaravelCrm\Http\Resources\Api\V2\ProductVariationResource;
@@ -20,12 +21,12 @@ class ProductVariationController extends ApiController
 {
     public function __construct(private ProductService $productService) {}
 
-    public function index(Product $product)
+    public function index(Request $request, Product $product)
     {
         $this->authorize('view', $product);
 
         return ProductVariationResource::collection(
-            $product->productVariations()->with('productPrices')->get()
+            $product->productVariations()->withTrashed()->with(['productPrices', 'selections.option', 'selections.value', 'product.productPrices', 'imageFile'])->paginate($this->perPage($request))
         );
     }
 
@@ -33,7 +34,7 @@ class ProductVariationController extends ApiController
     {
         $this->authorize('view', $product);
 
-        return new ProductVariationResource($productVariation->load('productPrices'));
+        return new ProductVariationResource($productVariation->load(['productPrices', 'selections.option', 'selections.value', 'product.productPrices', 'imageFile']));
     }
 
     public function store(StoreProductVariationRequest $request, Product $product)
@@ -46,7 +47,7 @@ class ProductVariationController extends ApiController
             $request->input('currency')
         );
 
-        return (new ProductVariationResource($variation->refresh()->load('productPrices')))
+        return (new ProductVariationResource($variation->refresh()->load(['productPrices', 'selections.option', 'selections.value', 'product.productPrices', 'imageFile'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -61,7 +62,7 @@ class ProductVariationController extends ApiController
             $request->input('currency')
         );
 
-        return new ProductVariationResource($variation->refresh()->load('productPrices'));
+        return new ProductVariationResource($variation->refresh()->load(['productPrices', 'selections.option', 'selections.value', 'product.productPrices', 'imageFile']));
     }
 
     public function destroy(Product $product, ProductVariation $productVariation)
@@ -83,7 +84,7 @@ class ProductVariationController extends ApiController
     {
         $data = [];
 
-        foreach (['name', 'code', 'barcode', 'unit_price'] as $key) {
+        foreach (['name', 'code', 'barcode', 'unit_price', 'published', 'image_file_id', 'options_version'] as $key) {
             if ($request->exists($key)) {
                 $data[$key] = $request->input($key);
             }

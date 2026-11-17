@@ -2,6 +2,8 @@
 
 namespace VentureDrake\LaravelCrm\Traits;
 
+use VentureDrake\LaravelCrm\Services\ProductCatalogSnapshotService;
+
 /**
  * The name a line item prints: the product name, plus the variation name when
  * the line has one ("Widget — Large").
@@ -12,11 +14,34 @@ namespace VentureDrake\LaravelCrm\Traits;
  */
 trait HasProductLineName
 {
+    public static function bootHasProductLineName(): void
+    {
+        static::saving(function ($line) {
+            $identityChanged = $line->exists && ($line->isDirty('product_id') || $line->isDirty('product_variation_id'));
+            if ($identityChanged && $line->catalog_snapshot) {
+                // A document edit chooses a different commercial item; a catalog edit never does.
+                $line->unsetRelation('product');
+                $line->unsetRelation('productVariation');
+            }
+            if (! $line->exists || $identityChanged || (! $line->catalog_snapshot && $line->product_id)) {
+                $line->catalog_snapshot = json_encode(app(ProductCatalogSnapshotService::class)
+                    ->capture($line->product, $line->productVariation), JSON_THROW_ON_ERROR);
+                $line->catalog_snapshot_source = $line->exists ? 'legacy_best_effort' : 'captured_at_creation';
+            }
+        });
+    }
+
+    public function catalogSnapshot(): ?array
+    {
+        return $this->catalog_snapshot ? json_decode($this->catalog_snapshot, true, 512, JSON_THROW_ON_ERROR) : null;
+    }
+
     public function displayName(): string
     {
-        $name = (string) ($this->product?->name ?? '');
+        $snapshot = $this->catalogSnapshot();
+        $name = (string) ($snapshot['product_name'] ?? $this->product?->name ?? '');
 
-        $variationName = $this->product_variation_id ? (string) ($this->productVariation?->name ?? '') : '';
+        $variationName = $snapshot !== null ? (string) ($snapshot['variation_name'] ?? '') : ($this->product_variation_id ? (string) ($this->productVariation?->name ?? '') : '');
 
         if ($variationName === '') {
             return $name;
@@ -31,6 +56,9 @@ trait HasProductLineName
      */
     public function displayCode(): ?string
     {
+        if ($snapshot = $this->catalogSnapshot()) {
+            return $snapshot['sku'];
+        }
         if ($this->product_variation_id && ($code = $this->productVariation?->code)) {
             return $code;
         }

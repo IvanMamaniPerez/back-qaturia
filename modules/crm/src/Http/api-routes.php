@@ -9,6 +9,7 @@ use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\OrderController;
 use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\OrganizationController;
 use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\PersonController;
 use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\ProductController;
+use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\ProductOptionController;
 use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\ProductVariationController;
 use VentureDrake\LaravelCrm\Http\Controllers\Api\V2\QuoteController;
 
@@ -39,6 +40,23 @@ Route::middleware(['auth:sanctum', 'crm-api', 'laravel-crm.api.team'])->group(fu
     Route::apiResource('products', ProductController::class)
         ->names('laravel-crm.api.v2.products')
         ->scoped(['product' => 'external_id']);
+
+    Route::prefix('products/{product:external_id}')->group(function () {
+        $controller = ProductOptionController::class;
+        Route::get('options', [$controller, 'index'])->name('laravel-crm.api.v2.products.options');
+        Route::post('options/preview', [$controller, 'preview'])->name('laravel-crm.api.v2.products.options.preview');
+        Route::post('options/apply', [$controller, 'apply'])->name('laravel-crm.api.v2.products.options.apply');
+        Route::patch('options/{option}', [$controller, 'update'])->name('laravel-crm.api.v2.products.options.update');
+        Route::patch('options/{option}/values/{value}', [$controller, 'update'])->name('laravel-crm.api.v2.products.options.values.update');
+        Route::post('variations/generate/preview', [$controller, 'preview'])->name('laravel-crm.api.v2.products.variations.generate.preview');
+        Route::post('variations/generate', [$controller, 'apply'])->name('laravel-crm.api.v2.products.variations.generate');
+        Route::patch('variations/bulk', [$controller, 'bulk'])->name('laravel-crm.api.v2.products.variations.bulk');
+        Route::post('variations/resolve', [$controller, 'resolve'])->name('laravel-crm.api.v2.products.variations.resolve');
+        Route::post('variations/{variation}/archive', [$controller, 'archive'])->name('laravel-crm.api.v2.products.variations.archive');
+        Route::post('variations/{variation}/restore', [$controller, 'restore'])->name('laravel-crm.api.v2.products.variations.restore');
+        Route::post('legacy-variations/preview', [$controller, 'legacyPreview'])->name('laravel-crm.api.v2.products.legacy.preview');
+        Route::post('legacy-variations/map', [$controller, 'apply'])->name('laravel-crm.api.v2.products.legacy.map');
+    });
 
     // The variation resolves through Product::productVariations(), so a
     // variation of another product, or a soft-deleted one, is a 404.

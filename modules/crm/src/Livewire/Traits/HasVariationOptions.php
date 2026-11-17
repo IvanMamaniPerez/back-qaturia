@@ -41,6 +41,10 @@ trait HasVariationOptions
             $this->variationOptionsCache[$productId] = ProductVariation::query()
                 ->where('product_id', $productId)
                 ->active()
+                ->where('published', true)
+                ->where(function ($q) {
+                    $q->whereDoesntHave('product.options')->orWhere(fn ($structured) => $structured->where('configuration_status', 'configured')->where('published', true));
+                })
                 ->ordered()
                 ->get()
                 ->map(fn (ProductVariation $variation) => $this->variationOption($variation))

@@ -36,7 +36,7 @@ class ProductEdit extends Component
         $this->tax_rate = $this->product->tax_rate;
         $this->currency = $productPrice->currency ?? app('laravel-crm.settings')->get('currency', 'USD');
         $this->user_owner_id = $this->product->user_owner_id;
-        $this->variations = $this->variationRows($this->product, $this->currency);
+        $this->variations = []; // Dedicated paginated editor writes variants explicitly.
 
         $this->loadCustomFields($this->product);
     }
