@@ -3,7 +3,9 @@
 namespace VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use VentureDrake\LaravelCrm\Models\Product;
 
+/** @mixin Product */
 class ProductBriefResource extends JsonResource
 {
     public function toArray($request): array

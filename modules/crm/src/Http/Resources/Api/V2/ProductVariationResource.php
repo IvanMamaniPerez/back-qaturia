@@ -3,8 +3,10 @@
 namespace VentureDrake\LaravelCrm\Http\Resources\Api\V2;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use VentureDrake\LaravelCrm\Models\ProductVariation;
 use VentureDrake\LaravelCrm\Services\CatalogAvailabilityService;
 
+/** @mixin ProductVariation */
 class ProductVariationResource extends JsonResource
 {
     public function toArray($request): array

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\RegisterAccountRequest;
 use App\Services\ApiTokenSessionService;
+use Dedoc\Scramble\Attributes\Response;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
@@ -14,6 +15,7 @@ use VentureDrake\LaravelCrm\Services\BusinessRegistrationService;
 
 class RegistrationController extends AuthController
 {
+    #[Response(status: 201, type: 'array{token: string, access_token: string, token_type: \'Bearer\', expires_in: int, expires_at: string, refresh_token: string, refresh_expires_at: string, user: array{id: string, name: string, email: string, team_id: string|null, business: array{id: string, name: string, legal_name: string|null, tax_id: string|null}|null}}')]
     public function store(RegisterAccountRequest $request, BusinessRegistrationService $registration, ApiTokenSessionService $sessions): JsonResponse
     {
         try {

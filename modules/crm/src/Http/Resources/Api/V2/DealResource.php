@@ -9,7 +9,9 @@ use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\LeadBriefResource;
 use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\OrganizationBriefResource;
 use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\PersonBriefResource;
 use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\UserBriefResource;
+use VentureDrake\LaravelCrm\Models\Deal;
 
+/** @mixin Deal */
 class DealResource extends JsonResource
 {
     public function toArray($request): array

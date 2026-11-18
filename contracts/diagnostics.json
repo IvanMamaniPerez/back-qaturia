@@ -1,0 +1,913 @@
+{
+    "contract_sha256": "664e68e407c95206c2b349b6fed7919455fbdd45e43d06c0816df1dafa391bca",
+    "diagnostics": [
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@index",
+                "key": "route:GET:crm/api/v2/products/{product}/options:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@index",
+                "label": "/crm/api/v2/products/{product}/options",
+                "method": "GET",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options/get/responses/0/content/application~1json/type/properties/options_version"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Http/Controllers/Api/V2/ProductOptionController.php:18"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "key": "route:POST:crm/api/v2/products/{product}/options/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "label": "/crm/api/v2/products/{product}/options/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1preview/post/responses/0/content/application~1json/type/properties/options/items/items/1/properties/name"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1preview/post/responses/0/content/application~1json/type/properties/options/items/items/1/properties/values/items/properties/value"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:397"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "key": "route:POST:crm/api/v2/products/{product}/options/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "label": "/crm/api/v2/products/{product}/options/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1preview/post/responses/0/content/application~1json/type/properties/defaults"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1preview/post/responses/0/content/application~1json/type/properties/command"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:318"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "key": "route:POST:crm/api/v2/products/{product}/options/apply:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "label": "/crm/api/v2/products/{product}/options/apply",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1apply/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/name"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1apply/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/values/items/properties/value"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:397"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "key": "route:POST:crm/api/v2/products/{product}/options/apply:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "label": "/crm/api/v2/products/{product}/options/apply",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1apply/post/responses/0/content/application~1json/type/items/0/properties/defaults"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1apply/post/responses/0/content/application~1json/type/items/0/properties/command"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:318"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "VR002",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "key": "route:PATCH:crm/api/v2/products/{product}/options/{option}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "label": "/crm/api/v2/products/{product}/options/{option}",
+                "method": "PATCH",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Source at",
+                    "modules/crm/src/Http/Controllers/Api/V2/ProductOptionController.php:56"
+                ],
+                [
+                    "Expression",
+                    "$value"
+                ],
+                [
+                    "Message",
+                    "Undefined variable $value"
+                ]
+            ],
+            "message": "Failed to evaluate expression",
+            "severity": "warning",
+            "tip": "A validation rule could not be evaluated, so it was skipped. The other rules are still documented."
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "key": "route:PATCH:crm/api/v2/products/{product}/options/{option}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "label": "/crm/api/v2/products/{product}/options/{option}",
+                "method": "PATCH",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1{option}/patch/requestBodyObject/content/application~1json/type/properties/swatch_hex"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "VR002",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "key": "route:PATCH:crm/api/v2/products/{product}/options/{option}/values/{value}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "label": "/crm/api/v2/products/{product}/options/{option}/values/{value}",
+                "method": "PATCH",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Source at",
+                    "modules/crm/src/Http/Controllers/Api/V2/ProductOptionController.php:56"
+                ],
+                [
+                    "Expression",
+                    "$value"
+                ],
+                [
+                    "Message",
+                    "Undefined variable $value"
+                ]
+            ],
+            "message": "Failed to evaluate expression",
+            "severity": "warning",
+            "tip": "A validation rule could not be evaluated, so it was skipped. The other rules are still documented."
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "key": "route:PATCH:crm/api/v2/products/{product}/options/{option}/values/{value}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@update",
+                "label": "/crm/api/v2/products/{product}/options/{option}/values/{value}",
+                "method": "PATCH",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1options~1{option}~1values~1{value}/patch/requestBodyObject/content/application~1json/type/properties/swatch_hex"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "key": "route:POST:crm/api/v2/products/{product}/variations/generate/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "label": "/crm/api/v2/products/{product}/variations/generate/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate~1preview/post/responses/0/content/application~1json/type/properties/options/items/items/1/properties/name"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate~1preview/post/responses/0/content/application~1json/type/properties/options/items/items/1/properties/values/items/properties/value"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:397"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "key": "route:POST:crm/api/v2/products/{product}/variations/generate/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@preview",
+                "label": "/crm/api/v2/products/{product}/variations/generate/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate~1preview/post/responses/0/content/application~1json/type/properties/defaults"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate~1preview/post/responses/0/content/application~1json/type/properties/command"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:318"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "key": "route:POST:crm/api/v2/products/{product}/variations/generate:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "label": "/crm/api/v2/products/{product}/variations/generate",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/name"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/values/items/properties/value"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:397"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "key": "route:POST:crm/api/v2/products/{product}/variations/generate:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "label": "/crm/api/v2/products/{product}/variations/generate",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate/post/responses/0/content/application~1json/type/items/0/properties/defaults"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1variations~1generate/post/responses/0/content/application~1json/type/items/0/properties/command"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:318"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "key": "route:POST:crm/api/v2/products/{product}/legacy-variations/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "label": "/crm/api/v2/products/{product}/legacy-variations/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1preview/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/name"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1preview/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/values/items/properties/value"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:397"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "key": "route:POST:crm/api/v2/products/{product}/legacy-variations/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "label": "/crm/api/v2/products/{product}/legacy-variations/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1preview/post/responses/0/content/application~1json/type/items/0/properties/defaults"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "key": "route:POST:crm/api/v2/products/{product}/legacy-variations/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "label": "/crm/api/v2/products/{product}/legacy-variations/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1preview/post/responses/0/content/application~1json/type/items/1/properties/options/items/items/1/properties/name"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1preview/post/responses/0/content/application~1json/type/items/1/properties/options/items/items/1/properties/values/items/properties/value"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:397"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "key": "route:POST:crm/api/v2/products/{product}/legacy-variations/preview:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@legacyPreview",
+                "label": "/crm/api/v2/products/{product}/legacy-variations/preview",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1preview/post/responses/0/content/application~1json/type/items/1/properties/defaults"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1preview/post/responses/0/content/application~1json/type/items/1/properties/command"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:318"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "key": "route:POST:crm/api/v2/products/{product}/legacy-variations/map:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "label": "/crm/api/v2/products/{product}/legacy-variations/map",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1map/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/name"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1map/post/responses/0/content/application~1json/type/items/0/properties/options/items/items/1/properties/values/items/properties/value"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:397"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "key": "route:POST:crm/api/v2/products/{product}/legacy-variations/map:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\ProductOptionController@apply",
+                "label": "/crm/api/v2/products/{product}/legacy-variations/map",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1map/post/responses/0/content/application~1json/type/items/0/properties/defaults"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": null,
+                "key": "class:VentureDrake\\LaravelCrm\\Services\\ProductVariantMatrixService",
+                "label": "ProductVariantMatrixService",
+                "method": null,
+                "type": "class"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/paths/crm~1api~1v2~1products~1{product}~1legacy-variations~1map/post/responses/0/content/application~1json/type/items/0/properties/command"
+                ],
+                [
+                    "Source at",
+                    "modules/crm/src/Services/ProductVariantMatrixService.php:318"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@store",
+                "key": "route:POST:crm/api/v2/quotes:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@store",
+                "label": "/crm/api/v2/quotes",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/StoreQuoteRequest/type/properties/subtotal"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@store",
+                "key": "route:POST:crm/api/v2/quotes:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@store",
+                "label": "/crm/api/v2/quotes",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/StoreQuoteRequest/type/properties/total"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@update",
+                "key": "route:PUT:crm/api/v2/quotes/{quote}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@update",
+                "label": "/crm/api/v2/quotes/{quote}",
+                "method": "PUT",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/UpdateQuoteRequest/type/properties/subtotal"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@update",
+                "key": "route:PUT:crm/api/v2/quotes/{quote}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\QuoteController@update",
+                "label": "/crm/api/v2/quotes/{quote}",
+                "method": "PUT",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/UpdateQuoteRequest/type/properties/total"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@store",
+                "key": "route:POST:crm/api/v2/orders:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@store",
+                "label": "/crm/api/v2/orders",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/StoreOrderRequest/type/properties/subtotal"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@store",
+                "key": "route:POST:crm/api/v2/orders:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@store",
+                "label": "/crm/api/v2/orders",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/StoreOrderRequest/type/properties/total"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@update",
+                "key": "route:PUT:crm/api/v2/orders/{order}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@update",
+                "label": "/crm/api/v2/orders/{order}",
+                "method": "PUT",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/UpdateOrderRequest/type/properties/subtotal"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@update",
+                "key": "route:PUT:crm/api/v2/orders/{order}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\OrderController@update",
+                "label": "/crm/api/v2/orders/{order}",
+                "method": "PUT",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/UpdateOrderRequest/type/properties/total"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@store",
+                "key": "route:POST:crm/api/v2/invoices:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@store",
+                "label": "/crm/api/v2/invoices",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/StoreInvoiceRequest/type/properties/subtotal"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@store",
+                "key": "route:POST:crm/api/v2/invoices:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@store",
+                "label": "/crm/api/v2/invoices",
+                "method": "POST",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/StoreInvoiceRequest/type/properties/total"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@update",
+                "key": "route:PUT:crm/api/v2/invoices/{invoice}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@update",
+                "label": "/crm/api/v2/invoices/{invoice}",
+                "method": "PUT",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/UpdateInvoiceRequest/type/properties/subtotal"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        },
+        {
+            "code": "SE001",
+            "context": {
+                "detail": "VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@update",
+                "key": "route:PUT:crm/api/v2/invoices/{invoice}:VentureDrake\\LaravelCrm\\Http\\Controllers\\Api\\V2\\InvoiceController@update",
+                "label": "/crm/api/v2/invoices/{invoice}",
+                "method": "PUT",
+                "type": "route"
+            },
+            "details": [
+                [
+                    "Located at",
+                    "/components/schemas/UpdateInvoiceRequest/type/properties/total"
+                ]
+            ],
+            "message": "Schema `UnknownType` is not allowed",
+            "severity": "error",
+            "tip": null
+        }
+    ]
+}

@@ -3,7 +3,9 @@
 namespace VentureDrake\LaravelCrm\Http\Resources\Api\V2;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use VentureDrake\LaravelCrm\Models\InvoiceLine;
 
+/** @mixin InvoiceLine */
 class InvoiceLineResource extends JsonResource
 {
     public function toArray($request): array

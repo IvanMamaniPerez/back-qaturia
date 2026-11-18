@@ -21,6 +21,7 @@
         </include>
     </source>
     <php>
+        <ini name="memory_limit" value="512M"/>
         <server name="LARAVEL_CRM_TEAMS" value="false" force="true"/>
         <server name="APP_ENV" value="testing" force="true"/>
         <server name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>

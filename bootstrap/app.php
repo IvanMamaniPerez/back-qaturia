@@ -34,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*', trim(config('laravel-crm.route_prefix', 'crm'), '/').'/api/*')
+                || $request->routeIs('api-contracts.*')
                 || $request->expectsJson(),
         );
     })->create();
