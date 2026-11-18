@@ -116,6 +116,10 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "api:docs": [
+            "@php artisan scramble:analyze --fail-on-empty --fail-on-unknown",
+            "@php artisan scramble:export --path=contracts/openapi.json"
         ]
     },
     "extra": {
