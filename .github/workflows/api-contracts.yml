@@ -1,0 +1,88 @@
+name: API contracts
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_NAME: Laravel
+      SESSION_COOKIE: laravel-session
+      LARAVEL_CRM_TEAMS: 'true'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /tmp/qaturia-contracts-ci.sqlite
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      BROADCAST_CONNECTION: log
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_sqlite
+          tools: composer:v2
+          coverage: none
+      - name: Install without application upgrade hooks
+        run: |
+          cp .env.example .env
+          composer install --no-scripts --no-interaction --prefer-dist --no-progress
+          php artisan package:discover --no-interaction
+          php artisan key:generate --no-interaction
+          touch "$DB_DATABASE"
+          php artisan migrate --force --no-interaction
+      - name: Dependency audit and endpoint behavior tests
+        run: |
+          composer audit --locked
+          php artisan test --compact tests/Unit/ApiContractRepositoryTest.php tests/Feature/ApiContractsTest.php tests/Feature/ApiAuthenticationTest.php tests/Feature/ProductVariantMatrixTest.php tests/Tenancy/AccountLifecycleTest.php
+          php artisan test --compact tests/Tenancy/BusinessIsolationTest.php --filter='API rejects selecting|Sanctum issues a real|foreign business IDs'
+      - name: Verify committed artifact integrity and freshness
+        run: php artisan api:contracts check
+      - name: Reproduce contract including documented partial schemas
+        run: |
+          php artisan api:contracts generate --allow-partial --directory=/tmp/qaturia-contract-candidate
+          cmp contracts/openapi.json /tmp/qaturia-contract-candidate/openapi.json
+          cmp contracts/operations-index.json /tmp/qaturia-contract-candidate/operations-index.json
+          cmp contracts/diagnostics.json /tmp/qaturia-contract-candidate/diagnostics.json
+      - name: Validate OpenAPI structure against the official schema
+        run: |
+          python3 -m pip install 'jsonschema==4.25.1'
+          python3 -m jsonschema -i contracts/openapi.json tests/Fixtures/openapi-3.1-schema.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.19.0'
+      - name: Verify TypeScript client generation
+        run: npx --yes orval@8.48.0 --config tests/Fixtures/orval.config.mjs
+      - name: Require review of changes to existing contracts
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if git cat-file -e "$BASE_SHA:contracts/openapi.json" 2>/dev/null; then
+            git show "$BASE_SHA:contracts/openapi.json" > /tmp/qaturia-base-openapi.json
+            php artisan api:contracts changes --against=/tmp/qaturia-base-openapi.json --fail-on-breaking
+          else
+            echo 'Initial contract baseline: no previous specification to compare.'
+          fi
+      - name: Upload validated draft for explicit frontend consumption
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: qaturia-api-contract-draft-${{ github.sha }}
+          path: |
+            contracts/openapi.json
+            contracts/operations-index.json
+            contracts/contract-version.json
+            contracts/diagnostics.json
+          if-no-files-found: error

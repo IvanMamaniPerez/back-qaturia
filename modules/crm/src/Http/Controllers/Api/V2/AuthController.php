@@ -18,6 +18,7 @@ use VentureDrake\LaravelCrm\Http\Requests\Api\V2\LoginRequest;
 
 class AuthController extends ApiController
 {
+    #[\Dedoc\Scramble\Attributes\Response(status: 201, type: 'array{token: string, access_token: string, token_type: \'Bearer\', expires_in: int, expires_at: string, refresh_token: string, refresh_expires_at: string, user: array{id: string, name: string, email: string, team_id: string|null, business: array{id: string, name: string, legal_name: string|null, tax_id: string|null}|null}}')]
     public function issueToken(IssueTokenRequest $request, ApiTokenSessionService $sessions): JsonResponse
     {
         $user = $this->authenticate($request);
@@ -30,6 +31,7 @@ class AuthController extends ApiController
         ], 201)->header('Cache-Control', 'no-store, private');
     }
 
+    #[\Dedoc\Scramble\Attributes\Response(status: 200, type: 'array{token: string, access_token: string, token_type: \'Bearer\', expires_in: int, expires_at: string, refresh_token: string, refresh_expires_at: string, user: array{id: string, name: string, email: string, team_id: string|null, business: array{id: string, name: string, legal_name: string|null, tax_id: string|null}|null}}')]
     public function refresh(RefreshTokenRequest $request, ApiTokenSessionService $sessions): JsonResponse
     {
         $credentials = $sessions->refresh($request->validated('refresh_token'), $request->validated('rotation_id'));
@@ -124,7 +126,7 @@ class AuthController extends ApiController
         return response()->noContent();
     }
 
-    /** @return array<string, mixed> */
+    /** @return array{id: string, name: string, email: string, team_id: ?string, business: ?array{id: string, name: string, legal_name: ?string, tax_id: ?string}} */
     protected function transformUser(User $user): array
     {
         return [

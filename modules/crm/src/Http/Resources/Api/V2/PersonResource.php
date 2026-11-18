@@ -6,7 +6,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\LabelBriefResource;
 use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\OrganizationBriefResource;
 use VentureDrake\LaravelCrm\Http\Resources\Api\V2\Related\UserBriefResource;
+use VentureDrake\LaravelCrm\Models\Person;
 
+/** @mixin Person */
 class PersonResource extends JsonResource
 {
     public function toArray($request): array

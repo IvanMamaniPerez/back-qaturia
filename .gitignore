@@ -46,3 +46,5 @@ AGENTS.md
 **/caddy
 frankenphp
 frankenphp-worker.php
+
+/contracts/.generate.lock
