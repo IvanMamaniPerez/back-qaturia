@@ -10,6 +10,8 @@ class ContractRepository
 {
     public const METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'];
 
+    public const ARTIFACTS = ['openapi.json', 'operations-index.json', 'contract-version.json', 'diagnostics.json'];
+
     /**
      * @return array<string, mixed>
      */
@@ -365,19 +367,39 @@ class ContractRepository
      */
     public function verify(string $directory): array
     {
-        $spec = $this->read($directory.'/openapi.json');
+        return $this->snapshot($directory)['version'];
+    }
+
+    /**
+     * @return array{version: array<string, mixed>, spec: array<string, mixed>, index: array<string, mixed>, files: array<string, string>}
+     */
+    public function snapshot(string $directory): array
+    {
+        $files = [];
+        $documents = [];
+        foreach (self::ARTIFACTS as $name) {
+            $path = $directory.'/'.$name;
+            if (! is_file($path)) {
+                throw new RuntimeException("Contract file not found: {$path}");
+            }
+            $files[$name] = File::get($path);
+            $documents[$name] = $this->decode($files[$name]);
+        }
+        $spec = $documents['openapi.json'];
         $this->validate($spec);
-        $version = $this->read($directory.'/contract-version.json');
-        $index = $this->read($directory.'/operations-index.json');
-        if ($version['contract_sha256'] !== $this->hash($spec) || $this->json($index) !== $this->json($this->index($spec))) {
+        $version = $documents['contract-version.json'];
+        $index = $documents['operations-index.json'];
+        if ($version['contract_sha256'] !== $this->hash($spec)
+            || hash('sha256', $files['openapi.json']) !== $version['contract_sha256']
+            || $this->json($index) !== $this->json($this->index($spec))) {
             throw new RuntimeException('Specification, index and version belong to different revisions.');
         }
-        $diagnostics = $this->read($directory.'/diagnostics.json');
+        $diagnostics = $documents['diagnostics.json'];
         if ($diagnostics['contract_sha256'] !== $version['contract_sha256'] || $this->hash($diagnostics['diagnostics']) !== $version['diagnostics_sha256']) {
             throw new RuntimeException('Diagnostics belong to a different revision.');
         }
 
-        return $version;
+        return ['version' => $version, 'spec' => $spec, 'index' => $index, 'files' => $files];
     }
 
     public function sourceHash(): string

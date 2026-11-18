@@ -7,6 +7,7 @@ return [
         'path' => env('API_CONTRACTS_HTTP_PATH', 'docs/api/contracts'),
         'requests_per_minute' => 60,
         'max_bytes' => 1048576,
+        'max_download_bytes' => 16777216,
     ],
     'routes' => [
         'laravel-crm.api.v2.auth.password.request',

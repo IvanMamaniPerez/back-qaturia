@@ -75,7 +75,7 @@ GET /.well-known/api-contracts
 Accept: application/json
 ```
 
-La respuesta contiene `contract_sha256`, `status`, `operation_count`, `schema_count`, `links`, `parameters` y `limits`. Seguir `links.search`, `links.operation`, `links.schema` y `links.changes`; usar los nombres de parámetros indicados en el descriptor.
+La respuesta contiene `contract_sha256`, `status`, `operation_count`, `schema_count`, `links`, `artifacts`, `parameters` y `limits`. Seguir `links.search`, `links.operation`, `links.schema`, `links.changes` y las URLs en `artifacts`; usar los nombres de parámetros indicados en el descriptor.
 
 Cliente mínimo para una sesión web ya autorizada, o para desarrollo local sin login:
 
@@ -141,6 +141,7 @@ En `local`, omitir `--cookie` si no hay sesión. Para las siguientes peticiones 
 | Operación | `operationId` | `contract.method`, `contract.path`, `contract.operation` y `components` necesarios |
 | Esquema | `schemaName` | Referencia al esquema y definiciones transitivas en `components.schemas` |
 | Cambios | `revision` | Revisiones `from`/`to`, operaciones y esquemas añadidos/modificados/eliminados y `requires_review` |
+| Descarga | `artifact`, con `revision` y `sha256` opcionales | Archivo JSON completo sin envoltura; usar directamente la URL de `descriptor.artifacts[nombre].url` |
 
 La búsqueda combina todos los términos sin distinguir mayúsculas y minúsculas. Buscar nombres presentes en el contrato, por ejemplo `products`, `people`, `organizations`, `leads`, `deals`, `quotes`, `orders`, `invoices` o `auth`. No hay búsqueda semántica ni traducción automática de términos.
 
@@ -173,7 +174,8 @@ const changes = await queryDocumentation('changes', { revision: PREVIOUS_CONTRAC
 | 401 en una operación comercial | Credencial o sesión de token inválida/expirada; seguir el contrato de autenticación |
 | 403 en documentación | Sesión ausente/expirada o usuario no autorizado por `viewApiDocs`; pedir al responsable del backend que revise el lector permitido |
 | 404 | Identificador de operación, esquema o revisión inexistente; en una operación comercial también puede representar scoping/binding |
-| 413 | Aumentar `max_bytes` según `required_bytes`, sin superar 1048576; el backend no truncó el contrato |
+| 409 al descargar | El contrato o el archivo cambió: volver a descubrimiento y descargar nuevamente el conjunto, sin mezclar revisiones |
+| 413 | En consultas, aumentar `max_bytes` hasta 1048576; en descargas, el máximo independiente es 16 MiB/archivo. El backend no trunca datos |
 | 419 durante login | Cookies, origen reconocido para sesiones o header CSRF incorrectos; verificar la configuración con backend |
 | 422 | Revisar `errors`: parámetros inválidos/desconocidos, `limit` o identificadores; el servicio de documentación rechaza acciones de escritura |
 | 429 | Respetar `Retry-After` y reducir frecuencia; la documentación admite 60 consultas/minuto por usuario o IP local |
@@ -188,11 +190,57 @@ const operation = await queryDocumentation('operation', {
 });
 ```
 
-Para datos que superen ese límite, solicitar el artefacto validado. No recortar esquemas ni eliminar referencias para hacerlos caber.
+Para el documento global o datos que superen ese límite, usar las descargas de artefactos descritas a continuación. No recortar esquemas ni eliminar referencias para hacerlos caber.
 
 ## 6. Cliente TypeScript opcional mediante Orval
 
-Para generación de clientes, solicitar al backend el artefacto del workflow validado o la copia de contrato acordada: `openapi.json`, `operations-index.json`, `contract-version.json` y `diagnostics.json`. Verificar que su hash y revisión coincidan. La consulta selectiva no sustituye al documento global requerido por Orval; `/docs/api.json` no se publica en producción.
+El backend ya publica por HTTP los cuatro recursos necesarios. No hace falta una entrega manual ni acceso a archivos del servidor:
+
+| Recurso en `descriptor.artifacts` | Contenido |
+|---|---|
+| `['openapi.json']` | OpenAPI global, entrada real de Orval |
+| `['operations-index.json']` | Índice de operaciones y revisiones |
+| `['contract-version.json']` | Revisión, estado y hash del contrato |
+| `['diagnostics.json']` | Limitaciones y diagnósticos de inferencia |
+
+Cada recurso tiene `url`, `sha256`, `bytes` y `media_type`. La URL ya contiene los pins de revisión y checksum: usarla sin eliminar esos parámetros y enviar la misma sesión autorizada que al explorar. Si el servidor responde 409, volver a descubrir y reiniciar la descarga del conjunto completo.
+
+Las descargas devuelven JSON crudo con `Content-Disposition: attachment`. `openapi.json` tiene las propiedades globales OpenAPI (`openapi`, `info`, `paths`, `components`), sin un objeto `contract` envolvente. No utilizar `queryDocumentation()` del ejemplo anterior para descargar: ese helper espera una respuesta de consulta con `contract_sha256`. Descargar desde `descriptor.artifacts[nombre].url` como archivo o bytes y verificar su checksum.
+
+En desarrollo local no hace falta sesión. Fuera de local, usar el cookie jar de un lector autorizado. Este bloque se ejecuta en la terminal del proyecto consumidor y necesita Bash, cURL, `jq` y `sha256sum`; no utiliza PHP ni un checkout del backend:
+
+```bash
+set -euo pipefail
+BACKEND_ORIGIN='http://localhost:8000'
+CONTRACTS_DIR=$(mktemp -d /tmp/qaturia-orval-contracts.XXXXXX)
+CURL_OPTIONS=(--fail --silent --show-error -H 'Accept: application/json')
+if [ -n "${DOCS_COOKIE_JAR:-}" ]; then
+  CURL_OPTIONS+=(--cookie "$DOCS_COOKIE_JAR")
+fi
+
+curl "${CURL_OPTIONS[@]}" \
+  "$BACKEND_ORIGIN/.well-known/api-contracts" \
+  --output "$CONTRACTS_DIR/discovery.json"
+REVISION=$(jq -er '.contract_sha256' "$CONTRACTS_DIR/discovery.json")
+
+for artifact in openapi.json operations-index.json contract-version.json diagnostics.json; do
+  url=$(jq -er --arg artifact "$artifact" '.artifacts[$artifact].url' "$CONTRACTS_DIR/discovery.json")
+  checksum=$(jq -er --arg artifact "$artifact" '.artifacts[$artifact].sha256' "$CONTRACTS_DIR/discovery.json")
+  curl "${CURL_OPTIONS[@]}" "$url" --output "$CONTRACTS_DIR/$artifact"
+  printf '%s  %s\n' "$checksum" "$CONTRACTS_DIR/$artifact" | sha256sum --check --status
+done
+
+for metadata in operations-index.json contract-version.json diagnostics.json; do
+  test "$(jq -er '.contract_sha256' "$CONTRACTS_DIR/$metadata")" = "$REVISION"
+done
+test "$(sha256sum "$CONTRACTS_DIR/openapi.json" | cut -d ' ' -f 1)" = "$REVISION"
+export QATURIA_OPENAPI_PATH="$CONTRACTS_DIR/openapi.json"
+printf 'Contrato verificado: %s\nArchivo OpenAPI: %s\n' "$REVISION" "$QATURIA_OPENAPI_PATH"
+```
+
+Para producción, establecer `DOCS_COOKIE_JAR` con la ruta privada del cookie jar autorizado antes de ejecutar el bloque. El comando se detiene si falla una descarga, validación de hash o consistencia. No usar archivos parciales ni reemplazar el contrato usado por el proyecto hasta completar todas las verificaciones. La revisión y checksums fijados en los enlaces también detectan cambios del manifest aunque el contenido OpenAPI no haya cambiado.
+
+Una vez verificados, se puede conservar el conjunto en el directorio de contratos del consumidor según sus convenciones. Los archivos son borradores mientras `contract-version.json` lo indique: revisar los diagnósticos y las operaciones parciales antes de aprobar la integración.
 
 La versión de Orval y su configuración pertenecen al repositorio frontend y deben fijarse en su lockfile. Este patrón se comprobó con Orval 8.48.0 y Node 22.19.0:
 
@@ -201,7 +249,7 @@ import { defineConfig } from 'orval';
 
 export default defineConfig({
   qaturia: {
-    input: { target: './contracts/openapi.json' },
+    input: { target: process.env.QATURIA_OPENAPI_PATH ?? './contracts/openapi.json' },
     output: {
       mode: 'tags-split',
       target: './src/api/generated/qaturia.ts',
@@ -212,6 +260,14 @@ export default defineConfig({
   },
 });
 ```
+
+Con Orval ya instalado y fijado en el lockfile del consumidor, ejecutar en la misma terminal que descargó los archivos:
+
+```bash
+npx --no-install orval --config orval.config.ts
+```
+
+`QATURIA_OPENAPI_PATH` apunta al OpenAPI verificado. Este paso genera el cliente en el proyecto consumidor y no instala dependencias en el backend. La exportación dinámica `/docs/api.json` sigue sin publicarse en producción; su alternativa para generación es la descarga estática protegida.
 
 Configurar el origen real, prefijo y mecanismo de autenticación del cliente según el despliegue; el `baseUrl` relativo del ejemplo presupone que las llamadas llegan al backend bajo ese prefijo. No copiarlo sin adaptar si el consumidor usa otro origen. No usar las respuestas envueltas de `action=operation` como entrada directa de Orval.
 

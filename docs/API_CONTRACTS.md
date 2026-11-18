@@ -63,6 +63,7 @@ El endpoint único de consulta tiene por defecto la ruta `GET /docs/api/contract
 | `?action=operation&operationId=crm.v2.products.index.get` | Contrato de una operación, seguridad, parámetros, body, respuestas y referencias transitivas |
 | `?action=schema&schemaName=ProductResource` | Esquema solicitado y sus dependencias |
 | `?action=changes&revision=SHA256_ANTERIOR` | Operaciones y esquemas añadidos, modificados o eliminados respecto de una revisión disponible |
+| `?action=download&artifact=openapi.json` | Archivo OpenAPI completo, sin envoltura y listo para generadores de clientes |
 
 Ejemplo con cURL y `jq`, utilizando una sesión autorizada ya guardada en un archivo de cookies. En local no hace falta la opción `--cookie`. `BACKEND_ORIGIN` debe contener el origen real del backend:
 
@@ -91,7 +92,26 @@ fi
 
 El archivo de cookies contiene una sesión de acceso y debe permanecer fuera del control de versiones. Para agentes o procesos HTTP, reutilizar su mecanismo de cookie jar y seguir los enlaces de descubrimiento.
 
-Estas consultas solo leen los artefactos generados. No generan documentación durante la petición ni ejecutan controladores comerciales. No aceptan directorios, nombres de archivo, salidas o acciones de escritura (`generate`/`sync`). Tampoco se agregan a la allowlist de operaciones comerciales del CRM.
+Estas consultas solo leen los artefactos generados. No generan documentación durante la petición ni ejecutan controladores comerciales. No aceptan directorios, rutas de archivos, salidas o acciones de escritura (`generate`/`sync`). La descarga admite únicamente los cuatro identificadores de artefacto publicados. Tampoco se agregan a la allowlist de operaciones comerciales del CRM.
+
+### Descarga de artefactos completos
+
+Descubrimiento devuelve `links.download` y un mapa `artifacts` con estas entradas permitidas:
+
+| Artefacto | Uso |
+|---|---|
+| `openapi.json` | Especificación OpenAPI global que necesita Orval u otro generador |
+| `operations-index.json` | Índice selectivo y revisiones de operaciones |
+| `contract-version.json` | Revisión de código, hash del contrato y estado de validación |
+| `diagnostics.json` | Limitaciones conocidas de inferencia asociadas al contrato |
+
+Cada entrada incluye `url`, `sha256`, `bytes` y `media_type`. Seguir su URL de descarga, que ya contiene `action=download`, el identificador `artifact` y las comprobaciones `revision`/`sha256`. El endpoint también admite descargar el archivo actual sin esos dos pins, pero el consumidor debe usar los enlaces de descubrimiento para obtener un conjunto consistente.
+
+La respuesta lleva `Content-Type: application/json`, `Content-Disposition: attachment`, `X-Contract-Revision` y `X-Artifact-SHA256`; el body son los bytes exactos del archivo, sin el objeto `contract` de las consultas selectivas. El backend valida y retiene en memoria el mismo conjunto de archivos que sirve, evitando releer otro contenido después de comprobar sus hashes. En particular, el SHA-256 de los bytes de `openapi.json` debe coincidir con el manifest.
+
+Si cambió el contrato o el checksum de un archivo desde el descubrimiento, la descarga responde **409**. Volver a descubrir y descargar el conjunto completo. Los pins se aplican a la revisión actualmente publicada; no se reconstruyen archivos históricos a partir de metadatos incompletos.
+
+La descarga conserva la misma sesión/gate y el límite de frecuencia que las consultas, sin generación dinámica. Tiene su propio límite de 16 MiB por archivo (`api-contracts.http.max_download_bytes`); no se aplica el límite de 128 KiB de las respuestas selectivas ni se trunca el archivo. Si excede el máximo de descarga, responde 413. Solo se publican los cuatro artefactos de la lista, nunca archivos arbitrarios del servidor.
 
 ### Seguridad compartida con Scramble
 
@@ -117,7 +137,8 @@ En producción, un invitado o usuario no autorizado recibe **403**; las rutas de
 - Límite compartido de 60 peticiones/minuto por usuario autenticado o IP local; excederlo devuelve **429**.
 - `limit` admite 1–100 resultados y `q` hasta 200 caracteres. Parámetros desconocidos, identificadores inválidos o acciones de escritura devuelven **422**.
 - Operación, esquema o revisión inexistente: **404**. Artefactos ausentes, mezclados o con hashes inválidos: **503**, sin revelar directorios del servidor.
-- Respuesta por defecto hasta 128 KiB; `max_bytes` permite pedir hasta 1 MiB. Si no cabe, devuelve **413** con `required_bytes`, sin truncar datos; reintentar con un límite permitido mayor. Para resultados aún mayores usar CLI con `--output`.
+- Si una descarga fijada cambió respecto a descubrimiento: **409**, volver a obtener sus enlaces y checksums.
+- Respuesta selectiva por defecto hasta 128 KiB; `max_bytes` permite pedir hasta 1 MiB. Si no cabe, devuelve **413** con `required_bytes`, sin truncar datos; reintentar con un límite permitido mayor. Para obtener el contrato global usar la descarga del artefacto; para una consulta selectiva aún mayor sigue disponible CLI con `--output`.
 - Las respuestas de datos llevan `Cache-Control: no-store, private`, `Vary: Cookie, Authorization` y `X-Contract-Revision` para identificar el contrato.
 
 La CLI sigue disponible para automatización local o copias de artefactos. Para HTTP basta conocer el origen del backend y la entrada convencional de descubrimiento; seguir sus enlaces evita fijar la ruta configurable de consulta en cada consumidor.
@@ -193,7 +214,7 @@ php artisan api:contracts sync --destination=/tmp/qaturia-contract-revision --al
 php artisan api:contracts search products --directory=/tmp/qaturia-contract-revision
 ```
 
-`sync` valida hashes antes y después, conserva estado y diagnósticos, y rechaza sobrescribir un destino existente. Entregar siempre `openapi.json`, `operations-index.json`, `contract-version.json` y `diagnostics.json` juntos, o el artefacto del workflow exitoso. Los consumidores deben fijar la revisión, comprobar su integridad y revisar las operaciones parciales.
+`sync` valida hashes antes y después, conserva estado y diagnósticos, y rechaza sobrescribir un destino existente. Publicar siempre `openapi.json`, `operations-index.json`, `contract-version.json` y `diagnostics.json` juntos. El consumidor puede descargarlos mediante `artifacts` de descubrimiento, recibir una copia verificada o usar el artefacto del workflow exitoso. Los consumidores deben fijar la revisión, comprobar su integridad y revisar las operaciones parciales.
 
 El mantenimiento de este backend termina en el contrato publicado y sus validaciones de compatibilidad. La generación y configuración de clientes pertenece al repositorio consumidor; la guía independiente explica cómo descubrir las operaciones y utilizar el artefacto recibido.
 
@@ -231,7 +252,9 @@ Las APIs de stock, reservas, POS y pagos no se inventaron. Backoffice Blade/Live
 
 ## Evidencia local de esta implementación
 
-- 90 pruebas focalizadas: 525 aserciones, todas correctas; incluye repositorio de contratos, generación real, las 23 pruebas HTTP de consulta, autenticación y matriz de variantes.
+- Validación previa de API y consultas: 90 pruebas focalizadas, 525 aserciones, todas correctas; incluye repositorio de contratos, generación real, las 23 pruebas HTTP de consulta, autenticación y matriz de variantes.
+- Ampliación de descargas: 51 pruebas focalizadas y 278 aserciones correctas; cubre bytes exactos de los cuatro archivos, seguridad, pins de revisión/checksum, límites e integridad de snapshots.
+- Ejemplo de descarga de la guía ejecutado por HTTP real: cuatro artefactos verificados, OpenAPI validado contra el esquema oficial, 332 archivos TypeScript generados por Orval y `tsc --noEmit` correcto.
 - HTTP real en servidor temporal de loopback: descubrimiento, búsqueda y recuperación de operación/esquema con 200; perfil de producción anónimo con 403 y cuerpo JSON sin trazas ni directorios del servidor.
 - 4 pruebas adicionales de aislamiento y registro: 26 aserciones, todas correctas.
 - PHPStan completo: cero errores usando `--debug --memory-limit=1G` (el PHP estático local no puede cargar la extensión turbo y el sandbox restringe el socket del modo paralelo).
@@ -246,7 +269,7 @@ Las APIs de stock, reservas, POS y pagos no se inventaron. Backoffice Blade/Live
 ## Evidencia automatizada
 
 - `ApiContractRepositoryTest`: referencias compartidas/cíclicas, metadata heredada, búsquedas, hash canónico, referencias inválidas, duplicados y cambios de contratos transitivos.
-- `ApiContractHttpTest`: descubrimiento y consultas HTTP, gate/lectores en producción, límites, validación, referencias, revisiones e integridad de artefactos.
+- `ApiContractHttpTest`: descargas exactas protegidas, checksums/pins, límites de descarga, descubrimiento y consultas HTTP, gate/lectores en producción, límites, validación, referencias, revisiones e integridad de artefactos.
 - `ApiContractsTest`: generación real desde el módulo, allowlist, PUT/PATCH, esquemas, respuestas, recuperación selectiva, límite de salida, integridad y ausencia HTTP fuera de local.
 - Pruebas funcionales existentes de autenticación, catálogo y empresa: acreditan comportamiento real de endpoints; el contrato generado no las sustituye.
 - `.github/workflows/api-contracts.yml`: auditoría Composer, pruebas funcionales, integridad/frescura, reproducibilidad, esquema oficial, generación real con Orval, revisión conservadora y artefacto draft.

@@ -174,3 +174,88 @@ test('documentation queries reuse the configured frontend origins without making
     $this->withHeader('Origin', 'https://untrusted.example')->getJson('/.well-known/api-contracts')
         ->assertHeaderMissing('Access-Control-Allow-Origin');
 });
+
+test('discovery provides exact protected JSON downloads for Orval and its metadata', function (string $name) {
+    app()->instance('env', 'local');
+    $descriptor = $this->getJson('/.well-known/api-contracts')->assertOk();
+    $artifact = $descriptor->json('artifacts')[$name];
+    $expected = File::get(base_path('contracts/'.$name));
+
+    $download = $this->get($artifact['url'])->assertOk()->assertDownload($name)
+        ->assertHeader('Content-Type', 'application/json')
+        ->assertHeader('X-Contract-Revision', $descriptor->json('contract_sha256'))
+        ->assertHeader('X-Artifact-SHA256', $artifact['sha256'])
+        ->assertContent($expected);
+    expect(hash('sha256', $download->getContent()))->toBe($artifact['sha256']);
+    expect(strlen($download->getContent()))->toBe($artifact['bytes']);
+    expect($download->headers->get('Cache-Control'))->toContain('private')->toContain('no-store');
+})->with(ContractRepository::ARTIFACTS);
+
+test('production artifact downloads require the documentation reader session', function () {
+    app()->instance('env', 'production');
+    $url = route('api-contracts.query', ['action' => 'download', 'artifact' => 'openapi.json']);
+
+    $this->get($url)->assertForbidden()->assertExactJson(['message' => 'Forbidden.']);
+    $reader = User::factory()->create();
+    $this->actingAs($reader)->get($url)->assertForbidden();
+    config(['api-contracts.readers' => [$reader->id]]);
+    $this->get($url)->assertOk()->assertDownload('openapi.json');
+});
+
+test('download selection rejects arbitrary files and invalid version pins', function (array $query, string $field) {
+    app()->instance('env', 'local');
+
+    $this->getJson(route('api-contracts.query', ['action' => 'download', ...$query]))
+        ->assertUnprocessable()->assertJsonValidationErrors($field);
+})->with([
+    [[], 'artifact'],
+    [['artifact' => '../.env'], 'artifact'],
+    [['artifact' => '/etc/passwd'], 'artifact'],
+    [['artifact' => 'missing.json'], 'artifact'],
+    [['artifact' => 'openapi.json', 'sha256' => 'invalid'], 'sha256'],
+    [['artifact' => 'openapi.json', 'revision' => '../revision'], 'revision'],
+]);
+
+test('downloads fail with 409 if a pinned contract or file has changed', function (string $pin) {
+    app()->instance('env', 'local');
+
+    $this->getJson(route('api-contracts.query', ['action' => 'download', 'artifact' => 'openapi.json', $pin => str_repeat('0', 64)]))
+        ->assertConflict()->assertJsonMissingPath('paths')
+        ->assertExactJson(['message' => 'The contract artifact changed; refresh discovery and retry the complete download.']);
+})->with(['revision', 'sha256']);
+
+test('file downloads have their own size limit and preserve the complete OpenAPI bytes', function () {
+    app()->instance('env', 'local');
+    $url = route('api-contracts.query', ['action' => 'download', 'artifact' => 'openapi.json', 'max_bytes' => 1024]);
+
+    $this->get($url)->assertOk()->assertDownload('openapi.json')
+        ->assertContent(File::get(base_path('contracts/openapi.json')));
+    config(['api-contracts.http.max_download_bytes' => 1024]);
+    $this->getJson($url)->assertStatus(413)->assertJsonMissingPath('paths');
+});
+
+test('manifest checksum pins detect metadata changes even when OpenAPI has the same revision', function () {
+    app()->instance('env', 'local');
+    $this->httpContractDirectory = sys_get_temp_dir().'/qaturia-download-contracts-'.bin2hex(random_bytes(8));
+    File::ensureDirectoryExists($this->httpContractDirectory);
+    foreach (ContractRepository::ARTIFACTS as $name) {
+        File::copy(base_path('contracts/'.$name), $this->httpContractDirectory.'/'.$name);
+    }
+    config(['api-contracts.directory' => $this->httpContractDirectory]);
+    $descriptor = $this->getJson('/.well-known/api-contracts')->assertOk();
+    $oldUrl = $descriptor->json('artifacts')['contract-version.json']['url'];
+    $repository = new ContractRepository;
+    $version = $repository->read($this->httpContractDirectory.'/contract-version.json');
+    $version['code_revision'] = str_repeat('a', 40);
+    File::put($this->httpContractDirectory.'/contract-version.json', $repository->json($version));
+
+    $this->getJson($oldUrl)->assertConflict();
+    $updated = $this->getJson('/.well-known/api-contracts')->assertOk();
+    $this->get($updated->json('artifacts')['contract-version.json']['url'])->assertOk()->assertDownload('contract-version.json');
+
+    Exceptions::fake();
+    File::append($this->httpContractDirectory.'/openapi.json', "\n");
+    $this->getJson($updated->json('artifacts')['openapi.json']['url'])->assertServiceUnavailable()
+        ->assertExactJson(['message' => 'Contract artifacts are unavailable or inconsistent.']);
+    Exceptions::assertReported(RuntimeException::class);
+});
