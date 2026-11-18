@@ -1,0 +1,11 @@
+{
+    "code_revision": "74bd4c35355bc2e91aa3ef8d3b7f8070959a1a56",
+    "contract_sha256": "664e68e407c95206c2b349b6fed7919455fbdd45e43d06c0816df1dafa391bca",
+    "diagnostics_count": 44,
+    "diagnostics_sha256": "040ff7992aeba5dd8fed2b55a83320e9fb388f3d1a786176bdd20912992f413b",
+    "generator": "dedoc/scramble",
+    "generator_version": "v0.13.55",
+    "source_sha256": "938a7b968540cefde2b93824ca85de21ccd73de19db875d1f23d9e3d825ff35d",
+    "status": "draft",
+    "working_tree_dirty": false
+}

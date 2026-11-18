@@ -1,0 +1,1136 @@
+{
+    "contract_sha256": "664e68e407c95206c2b349b6fed7919455fbdd45e43d06c0816df1dafa391bca",
+    "operations": [
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.login.post",
+            "path": "/auth/login",
+            "revision": "5d1e2ede3496284dada0a972b01d587887cd75c42e2a840b2f0852f509fcb9d9",
+            "status": "inferred",
+            "summary": "Auth Login",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/login"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.logout.post",
+            "path": "/auth/logout",
+            "revision": "6fa20f918f20fd5ca60fad92621c4a15815a3a66a11e482bf22142f3c34d6baa",
+            "status": "inferred",
+            "summary": "Auth Logout",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/logout"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.auth.me.get",
+            "path": "/auth/me",
+            "revision": "4c406adf35675db6b315785f14140f712e2fae49f9dce0f5c2e1663df7c724df",
+            "status": "inferred",
+            "summary": "Auth Me",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/me"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.password.request.post",
+            "path": "/auth/forgot-password",
+            "revision": "14e663e00d3a8271c8eef7e23113a3877ad743150a5f4ce254da139d2be36ad4",
+            "status": "inferred",
+            "summary": "Auth Password Request",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/forgot-password"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.password.reset.post",
+            "path": "/auth/reset-password",
+            "revision": "45290565b8d38beb6a9d4394633406c78a6a8c1aa5c5a516392fd611746ac4c1",
+            "status": "inferred",
+            "summary": "Auth Password Reset",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/reset-password"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.refresh.post",
+            "path": "/auth/refresh",
+            "revision": "674297cb7b61619e58b2dea3be4b4f5ef31c3e0c7d325aff0d229ec662bd4948",
+            "status": "inferred",
+            "summary": "Auth Refresh",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/refresh"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.register.post",
+            "path": "/auth/register",
+            "revision": "a2a9eac3a58df49169dcacbd2686834631ee01d878e29568edc71ad1ac29f819",
+            "status": "inferred",
+            "summary": "Auth Register",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/register"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.token.issue.post",
+            "path": "/auth/token",
+            "revision": "bfbf8c13c0e00867544908479c171af2217d9eb08b385eab073727e74579eacc",
+            "status": "inferred",
+            "summary": "Auth Token Issue",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/token"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.auth.token.logout.post",
+            "path": "/auth/token/logout",
+            "revision": "10a5828b8544e03555b284166b8d006a4fbb73ccc77802e4d78525cead81c872",
+            "status": "inferred",
+            "summary": "Auth Token Logout",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/token/logout"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.auth.token.revoke.delete",
+            "path": "/auth/token",
+            "revision": "a5509bc2ff64c45f558215b9750523a64c33f120d7d486a36760384f78c09e62",
+            "status": "inferred",
+            "summary": "Auth Token Revoke",
+            "tags": [
+                "auth"
+            ],
+            "url_path": "/crm/api/v2/auth/token"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.deals.destroy.delete",
+            "path": "/deals/{deal}",
+            "revision": "939d1f6763c874d01dcc028086525ac2ecee2a708b619726b33ff001c2ea521a",
+            "status": "inferred",
+            "summary": "Deals Destroy",
+            "tags": [
+                "deals"
+            ],
+            "url_path": "/crm/api/v2/deals/{deal}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.deals.index.get",
+            "path": "/deals",
+            "revision": "3af24a801f74613aad7bb5a5eb35958c2168f64284bfd6fbce590c06a21c0d8f",
+            "status": "inferred",
+            "summary": "Deals Index",
+            "tags": [
+                "deals"
+            ],
+            "url_path": "/crm/api/v2/deals"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.deals.show.get",
+            "path": "/deals/{deal}",
+            "revision": "f3a351acc95f72f8bd83147b9e9a282c05eb52aefeef651d2ce059fb963274b2",
+            "status": "inferred",
+            "summary": "Deals Show",
+            "tags": [
+                "deals"
+            ],
+            "url_path": "/crm/api/v2/deals/{deal}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.deals.store.post",
+            "path": "/deals",
+            "revision": "034f84aab37fab4a83159c4cff39f620e3591d213af17528041ccd5c356a0291",
+            "status": "inferred",
+            "summary": "Deals Store",
+            "tags": [
+                "deals"
+            ],
+            "url_path": "/crm/api/v2/deals"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PATCH",
+            "operationId": "crm.v2.deals.update.patch",
+            "path": "/deals/{deal}",
+            "revision": "fa4391ff04bde3b234f0c817535d3c3ffbb03b00fa77777707031dad7ce1069e",
+            "status": "inferred",
+            "summary": "Deals Update",
+            "tags": [
+                "deals"
+            ],
+            "url_path": "/crm/api/v2/deals/{deal}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PUT",
+            "operationId": "crm.v2.deals.update.put",
+            "path": "/deals/{deal}",
+            "revision": "d42d3fbd9becdb5933019bb50487d1b5ce5b05c2dfe509eef06ed0e1f07812ce",
+            "status": "inferred",
+            "summary": "Deals Update",
+            "tags": [
+                "deals"
+            ],
+            "url_path": "/crm/api/v2/deals/{deal}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.invoices.destroy.delete",
+            "path": "/invoices/{invoice}",
+            "revision": "3605b014617adca384f7800bdcba65b37ab949c901e9565d0726184d12ba9ea8",
+            "status": "inferred",
+            "summary": "Invoices Destroy",
+            "tags": [
+                "invoices"
+            ],
+            "url_path": "/crm/api/v2/invoices/{invoice}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.invoices.index.get",
+            "path": "/invoices",
+            "revision": "6c225c04399116de0d7644ecb804e4e2a275454133d5480229f3a8e2e70822e2",
+            "status": "inferred",
+            "summary": "Invoices Index",
+            "tags": [
+                "invoices"
+            ],
+            "url_path": "/crm/api/v2/invoices"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.invoices.show.get",
+            "path": "/invoices/{invoice}",
+            "revision": "433db4b8b797cde1de73baa85519992292d708ad6cc5576dffafd340577ffb90",
+            "status": "inferred",
+            "summary": "Invoices Show",
+            "tags": [
+                "invoices"
+            ],
+            "url_path": "/crm/api/v2/invoices/{invoice}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.invoices.store.post",
+            "path": "/invoices",
+            "revision": "f4dc822d0204967219f71f2a16b04efd5da4226e6aad48cba884e7759bddbfee",
+            "status": "partial",
+            "summary": "Invoices Store",
+            "tags": [
+                "invoices"
+            ],
+            "url_path": "/crm/api/v2/invoices"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PATCH",
+            "operationId": "crm.v2.invoices.update.patch",
+            "path": "/invoices/{invoice}",
+            "revision": "3d822200d0b8f0483049099ae6de2df6ad0db0c730d426457dc2ab0a22cce98a",
+            "status": "partial",
+            "summary": "Invoices Update",
+            "tags": [
+                "invoices"
+            ],
+            "url_path": "/crm/api/v2/invoices/{invoice}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PUT",
+            "operationId": "crm.v2.invoices.update.put",
+            "path": "/invoices/{invoice}",
+            "revision": "d8843eeea97dea690ad5cf6b2c68efbffb4b651358a63defb9c6d387bf6046bd",
+            "status": "partial",
+            "summary": "Invoices Update",
+            "tags": [
+                "invoices"
+            ],
+            "url_path": "/crm/api/v2/invoices/{invoice}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.leads.destroy.delete",
+            "path": "/leads/{lead}",
+            "revision": "f674d44604f9bf8c64d812106924c02963af5a7c9decea6fd78b9a80adac5c83",
+            "status": "inferred",
+            "summary": "Leads Destroy",
+            "tags": [
+                "leads"
+            ],
+            "url_path": "/crm/api/v2/leads/{lead}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.leads.index.get",
+            "path": "/leads",
+            "revision": "5f4293b4c7c813b7e19efe3c8bdf9a713f9f72966c2283368da93e66aacb0dc6",
+            "status": "inferred",
+            "summary": "Leads Index",
+            "tags": [
+                "leads"
+            ],
+            "url_path": "/crm/api/v2/leads"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.leads.show.get",
+            "path": "/leads/{lead}",
+            "revision": "af4bb54263b8847c9d93cbccd1dfde26b723afd630422992153803448a32f8fe",
+            "status": "inferred",
+            "summary": "Leads Show",
+            "tags": [
+                "leads"
+            ],
+            "url_path": "/crm/api/v2/leads/{lead}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.leads.store.post",
+            "path": "/leads",
+            "revision": "d072b3bf697eb5482f7b88ce43d8b8f76d1fc4cb59a413aa700631fb28ab3721",
+            "status": "inferred",
+            "summary": "Leads Store",
+            "tags": [
+                "leads"
+            ],
+            "url_path": "/crm/api/v2/leads"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PATCH",
+            "operationId": "crm.v2.leads.update.patch",
+            "path": "/leads/{lead}",
+            "revision": "58c6a8eb7cf47cf27cf85007a645747d9159f0fd75294994bb8c341831926ee7",
+            "status": "inferred",
+            "summary": "Leads Update",
+            "tags": [
+                "leads"
+            ],
+            "url_path": "/crm/api/v2/leads/{lead}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PUT",
+            "operationId": "crm.v2.leads.update.put",
+            "path": "/leads/{lead}",
+            "revision": "1b5556a14a345217e3c05e3f802674a4a0d8562916fd1734088268d17a1a0978",
+            "status": "inferred",
+            "summary": "Leads Update",
+            "tags": [
+                "leads"
+            ],
+            "url_path": "/crm/api/v2/leads/{lead}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.orders.destroy.delete",
+            "path": "/orders/{order}",
+            "revision": "397aa9e822ccf969d3899e67936810097ec37b16d0119a4ab1e3ced40f0a24c9",
+            "status": "inferred",
+            "summary": "Orders Destroy",
+            "tags": [
+                "orders"
+            ],
+            "url_path": "/crm/api/v2/orders/{order}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.orders.index.get",
+            "path": "/orders",
+            "revision": "83c53461c298a277e3d3302e59f4db62f14ba931b8662c92e48783bff312d528",
+            "status": "inferred",
+            "summary": "Orders Index",
+            "tags": [
+                "orders"
+            ],
+            "url_path": "/crm/api/v2/orders"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.orders.show.get",
+            "path": "/orders/{order}",
+            "revision": "9d65e3463e2df6557cf3372d846e262e326cf4d01ce98d6750aa09a1356ea673",
+            "status": "inferred",
+            "summary": "Orders Show",
+            "tags": [
+                "orders"
+            ],
+            "url_path": "/crm/api/v2/orders/{order}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.orders.store.post",
+            "path": "/orders",
+            "revision": "5f94e359c796039a50490a022d0fd812175336e2288dc8ecb7df6b6e614c2b2b",
+            "status": "partial",
+            "summary": "Orders Store",
+            "tags": [
+                "orders"
+            ],
+            "url_path": "/crm/api/v2/orders"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PATCH",
+            "operationId": "crm.v2.orders.update.patch",
+            "path": "/orders/{order}",
+            "revision": "4ac65e40674545249c4eec7355f43a05660f26e2e1c4ab6a1d9dd8850bbed4cc",
+            "status": "partial",
+            "summary": "Orders Update",
+            "tags": [
+                "orders"
+            ],
+            "url_path": "/crm/api/v2/orders/{order}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PUT",
+            "operationId": "crm.v2.orders.update.put",
+            "path": "/orders/{order}",
+            "revision": "f2f773fa6e37a51e5298a2d1a4f3c741112cdeca99b4a337903e78e37583e856",
+            "status": "partial",
+            "summary": "Orders Update",
+            "tags": [
+                "orders"
+            ],
+            "url_path": "/crm/api/v2/orders/{order}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.organizations.destroy.delete",
+            "path": "/organizations/{organization}",
+            "revision": "73f61e2809571d4c115d9e0047aa67ccba5da6e31fceced37ae9b75f2041104d",
+            "status": "inferred",
+            "summary": "Organizations Destroy",
+            "tags": [
+                "organizations"
+            ],
+            "url_path": "/crm/api/v2/organizations/{organization}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.organizations.index.get",
+            "path": "/organizations",
+            "revision": "0ff8379f17e26133ee0f1ae89429542a07022a00b76e0ac82066129c91aadf76",
+            "status": "inferred",
+            "summary": "Organizations Index",
+            "tags": [
+                "organizations"
+            ],
+            "url_path": "/crm/api/v2/organizations"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.organizations.show.get",
+            "path": "/organizations/{organization}",
+            "revision": "431209f414ee0ef000d7eedf240ef961c217406e677f51fddbecbc264e7d04c8",
+            "status": "inferred",
+            "summary": "Organizations Show",
+            "tags": [
+                "organizations"
+            ],
+            "url_path": "/crm/api/v2/organizations/{organization}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.organizations.store.post",
+            "path": "/organizations",
+            "revision": "fae3998e9990a33c28e334510a37331b9c1ea10c29f58ad18ad2b7bb6c623ba4",
+            "status": "inferred",
+            "summary": "Organizations Store",
+            "tags": [
+                "organizations"
+            ],
+            "url_path": "/crm/api/v2/organizations"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PATCH",
+            "operationId": "crm.v2.organizations.update.patch",
+            "path": "/organizations/{organization}",
+            "revision": "4d7765141c56656c7e9f2cc7a9674f2440890439c1b0fc7eb5adb9b532f6b5da",
+            "status": "inferred",
+            "summary": "Organizations Update",
+            "tags": [
+                "organizations"
+            ],
+            "url_path": "/crm/api/v2/organizations/{organization}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PUT",
+            "operationId": "crm.v2.organizations.update.put",
+            "path": "/organizations/{organization}",
+            "revision": "a4229d1125f6ff0aea229f9b7b5678def5201cfafb413dccb2f8fd5cc8a4d77c",
+            "status": "inferred",
+            "summary": "Organizations Update",
+            "tags": [
+                "organizations"
+            ],
+            "url_path": "/crm/api/v2/organizations/{organization}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.people.destroy.delete",
+            "path": "/people/{person}",
+            "revision": "3e873a8760fd7fc53e0ef616c54194f8b15a8c9af23ea40583f17325b42331b8",
+            "status": "inferred",
+            "summary": "People Destroy",
+            "tags": [
+                "people"
+            ],
+            "url_path": "/crm/api/v2/people/{person}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.people.index.get",
+            "path": "/people",
+            "revision": "efc071cb2791db5722e62ada09ba76c99f9a3ce00aa997cde99daac1a06fc300",
+            "status": "inferred",
+            "summary": "People Index",
+            "tags": [
+                "people"
+            ],
+            "url_path": "/crm/api/v2/people"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.people.show.get",
+            "path": "/people/{person}",
+            "revision": "754fa842ddf8b718bcfcf01bdd0e4a74e9d96d8e9d1f935fbd61d7c4deb47dcc",
+            "status": "inferred",
+            "summary": "People Show",
+            "tags": [
+                "people"
+            ],
+            "url_path": "/crm/api/v2/people/{person}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.people.store.post",
+            "path": "/people",
+            "revision": "ae8d4528b5fa5b3ff3282c22dd883c006d829c51f318e1a9284dca23951a7c5e",
+            "status": "inferred",
+            "summary": "People Store",
+            "tags": [
+                "people"
+            ],
+            "url_path": "/crm/api/v2/people"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PATCH",
+            "operationId": "crm.v2.people.update.patch",
+            "path": "/people/{person}",
+            "revision": "78f3cace872b921e92ac7950d08969697485d58566817b38c6e0a80b99c16a49",
+            "status": "inferred",
+            "summary": "People Update",
+            "tags": [
+                "people"
+            ],
+            "url_path": "/crm/api/v2/people/{person}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PUT",
+            "operationId": "crm.v2.people.update.put",
+            "path": "/people/{person}",
+            "revision": "df3e04e43fa173879ade6c59a13355141f0d762eaff2f84ffde09ef950972e8b",
+            "status": "inferred",
+            "summary": "People Update",
+            "tags": [
+                "people"
+            ],
+            "url_path": "/crm/api/v2/people/{person}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.products.destroy.delete",
+            "path": "/products/{product}",
+            "revision": "2993fb044f06474658ef0c951f1edca6ab3cc01232771ba99a1052917bea09da",
+            "status": "inferred",
+            "summary": "Products Destroy",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.products.index.get",
+            "path": "/products",
+            "revision": "10c0e2428d8688de6367869da1541df4c5740431933dcae1a00b668d68849230",
+            "status": "inferred",
+            "summary": "Products Index",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.legacy.map.post",
+            "path": "/products/{product}/legacy-variations/map",
+            "revision": "5040fd41543dd4536ab6abc66983994630a16fa281f30b8bfa6fd2c417260f83",
+            "status": "partial",
+            "summary": "Products Legacy Map",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/legacy-variations/map"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.legacy.preview.post",
+            "path": "/products/{product}/legacy-variations/preview",
+            "revision": "7b38d6d3f3829d45dea3146f3819e6c063fe0d16e789d3f32997d9aa2e36b7e3",
+            "status": "partial",
+            "summary": "Products Legacy Preview",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/legacy-variations/preview"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.options.apply.post",
+            "path": "/products/{product}/options/apply",
+            "revision": "865e0b6e7cfd965f88259e998649f9b549e7674708d4ea9a8c1fbb0d2fbec01c",
+            "status": "partial",
+            "summary": "Products Options Apply",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/options/apply"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "GET",
+            "operationId": "crm.v2.products.options.get",
+            "path": "/products/{product}/options",
+            "revision": "d5665122490db61ebc4285fe53b1a743064e9c427d11e6123a4969a51dba9bcf",
+            "status": "partial",
+            "summary": "Products Options",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/options"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.options.preview.post",
+            "path": "/products/{product}/options/preview",
+            "revision": "8f3446cb1dd8415ff9243c484d1a3a54379ae16c50d1d37b82bacdc716c9809c",
+            "status": "partial",
+            "summary": "Products Options Preview",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/options/preview"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PATCH",
+            "operationId": "crm.v2.products.options.update.patch",
+            "path": "/products/{product}/options/{option}",
+            "revision": "d3c696e4739eb26695df466b5b8bc87f8fe9b01073fa03f159dca72557f1c659",
+            "status": "partial",
+            "summary": "Products Options Update",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/options/{option}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PATCH",
+            "operationId": "crm.v2.products.options.values.update.patch",
+            "path": "/products/{product}/options/{option}/values/{value}",
+            "revision": "dad57794dd236d2e23b87b5aea4e51a45344a7adaabbfb319e70a08264b3c44d",
+            "status": "partial",
+            "summary": "Products Options Values Update",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/options/{option}/values/{value}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.products.show.get",
+            "path": "/products/{product}",
+            "revision": "23b91150fa6df6d96abfabff4ce782f03771e88e7e2f1f301aca8b18bfdbe42b",
+            "status": "inferred",
+            "summary": "Products Show",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.products.store.post",
+            "path": "/products",
+            "revision": "4d2bd8ab9c5b9017a703b14ff7264ce174cfa57bc2171ac59f6cf1f9cf9f0464",
+            "status": "inferred",
+            "summary": "Products Store",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PATCH",
+            "operationId": "crm.v2.products.update.patch",
+            "path": "/products/{product}",
+            "revision": "37eae60227e275db1487d7dbe76c9c568485f8f102890d4a2009b44426116b3d",
+            "status": "inferred",
+            "summary": "Products Update",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PUT",
+            "operationId": "crm.v2.products.update.put",
+            "path": "/products/{product}",
+            "revision": "1fef63df7f53e9907df648d5e4f4c2c8843def91094f54c8e73ec430c28fd4c9",
+            "status": "inferred",
+            "summary": "Products Update",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.variations.archive.post",
+            "path": "/products/{product}/variations/{variation}/archive",
+            "revision": "8c0588dc970bf217701c8605c633342af927e3de7d415e5a34c1291c373dae15",
+            "status": "partial",
+            "summary": "Products Variations Archive",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/{variation}/archive"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json."
+            ],
+            "method": "PATCH",
+            "operationId": "crm.v2.products.variations.bulk.patch",
+            "path": "/products/{product}/variations/bulk",
+            "revision": "d1c20f64a9b52424b45d3a1be7862db1ca78e0d6950ebc32160f3b7054c48038",
+            "status": "partial",
+            "summary": "Products Variations Bulk",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/bulk"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.products.variations.destroy.delete",
+            "path": "/products/{product}/variations/{productVariation}",
+            "revision": "722569351a4c873550ea0880c6572e33f311483e9ca71e5fa0b77359899c5af7",
+            "status": "inferred",
+            "summary": "Products Variations Destroy",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/{productVariation}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.variations.generate.post",
+            "path": "/products/{product}/variations/generate",
+            "revision": "00035c60922332a447d47b52e3bb3dd1b0626d1b7fc03cebc400e02449f2dd76",
+            "status": "partial",
+            "summary": "Products Variations Generate",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/generate"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json.",
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.variations.generate.preview.post",
+            "path": "/products/{product}/variations/generate/preview",
+            "revision": "3d76e185a20ea959676149a5001efa2abdbe654e854c9e68007ab5db33bf6fb1",
+            "status": "partial",
+            "summary": "Products Variations Generate Preview",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/generate/preview"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.products.variations.index.get",
+            "path": "/products/{product}/variations",
+            "revision": "d08e4fff8150d47606e783b25485f8e4d0ca3c6a50cb8739cac53543d285701a",
+            "status": "inferred",
+            "summary": "Products Variations Index",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.variations.resolve.post",
+            "path": "/products/{product}/variations/resolve",
+            "revision": "19e49023431d4341366fb31ced22b4a8e51db8be2af99d556e21d376eb14bf36",
+            "status": "partial",
+            "summary": "Products Variations Resolve",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/resolve"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Dynamic matrix command and response inference requires review; see docs/API_CONTRACTS.md and diagnostics.json."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.products.variations.restore.post",
+            "path": "/products/{product}/variations/{variation}/restore",
+            "revision": "6cf49bce1278d586363d099db085e5a6e7ecefbc2aa7317c686b80d2498d4bfb",
+            "status": "partial",
+            "summary": "Products Variations Restore",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/{variation}/restore"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.products.variations.show.get",
+            "path": "/products/{product}/variations/{productVariation}",
+            "revision": "26ef9737c0e0549f1a1172d6a93275db69dd1fa478688e333e006f19a09741b9",
+            "status": "inferred",
+            "summary": "Products Variations Show",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/{productVariation}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "crm.v2.products.variations.store.post",
+            "path": "/products/{product}/variations",
+            "revision": "0ea4f45b53237762477e83f9a2f9cdb352642e09e6d2c4c37a6de2363fcff9fa",
+            "status": "inferred",
+            "summary": "Products Variations Store",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PATCH",
+            "operationId": "crm.v2.products.variations.update.patch",
+            "path": "/products/{product}/variations/{productVariation}",
+            "revision": "142011bf2cd3a528ae531c7f0f2a65e6f49f0e6943b24799a756137814e4ed2c",
+            "status": "inferred",
+            "summary": "Products Variations Update",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/{productVariation}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "PUT",
+            "operationId": "crm.v2.products.variations.update.put",
+            "path": "/products/{product}/variations/{productVariation}",
+            "revision": "6618c981530e7c902427866fe375e4e93415a832fe34bbcd91bcc17230c5fee6",
+            "status": "inferred",
+            "summary": "Products Variations Update",
+            "tags": [
+                "products"
+            ],
+            "url_path": "/crm/api/v2/products/{product}/variations/{productVariation}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "crm.v2.quotes.destroy.delete",
+            "path": "/quotes/{quote}",
+            "revision": "0cd5243a8ee20b746e5d54651401e7c2969d1789bd60b118696ccb484d53bc25",
+            "status": "inferred",
+            "summary": "Quotes Destroy",
+            "tags": [
+                "quotes"
+            ],
+            "url_path": "/crm/api/v2/quotes/{quote}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.quotes.index.get",
+            "path": "/quotes",
+            "revision": "00b72be0d7835b223d06a81653583759ecd672aca95acd7cfd6d357100f9c268",
+            "status": "inferred",
+            "summary": "Quotes Index",
+            "tags": [
+                "quotes"
+            ],
+            "url_path": "/crm/api/v2/quotes"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "crm.v2.quotes.show.get",
+            "path": "/quotes/{quote}",
+            "revision": "5b2dc69774c581c834db9364c218035b37302a0cbd0683b932283a679c127f7c",
+            "status": "inferred",
+            "summary": "Quotes Show",
+            "tags": [
+                "quotes"
+            ],
+            "url_path": "/crm/api/v2/quotes/{quote}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "POST",
+            "operationId": "crm.v2.quotes.store.post",
+            "path": "/quotes",
+            "revision": "5885add9d1e119d5fb30bfda355a99b954b51fb565a46980083e11b12872d352",
+            "status": "partial",
+            "summary": "Quotes Store",
+            "tags": [
+                "quotes"
+            ],
+            "url_path": "/crm/api/v2/quotes"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PATCH",
+            "operationId": "crm.v2.quotes.update.patch",
+            "path": "/quotes/{quote}",
+            "revision": "b3e50bb9ee87b26a499b8dc277d167ae9823d61f010acd530945267a7bcaa4db",
+            "status": "partial",
+            "summary": "Quotes Update",
+            "tags": [
+                "quotes"
+            ],
+            "url_path": "/crm/api/v2/quotes/{quote}"
+        },
+        {
+            "description": "",
+            "limitations": [
+                "Inference diagnostics are attached to this operation. Review before generating a production client."
+            ],
+            "method": "PUT",
+            "operationId": "crm.v2.quotes.update.put",
+            "path": "/quotes/{quote}",
+            "revision": "62afd388ddf2080edde708464baa727f90d32c040982154957a5384ecf702629",
+            "status": "partial",
+            "summary": "Quotes Update",
+            "tags": [
+                "quotes"
+            ],
+            "url_path": "/crm/api/v2/quotes/{quote}"
+        }
+    ]
+}
