@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\Operation;
@@ -13,7 +14,11 @@ use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Dedoc\Scramble\Support\Generator\Types\IntegerType;
 use Dedoc\Scramble\Support\Generator\Types\StringType;
 use Dedoc\Scramble\Support\RouteInfo;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -34,6 +39,13 @@ class ApiContractServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (! Gate::has('viewApiDocs')) {
+            Gate::define('viewApiDocs', fn (User $user): bool => in_array((string) $user->getAuthIdentifier(), config('api-contracts.readers'), true));
+        }
+
+        RateLimiter::for('api-contracts', fn (Request $request): Limit => Limit::perMinute(config('api-contracts.http.requests_per_minute'))
+            ->by((string) ($request->user()?->getAuthIdentifier() ?? $request->ip())));
+
         if (! class_exists(Scramble::class)) {
             return;
         }

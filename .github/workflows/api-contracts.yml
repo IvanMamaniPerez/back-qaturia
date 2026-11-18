@@ -46,7 +46,7 @@ jobs:
       - name: Dependency audit and endpoint behavior tests
         run: |
           composer audit --locked
-          php artisan test --compact tests/Unit/ApiContractRepositoryTest.php tests/Feature/ApiContractsTest.php tests/Feature/ApiAuthenticationTest.php tests/Feature/ProductVariantMatrixTest.php tests/Tenancy/AccountLifecycleTest.php
+          php artisan test --compact tests/Unit/ApiContractRepositoryTest.php tests/Feature/ApiContractsTest.php tests/Feature/ApiContractHttpTest.php tests/Feature/ApiAuthenticationTest.php tests/Feature/ProductVariantMatrixTest.php tests/Tenancy/AccountLifecycleTest.php
           php artisan test --compact tests/Tenancy/BusinessIsolationTest.php --filter='API rejects selecting|Sanctum issues a real|foreign business IDs'
       - name: Verify committed artifact integrity and freshness
         run: php artisan api:contracts check

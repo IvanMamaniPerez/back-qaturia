@@ -200,3 +200,5 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 Antes de analizar controladores para descubrir cómo consumir un endpoint, consulta el índice OpenAPI y su operación correspondiente.
 
 Usa `php artisan api:contracts search 'consulta' --limit=5`, luego `php artisan api:contracts operation operationId` y, cuando sea necesario, `php artisan api:contracts schema Nombre`. Consulta `docs/API_CONTRACTS.md` para generación, revisiones, autenticación y sincronización. Respeta los estados `partial`; no asumas que un borrador prueba el comportamiento del endpoint. No incorpores rutas privadas a la allowlist sin autorización. Tras cambiar rutas, validaciones o Resources, regenera y valida los contratos en una base temporal dedicada.
+
+Para consultar por HTTP, empieza por `GET /.well-known/api-contracts` y sigue los enlaces devueltos para buscar operaciones, recuperar esquemas o comparar revisiones. Fuera de local se exige una sesión autorizada por `viewApiDocs`; los lectores se configuran mediante `API_DOCS_USER_IDS`. Las consultas leen artefactos estáticos y no aceptan acciones de generación o escritura.

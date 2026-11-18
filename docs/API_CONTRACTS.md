@@ -48,27 +48,73 @@ php artisan api:contracts operation crm.v2.products.options.apply.post --max-byt
 
 Desde otra sesión o directorio, usar `php /ruta/al/backend/artisan ...`. `--directory=/ruta/a/contratos` permite consultar una copia externa sin inspeccionar controladores. `check` comprueba además el código del backend que ejecuta el comando; usarlo en el checkout productor, no para comparar una copia contra otro backend deliberadamente diferente.
 
-## Acceso HTTP y seguridad de la búsqueda
+## Acceso HTTP: descubrimiento, búsqueda y recuperación
 
-**No se ha implementado un endpoint HTTP de búsqueda selectiva de documentación.** Las acciones `search`, `operation`, `schema` y `changes` se ejecutan por CLI mediante `api:contracts`. No existe una URL de búsqueda que el frontend o un agente remoto pueda invocar con un token Sanctum.
+La entrada de descubrimiento es **`GET /.well-known/api-contracts`**. Devuelve el hash del contrato, estado, número de operaciones/esquemas, límites y enlaces a las consultas. El consumidor sigue esos enlaces: no necesita conocer rutas comerciales, controladores, directorios del servidor ni descargar OpenAPI completo.
 
-| Interfaz existente | Acceso y alcance |
+El endpoint único de consulta tiene por defecto la ruta `GET /docs/api/contracts`. Se puede cambiar con `API_CONTRACTS_HTTP_PATH`; el enlace devuelto por descubrimiento refleja automáticamente esa configuración. Las rutas tienen nombres `api-contracts.discovery` y `api-contracts.query`.
+
+| Consulta GET | Resultado |
 |---|---|
-| `php artisan api:contracts search 'consulta' --limit=5` | Busca en el índice generado. Requiere acceso al sistema donde se ejecuta Artisan y permisos de lectura de los artefactos; no usa autenticación HTTP |
-| `php artisan api:contracts operation operationId` | Recupera una operación y sus esquemas relacionados desde los artefactos, sin ejecutar el endpoint comercial |
-| `GET /docs/api` | Visor de documentación completa, registrado únicamente con `APP_ENV=local` |
-| `GET /docs/api.json` | Especificación OpenAPI completa de Scramble, registrada únicamente con `APP_ENV=local`; no realiza búsqueda selectiva |
+| Sin parámetros | Descriptor de descubrimiento y enlaces |
+| `?q=products%20index&limit=5` o `?action=search&q=products&limit=5` | Búsqueda por identificador, ruta, tags, resumen o descripción |
+| `?action=operation&operationId=crm.v2.products.index.get` | Contrato de una operación, seguridad, parámetros, body, respuestas y referencias transitivas |
+| `?action=schema&schemaName=ProductResource` | Esquema solicitado y sus dependencias |
+| `?action=changes&revision=SHA256_ANTERIOR` | Operaciones y esquemas añadidos, modificados o eliminados respecto de una revisión disponible |
 
-Las dos rutas HTTP de documentación usan `web` y `RestrictedDocsAccess`. Ese middleware permite acceso en el entorno local sin exigir login ni un token Sanctum. Por tanto, no constituyen un buscador remoto autenticado. En producción no se registran, incluso si están instaladas las dependencias de desarrollo; configurar el gate `viewApiDocs` por sí solo no las habilita con la configuración actual.
+Ejemplo para navegador o frontend, conservando la sesión autorizada:
 
-Para consultar desde otra máquina con acceso SSH autorizado, ejecutar los mismos comandos en el servidor:
+```js
+const origin = window.location.origin; // Usar el origen del backend si es otro.
+const options = { credentials: 'include', headers: { Accept: 'application/json' } };
+const descriptor = await fetch(new URL('/.well-known/api-contracts', origin), options)
+  .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); });
 
-```bash
-ssh usuario@servidor 'cd /ruta/back-qaturia && php artisan api:contracts search "products index" --limit=5'
-ssh usuario@servidor 'cd /ruta/back-qaturia && php artisan api:contracts operation crm.v2.products.index.get'
+const searchUrl = new URL(descriptor.links.search);
+searchUrl.searchParams.set('q', 'products index');
+searchUrl.searchParams.set('limit', '5');
+const matches = await fetch(searchUrl, options)
+  .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); });
+
+if (matches.operations.length > 0) {
+  const operationUrl = new URL(descriptor.links.operation);
+  operationUrl.searchParams.set('operationId', matches.operations[0].operationId);
+  const contract = await fetch(operationUrl, options)
+    .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); });
+  console.log(contract);
+}
 ```
 
-Otra opción es sincronizar los cuatro artefactos como se explica más adelante y consultarlos desde un checkout local del backend con `--directory`. Estas consultas leen contratos ya generados y verifican su integridad; no regeneran OpenAPI ni requieren ejecutar controladores para descubrir el contrato.
+Estas consultas solo leen los artefactos generados. No generan documentación durante la petición ni ejecutan controladores comerciales. No aceptan directorios, nombres de archivo, salidas o acciones de escritura (`generate`/`sync`). Tampoco se agregan a la allowlist de operaciones comerciales del CRM.
+
+### Seguridad compartida con Scramble
+
+`EnsureApiDocumentationAccess` aplica la misma política de acceso que `RestrictedDocsAccess` de Scramble: **permite en `local`; fuera de local exige que `viewApiDocs` autorice al usuario**. Scramble y el nuevo endpoint usan ahora este mismo middleware de la aplicación. No depende de tener Scramble instalado para consultar artefactos en producción con `composer install --no-dev`.
+
+El gate predeterminado usa la lista `API_DOCS_USER_IDS`, vacía por defecto. Para habilitar lectores fuera de local, configurar únicamente los UUID de los usuarios autorizados y actualizar la caché de configuración:
+
+```dotenv
+API_DOCS_USER_IDS=UUID_DE_USUARIO_AUTORIZADO,OTRO_UUID_AUTORIZADO
+API_CONTRACTS_HTTP_PATH=docs/api/contracts
+```
+
+```bash
+php artisan config:cache
+```
+
+Si el despliegue cachea rutas, reconstruir también esa caché después de cambiar `API_CONTRACTS_HTTP_PATH`. Recargar los procesos persistentes mediante el procedimiento habitual del despliegue para aplicar la configuración.
+
+Los lectores deben iniciar sesión mediante el mecanismo de cookies existente del backend. Un token bearer comercial por sí solo no autentica estas rutas `web`. El gate se puede personalizar en los proveedores de la aplicación para aplicar otra política explícita; si ya existe al registrar el proveedor de contratos, se conserva. No se otorga acceso a todos los usuarios autenticados ni se crean permisos/roles comerciales nuevos. Para consumidores desde otro origen, las dos rutas reutilizan los orígenes permitidos de `CORS_ALLOWED_ORIGINS` y las cookies existentes; no se añade ningún origen confiable nuevo. El origen frontend también debe estar configurado como stateful para el login SPA existente.
+
+En producción, un invitado o usuario no autorizado recibe **403**; las rutas de consulta están registradas pero denegadas por defecto. El visor `/docs/api` y la exportación dinámica `/docs/api.json` conservan su registro exclusivo en local. Habilitar lectores para consultas estáticas no habilita generación dinámica en producción. En local, tanto visor como consultas permiten acceso sin login, tal como Scramble.
+
+- Límite compartido de 60 peticiones/minuto por usuario autenticado o IP local; excederlo devuelve **429**.
+- `limit` admite 1–100 resultados y `q` hasta 200 caracteres. Parámetros desconocidos, identificadores inválidos o acciones de escritura devuelven **422**.
+- Operación, esquema o revisión inexistente: **404**. Artefactos ausentes, mezclados o con hashes inválidos: **503**, sin revelar directorios del servidor.
+- Respuesta por defecto hasta 128 KiB; `max_bytes` permite pedir hasta 1 MiB. Si no cabe, devuelve **413** con `required_bytes`, sin truncar datos; reintentar con un límite permitido mayor. Para resultados aún mayores usar CLI con `--output`.
+- Las respuestas de datos llevan `Cache-Control: no-store, private`, `Vary: Cookie, Authorization` y `X-Contract-Revision` para identificar el contrato.
+
+La CLI sigue disponible para automatización local o copias de artefactos. Para HTTP basta conocer el origen del backend y la entrada convencional de descubrimiento; seguir sus enlaces evita fijar la ruta configurable de consulta en cada consumidor.
 
 ## Generación reproducible y revisión
 
@@ -196,7 +242,8 @@ Las APIs de stock, reservas, POS y pagos no se inventaron. Backoffice Blade/Live
 
 ## Evidencia local de esta implementación
 
-- 67 pruebas focalizadas: 421 aserciones, todas correctas; incluye repositorio de contratos, generación real, autenticación y matriz de variantes.
+- 90 pruebas focalizadas: 525 aserciones, todas correctas; incluye repositorio de contratos, generación real, las 23 pruebas HTTP de consulta, autenticación y matriz de variantes.
+- HTTP real en servidor temporal de loopback: descubrimiento, búsqueda y recuperación de operación/esquema con 200; perfil de producción anónimo con 403 y cuerpo JSON sin trazas ni directorios del servidor.
 - 4 pruebas adicionales de aislamiento y registro: 26 aserciones, todas correctas.
 - PHPStan completo: cero errores usando `--debug --memory-limit=1G` (el PHP estático local no puede cargar la extensión turbo y el sandbox restringe el socket del modo paralelo).
 - Pint `--dirty --format agent`, `composer validate --strict` y esquema oficial OpenAPI: correctos.
@@ -204,12 +251,13 @@ Las APIs de stock, reservas, POS y pagos no se inventaron. Backoffice Blade/Live
 - Orval 8.48.0 con Node 22.19.0: 332 archivos TypeScript generados y comprobados con `tsc --noEmit` en un directorio temporal. No se instaló Node ni Orval en las dependencias del backend.
 - Perfil exportado: 77 operaciones, 41 esquemas, 55 operaciones inferidas y 22 parciales. Se conservan 44 diagnósticos; son limitaciones conocidas y la comprobación estricta de Scramble sigue fallando.
 - Descubrimiento de dos operaciones: 846 bytes; contrato completo de productos con dependencias: aproximadamente 26 KiB frente a la especificación global completa.
-- La ejecución HTTP en entorno de producción no registra `/docs/api` ni `/docs/api.json`.
+- En producción el visor `/docs/api` y la exportación dinámica `/docs/api.json` no se registran; las consultas HTTP de artefactos sí están registradas y exigen `viewApiDocs`.
 - La suite general inicial sin APP_KEY tuvo errores de cifrado de entorno. Repetida con una clave exclusiva de pruebas: 210 pruebas, 208 correctas, 1757 aserciones y los dos fallos de traducciones/moneda reproducidos por separado también en el commit base.
 
 ## Evidencia automatizada
 
 - `ApiContractRepositoryTest`: referencias compartidas/cíclicas, metadata heredada, búsquedas, hash canónico, referencias inválidas, duplicados y cambios de contratos transitivos.
+- `ApiContractHttpTest`: descubrimiento y consultas HTTP, gate/lectores en producción, límites, validación, referencias, revisiones e integridad de artefactos.
 - `ApiContractsTest`: generación real desde el módulo, allowlist, PUT/PATCH, esquemas, respuestas, recuperación selectiva, límite de salida, integridad y ausencia HTTP fuera de local.
 - Pruebas funcionales existentes de autenticación, catálogo y empresa: acreditan comportamiento real de endpoints; el contrato generado no las sustituye.
 - `.github/workflows/api-contracts.yml`: auditoría Composer, pruebas funcionales, integridad/frescura, reproducibilidad, esquema oficial, generación real con Orval, revisión conservadora y artefacto draft.

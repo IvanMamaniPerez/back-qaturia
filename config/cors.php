@@ -15,7 +15,13 @@ return [
     |
     */
 
-    'paths' => ['api/*', trim((string) env('LARAVEL_CRM_ROUTE_PREFIX', 'crm'), '/').'/api/*', 'sanctum/csrf-cookie'],
+    'paths' => [
+        'api/*',
+        trim((string) env('LARAVEL_CRM_ROUTE_PREFIX', 'crm'), '/').'/api/*',
+        'sanctum/csrf-cookie',
+        '.well-known/api-contracts',
+        trim((string) env('API_CONTRACTS_HTTP_PATH', 'docs/api/contracts'), '/'),
+    ],
 
     'allowed_methods' => ['*'],
 

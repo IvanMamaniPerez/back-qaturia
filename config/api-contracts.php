@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'directory' => base_path('contracts'),
+    'readers' => array_values(array_filter(array_map('trim', explode(',', (string) env('API_DOCS_USER_IDS', ''))))),
+    'http' => [
+        'path' => env('API_CONTRACTS_HTTP_PATH', 'docs/api/contracts'),
+        'requests_per_minute' => 60,
+        'max_bytes' => 1048576,
+    ],
     'routes' => [
         'laravel-crm.api.v2.auth.password.request',
         'laravel-crm.api.v2.auth.login',
