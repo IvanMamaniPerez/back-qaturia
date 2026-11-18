@@ -48,6 +48,28 @@ php artisan api:contracts operation crm.v2.products.options.apply.post --max-byt
 
 Desde otra sesión o directorio, usar `php /ruta/al/backend/artisan ...`. `--directory=/ruta/a/contratos` permite consultar una copia externa sin inspeccionar controladores. `check` comprueba además el código del backend que ejecuta el comando; usarlo en el checkout productor, no para comparar una copia contra otro backend deliberadamente diferente.
 
+## Acceso HTTP y seguridad de la búsqueda
+
+**No se ha implementado un endpoint HTTP de búsqueda selectiva de documentación.** Las acciones `search`, `operation`, `schema` y `changes` se ejecutan por CLI mediante `api:contracts`. No existe una URL de búsqueda que el frontend o un agente remoto pueda invocar con un token Sanctum.
+
+| Interfaz existente | Acceso y alcance |
+|---|---|
+| `php artisan api:contracts search 'consulta' --limit=5` | Busca en el índice generado. Requiere acceso al sistema donde se ejecuta Artisan y permisos de lectura de los artefactos; no usa autenticación HTTP |
+| `php artisan api:contracts operation operationId` | Recupera una operación y sus esquemas relacionados desde los artefactos, sin ejecutar el endpoint comercial |
+| `GET /docs/api` | Visor de documentación completa, registrado únicamente con `APP_ENV=local` |
+| `GET /docs/api.json` | Especificación OpenAPI completa de Scramble, registrada únicamente con `APP_ENV=local`; no realiza búsqueda selectiva |
+
+Las dos rutas HTTP de documentación usan `web` y `RestrictedDocsAccess`. Ese middleware permite acceso en el entorno local sin exigir login ni un token Sanctum. Por tanto, no constituyen un buscador remoto autenticado. En producción no se registran, incluso si están instaladas las dependencias de desarrollo; configurar el gate `viewApiDocs` por sí solo no las habilita con la configuración actual.
+
+Para consultar desde otra máquina con acceso SSH autorizado, ejecutar los mismos comandos en el servidor:
+
+```bash
+ssh usuario@servidor 'cd /ruta/back-qaturia && php artisan api:contracts search "products index" --limit=5'
+ssh usuario@servidor 'cd /ruta/back-qaturia && php artisan api:contracts operation crm.v2.products.index.get'
+```
+
+Otra opción es sincronizar los cuatro artefactos como se explica más adelante y consultarlos desde un checkout local del backend con `--directory`. Estas consultas leen contratos ya generados y verifican su integridad; no regeneran OpenAPI ni requieren ejecutar controladores para descubrir el contrato.
+
 ## Generación reproducible y revisión
 
 Usar el lockfile y una base **temporal dedicada** con el esquema migrado. Scramble utiliza los tipos de columnas; una base sin migraciones produce contratos incompletos. No hace falta sembrar datos comerciales. Este bloque mantiene los ajustes dentro de un subshell:
