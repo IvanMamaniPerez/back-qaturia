@@ -5,11 +5,10 @@
 
 ## Foundational Context
 
-This application is a Laravel application running on PHP 8.5. Always use the APIs that match the installed major version of each package — do not assume a version.
+This repository is the Qaturia JSON API backend, built with Laravel and running on PHP 8.5. Always use the APIs that match the installed major version of each package — do not assume a version.
 
 Before relying on a package's API, confirm its installed version:
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
-- JS packages: check `package.json` for the installed versions.
 
 ## Skills Activation
 
@@ -19,7 +18,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
-- Check for existing components to reuse before writing a new one.
+- Reuse existing controllers, services, FormRequests, API Resources and middleware before introducing equivalents.
 
 ## Verification Scripts
 
@@ -30,9 +29,15 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Stick to existing directory structure; don't create new base folders without approval.
 - Do not change the application's dependencies without approval.
 
-## Frontend Bundling
+## API Backend Scope
 
-- If a frontend change doesn't show in the UI or you get a "Unable to locate file in Vite manifest" error, run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
+- Preserve this API backend scope when updating or regenerating agent instructions.
+- Develop this repository as an HTTP JSON API backend: routes, controllers, validation, serialization, authentication, authorization, tenancy, services, jobs and persistence.
+- Follow the existing versioned CRM API and its module structure. Inspect actual routes and OpenAPI contracts before adding or consuming endpoints.
+- Document and verify requests, response schemas, status codes, pagination, monetary units and public identifiers.
+- Use HTTP clients, Artisan and automated API tests for examples and validation. Generated clients belong to external consumer repositories.
+- Business API authentication supports Sanctum bearer tokens. Documentation queries currently require an authorized session outside local; preserve the actual implementation when describing access.
+- Keep API behavior and security changes explicit. Documentation edits alone do not authorize changes to guards, permissions, session handling, migrations or commercial contracts.
 
 ## Documentation Files
 
@@ -48,7 +53,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Use `database-query` to run read-only queries against the database instead of writing raw SQL in tinker.
 - Use `database-schema` to inspect table structure before writing migrations or models.
 - Use `get-absolute-url` to resolve the correct scheme, domain, and port for project URLs. Always use this before sharing a URL with the user.
-- Use `browser-logs` to read browser logs, errors, and exceptions. Only recent logs are useful, ignore old entries.
+- Use `last-error` and `read-log-entries` to inspect current backend errors and application logs.
 
 ## Searching Documentation (IMPORTANT)
 
@@ -98,29 +103,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
 - Activate the `deploying-to-cloud` skill whenever deploying to Laravel Cloud, configuring Cloud environments or resources, using the Cloud CLI, or troubleshooting Cloud deployments.
 
-=== inertia-laravel/core rules ===
-
-# Inertia
-
-- Inertia creates fully client-side rendered SPAs without modern SPA complexity, leveraging existing server-side patterns.
-- Components live in `resources/js/pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
-- ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
-- IMPORTANT: Activate `inertia-react-development` when working with Inertia client-side patterns.
-
-# Inertia v3
-
-- Use all Inertia features from v1, v2, and v3. Check the documentation before making changes to ensure the correct approach.
-- New v3 features: standalone HTTP requests (`useHttp` hook), optimistic updates with automatic rollback, layout props (`useLayoutProps` hook), instant visits, simplified SSR via `@inertiajs/vite` plugin, custom exception handling for error pages.
-- Carried over from v2: deferred props, infinite scroll, merging props, polling, prefetching, once props, flash data.
-- When using deferred props, add an empty state with a pulsing or animated skeleton.
-- Axios has been removed. Use the built-in XHR client with interceptors, or install Axios separately if needed.
-- `Inertia::lazy()` / `LazyProp` has been removed. Use `Inertia::optional()` instead.
-- Prop types (`Inertia::optional()`, `Inertia::defer()`, `Inertia::merge()`) work inside nested arrays with dot-notation paths.
-- SSR works automatically in Vite dev mode with `@inertiajs/vite` - no separate Node.js server needed during development.
-- Event renames: `invalid` is now `httpException`, `exception` is now `networkError`.
-- `router.cancel()` replaced by `router.cancelAll()`.
-- The `future` configuration namespace has been removed - all v2 future options are now always enabled.
-
 === laravel/core rules ===
 
 # Do Things the Laravel Way
@@ -159,12 +141,6 @@ This application uses Laravel Octane, a long-running PHP server. The application
 
 When working on Octane-specific features (concurrency, shared tables, memory, driver configuration, testing), invoke `octane-development` for detailed rules.
 
-=== wayfinder/core rules ===
-
-# Laravel Wayfinder
-
-Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `@/actions/` (controllers) or `@/routes/` (named routes).
-
 === pint/core rules ===
 
 # Laravel Pint Code Formatter
@@ -186,12 +162,6 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 - Run the narrowest set of tests that covers the change. Pass a file path or `--filter=testName` to `php artisan test --compact`.
 - Rerun a test after each change to it.
 - Run `vendor/bin/pest` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
-
-=== inertia-react/core rules ===
-
-# Inertia + React
-
-- IMPORTANT: Activate `inertia-react-development` when working with Inertia React client-side patterns.
 
 </laravel-boost-guidelines>
 
