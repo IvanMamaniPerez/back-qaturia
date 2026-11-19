@@ -1,7 +1,9 @@
+import { fileURLToPath } from 'node:url';
+
 export default {
     qaturia: {
         input: {
-            target: process.env.API_CONTRACT_INPUT ?? './contracts/openapi.json',
+            target: process.env.API_CONTRACT_INPUT ?? fileURLToPath(new URL('../../contracts/openapi.json', import.meta.url)),
         },
         output: {
             mode: 'tags-split',
