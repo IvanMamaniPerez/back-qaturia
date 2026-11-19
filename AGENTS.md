@@ -174,3 +174,16 @@ Usa `php artisan api:contracts search 'consulta' --limit=5`, luego `php artisan 
 Para consultar por HTTP, empieza por `GET /.well-known/api-contracts` y sigue los enlaces devueltos para buscar operaciones, recuperar esquemas o comparar revisiones. Fuera de local se exige una sesión autorizada por `viewApiDocs`; los lectores se configuran mediante `API_DOCS_USER_IDS`. Las consultas leen artefactos estáticos y no aceptan acciones de generación o escritura.
 
 Para generar clientes externos, descubrimiento publica `artifacts` con URLs de descarga de OpenAPI, índice, versión y diagnósticos. Usar esas URLs con sus pins de revisión y SHA-256; ante 409, volver a descubrir y descargar el conjunto. El archivo OpenAPI descargado es la entrada del generador, no la respuesta selectiva de una operación.
+
+## Cierre obligatorio de tareas backend (Codex y Claude Code)
+
+Antes de declarar finalizada **cualquier tarea de desarrollo backend**, ejecutar `composer api:docs` en el perfil reproducible con SQLite temporal migrado de `docs/API_CONTRACTS.md`. Es el único flujo principal: genera y valida los cuatro artefactos mediante `api:contracts`; no usar `scramble:export` para publicarlos.
+
+- Si OpenAPI no cambia, informar literalmente `API contract unchanged`, aunque cambien las fuentes o metadatos.
+- Informar `contract_sha256`, operaciones agregadas, modificadas o eliminadas y esquemas afectados. El frontend decide regenerar Orval por `contract_sha256`, nunca por `source_sha256`.
+- Revisar candidatos nuevos: solo añadir a `api-contracts.routes` rutas cuya exposición esté autorizada en la tarea. Clasificar rutas privadas con nombre en `excluded_routes`; nunca ampliar automáticamente la allowlist.
+- Los 44 diagnósticos iniciales y las operaciones `partial` son una línea base explícita. Nuevos/modificados bloquean incluso con `--allow-partial`; desaparecidos se informan para revisión. No editar la línea base para ocultar errores ni promover contratos a estables sin corregir y probar su comportamiento. Una actualización de baseline requiere revisión explícita y un conjunto íntegro en `--baseline`.
+- `composer api:docs` bloquea cambios potencialmente incompatibles antes de publicarlos. Revisarlos y coordinarlos; solo tras autorización explícita usar `php artisan api:contracts generate --no-interaction` sin `--fail-on-breaking`, y ejecutar `api:contracts check`. El informe conserva `requires_review`.
+- Incluir los cuatro artefactos actualizados en el PR junto a las pruebas. Si falla cualquier gate, no declarar la tarea completamente validada. CI verifica frescura, reproducción, diagnósticos contra la base del PR y compatibilidad conservadora.
+
+Ejemplo de cierre: `API contract unchanged; contract_sha256=<hash>; operaciones agregadas/modificadas/eliminadas: ninguna; diagnósticos nuevos/modificados: 0; pruebas y composer api:docs correctos.` Si cambia: `API contract changed; contract_sha256=<hash>; agregadas: <ids>; modificadas/eliminadas: <ids>; esquemas: <nombres>; revisión de compatibilidad: <resultado>; validación: <resultado>.`

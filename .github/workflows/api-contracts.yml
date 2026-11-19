@@ -50,9 +50,21 @@ jobs:
           php artisan test --compact tests/Tenancy/BusinessIsolationTest.php --filter='API rejects selecting|Sanctum issues a real|foreign business IDs'
       - name: Verify committed artifact integrity and freshness
         run: php artisan api:contracts check
-      - name: Reproduce contract including documented partial schemas
+      - name: Select accepted baseline before the change
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          php artisan api:contracts generate --allow-partial --directory=/tmp/qaturia-contract-candidate
+          mkdir /tmp/qaturia-contract-base
+          for artifact in openapi.json operations-index.json diagnostics.json contract-version.json; do
+            git show "$BASE_SHA:contracts/$artifact" > "/tmp/qaturia-contract-base/$artifact"
+          done
+      - name: Reproduce contract against accepted diagnostics
+        run: |
+          baseline=contracts
+          if [ -d /tmp/qaturia-contract-base ]; then baseline=/tmp/qaturia-contract-base; fi
+          php artisan api:contracts generate --baseline="$baseline" --directory=/tmp/qaturia-contract-candidate
+          php artisan api:contracts check --directory=/tmp/qaturia-contract-candidate
           cmp contracts/openapi.json /tmp/qaturia-contract-candidate/openapi.json
           cmp contracts/operations-index.json /tmp/qaturia-contract-candidate/operations-index.json
           cmp contracts/diagnostics.json /tmp/qaturia-contract-candidate/diagnostics.json

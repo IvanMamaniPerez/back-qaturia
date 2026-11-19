@@ -95,3 +95,17 @@ test('duplicate operation parameters are rejected before client generation', fun
 
     expect(fn () => $repository->validate($spec))->toThrow(RuntimeException::class, 'Duplicate parameter');
 });
+
+test('diagnostic comparison detects added removed and modified errors even when counts match', function () {
+    $repository = new ContractRepository;
+    $original = ['context' => ['key' => 'route:products'], 'details' => [['Located at', '/products']], 'code' => 'SE001', 'message' => 'Unknown'];
+    $modified = [...$original, 'message' => 'Different error'];
+    $added = [...$original, 'context' => ['key' => 'route:stock']];
+
+    $changes = $repository->diagnosticChanges([$original], [$modified, $added]);
+
+    expect($changes['added'])->toBe([$added]);
+    expect($changes['modified'])->toBe([['before' => [$original], 'after' => [$modified]]]);
+    expect($repository->diagnosticChanges([$original], [])['removed'])->toBe([$original]);
+    expect($repository->diagnosticChanges([$original, $added], [$added, $original]))->toBe(['added' => [], 'removed' => [], 'modified' => []]);
+});

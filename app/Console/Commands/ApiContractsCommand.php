@@ -5,10 +5,15 @@ namespace App\Console\Commands;
 use App\Support\ApiContracts\ContractRepository;
 use Composer\InstalledVersions;
 use Dedoc\Scramble\Generator;
+use Dedoc\Scramble\Infer;
+use Dedoc\Scramble\Infer\Scope\Index;
+use Dedoc\Scramble\Infer\Scope\LazyShallowReflectionIndex;
+use Dedoc\Scramble\OpenApiVisitor\SchemaEnforceVisitor;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\Types\UnknownType;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use ReflectionProperty;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
@@ -23,7 +28,8 @@ class ApiContractsCommand extends Command
         {--limit=10 : Search result limit (1-100)}
         {--max-bytes=131072 : Maximum stdout bytes; never truncates contracts}
         {--output= : Write the complete result to a file instead of stdout}
-        {--allow-partial : Explicitly allow a draft with documented inference limitations}
+        {--allow-partial : Allow draft sync; never bypass the generation diagnostic baseline}
+        {--baseline=contracts : Verified contract directory containing the accepted diagnostic baseline}
         {--against= : Previous OpenAPI JSON file for compatibility comparison}
         {--fail-on-breaking : Fail on any modified or removed existing contract}
         {--destination= : New directory for a verified draft copy}';
@@ -81,9 +87,56 @@ class ApiContractsCommand extends Command
         if (! class_exists(Scramble::class)) {
             throw new RuntimeException('Install development dependencies to generate contracts.');
         }
-        Scramble::preventSchema(UnknownType::class, throw: false);
-        $config = Scramble::getGeneratorConfig('default');
-        $result = app(Generator::class)->generate($config);
+        File::ensureDirectoryExists($directory);
+        $lock = fopen($directory.'/.generate.lock', 'c');
+        if ($lock === false) {
+            throw new RuntimeException('Cannot open the contract writer lock.');
+        }
+        if (! flock($lock, LOCK_EX | LOCK_NB)) {
+            fclose($lock);
+            throw new RuntimeException('Another contract writer is active.');
+        }
+        try {
+            return $this->generateLocked($contracts, $directory);
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+    }
+
+    private function generateLocked(ContractRepository $contracts, string $directory): int
+    {
+        $baseline = $contracts->snapshot($this->directory((string) $this->option('baseline')));
+        $previous = is_file($directory.'/openapi.json') ? $contracts->snapshot($directory) : $baseline;
+        $candidates = [];
+        $apiPath = trim(config('scramble.api_path'), '/');
+        foreach (app('router')->getRoutes()->getRoutes() as $route) {
+            if (($route->uri() === $apiPath || str_starts_with($route->uri(), $apiPath.'/'))
+                && ! in_array($route->getName(), config('api-contracts.routes'), true)
+                && (! $route->getName() || ! in_array($route->getName(), config('api-contracts.excluded_routes', []), true))) {
+                $candidates[] = ['name' => $route->getName(), 'path' => $route->uri(), 'methods' => $route->methods()];
+            }
+        }
+        if ($candidates !== []) {
+            $this->emit($contracts, ['unapproved_candidates' => $candidates]);
+            throw new RuntimeException('Review candidate routes: explicitly authorize the allowlist entry or classify a named private route in excluded_routes.');
+        }
+        /** Scramble 0.13 caches visited schema references across generators in the same process. */
+        $handledReferences = new ReflectionProperty(SchemaEnforceVisitor::class, 'handledReferences');
+        $previousReferences = $handledReferences->getValue();
+        $handledReferences->setValue(null, []);
+        $rules = Scramble::$enforceSchemaRules;
+        try {
+            Scramble::preventSchema(UnknownType::class, throw: false);
+            $config = Scramble::getGeneratorConfig('default');
+            foreach ([Infer::class, Index::class, LazyShallowReflectionIndex::class] as $binding) {
+                app()->forgetInstance($binding);
+            }
+            $result = app(Generator::class)->generate($config);
+        } finally {
+            Scramble::$enforceSchemaRules = $rules;
+            $handledReferences->setValue(null, $previousReferences);
+        }
         $spec = $contracts->decode(json_encode($result->spec($config->openApiVersion()), JSON_THROW_ON_ERROR));
         $spec['servers'] = [['url' => '/'.trim(config('scramble.api_path'), '/')]];
         $diagnostics = $result->diagnostics()->map(function ($diagnostic): array {
@@ -94,8 +147,12 @@ class ApiContractsCommand extends Command
         })->values()->all();
         unset($result);
         $diagnostics = array_values($diagnostics);
-        if ($diagnostics !== [] && ! $this->option('allow-partial')) {
-            throw new RuntimeException('Scramble reported '.count($diagnostics).' diagnostics. Use scramble:analyze --fail-on-unknown to inspect them, or --allow-partial for an explicitly marked draft.');
+        $diagnosticChanges = $contracts->diagnosticChanges(
+            $contracts->decode($baseline['files']['diagnostics.json'])['diagnostics'], $diagnostics,
+        );
+        if ($diagnosticChanges['added'] !== [] || $diagnosticChanges['modified'] !== []) {
+            $this->emit($contracts, ['diagnostics' => $diagnosticChanges]);
+            throw new RuntimeException('New or modified diagnostics require correction or an explicitly reviewed baseline update; --allow-partial cannot bypass this gate.');
         }
         $spec = $contracts->withDiagnostics($spec, $diagnostics);
         $contracts->validate($spec);
@@ -109,48 +166,41 @@ class ApiContractsCommand extends Command
                 }
             }
         }
-        if ($this->option('against')) {
-            $changes = $contracts->changes($contracts->read((string) $this->option('against')), $spec);
-            if ($this->option('fail-on-breaking') && $changes['requires_review']) {
-                $this->emit($contracts, $changes);
+        $changes = $contracts->changes($this->option('against') ? $contracts->read((string) $this->option('against')) : $previous['spec'], $spec);
+        $git = new Process(['git', 'rev-parse', 'HEAD'], base_path());
+        $git->mustRun();
+        $status = new Process(['git', 'status', '--porcelain', '--untracked-files=normal'], base_path());
+        $status->mustRun();
+        $version = [
+            'contract_sha256' => $contracts->hash($spec), 'source_sha256' => $contracts->sourceHash(),
+            'code_revision' => trim($git->getOutput()), 'working_tree_dirty' => trim($status->getOutput()) !== '',
+            'status' => 'draft', 'diagnostics_count' => count($diagnostics),
+            'diagnostics_sha256' => $contracts->hash($diagnostics),
+            'generator' => 'dedoc/scramble', 'generator_version' => InstalledVersions::getPrettyVersion('dedoc/scramble'),
+        ];
+        $contractChanged = $changes['from'] !== $changes['to'];
+        $producerKeys = array_flip(['code_revision', 'working_tree_dirty', 'generator', 'generator_version', 'status']);
+        $producerChanged = $contracts->hash(array_intersect_key($previous['version'], $producerKeys)) !== $contracts->hash(array_intersect_key($version, $producerKeys));
+        $report = [
+            ...$version,
+            'message' => $contractChanged ? 'API contract changed' : 'API contract unchanged',
+            'source_changed' => $previous['version']['source_sha256'] !== $version['source_sha256'],
+            'contract_changed' => $contractChanged,
+            'producer_metadata_changed' => $producerChanged,
+            'metadata_only' => ! $contractChanged && $previous['version']['source_sha256'] === $version['source_sha256'] && $producerChanged,
+            'changes' => $changes, 'diagnostics' => $diagnosticChanges,
+        ];
+        if ($this->option('fail-on-breaking') && $changes['requires_review']) {
+            $this->emit($contracts, $report);
 
-                return self::FAILURE;
-            }
+            return self::FAILURE;
         }
-        File::ensureDirectoryExists($directory);
-        $lock = fopen($directory.'/.generate.lock', 'c');
-        if ($lock === false || ! flock($lock, LOCK_EX | LOCK_NB)) {
-            throw new RuntimeException('Another contract writer is active.');
-        }
-        try {
-            if (is_file($directory.'/openapi.json')) {
-                $contracts->verify($directory);
-                $previous = $contracts->read($directory.'/openapi.json');
-                $snapshot = $directory.'/revisions/'.$contracts->hash($previous);
-                File::ensureDirectoryExists($snapshot);
-                File::put($snapshot.'/openapi.json', $contracts->json($previous));
-            }
-            $git = new Process(['git', 'rev-parse', 'HEAD'], base_path());
-            $git->mustRun();
-            $status = new Process(['git', 'status', '--porcelain', '--untracked-files=normal'], base_path());
-            $status->mustRun();
-            $version = [
-                'contract_sha256' => $contracts->hash($spec), 'source_sha256' => $contracts->sourceHash(),
-                'code_revision' => trim($git->getOutput()), 'working_tree_dirty' => trim($status->getOutput()) !== '',
-                'status' => 'draft', 'diagnostics_count' => count($diagnostics),
-                'diagnostics_sha256' => $contracts->hash($diagnostics),
-                'generator' => 'dedoc/scramble', 'generator_version' => InstalledVersions::getPrettyVersion('dedoc/scramble'),
-            ];
-            foreach (['openapi.json' => $spec, 'operations-index.json' => $contracts->index($spec), 'diagnostics.json' => ['contract_sha256' => $version['contract_sha256'], 'diagnostics' => $diagnostics], 'contract-version.json' => $version] as $file => $data) {
-                File::replace($directory.'/'.$file, $contracts->json($data));
-                chmod($directory.'/'.$file, 0644);
-            }
-            $contracts->verify($directory);
-        } finally {
-            flock($lock, LOCK_UN);
-            fclose($lock);
-        }
-        $this->emit($contracts, $version);
+        $contracts->publish($directory, [
+            'openapi.json' => $spec, 'operations-index.json' => $contracts->index($spec),
+            'diagnostics.json' => ['contract_sha256' => $version['contract_sha256'], 'diagnostics' => $diagnostics],
+            'contract-version.json' => $version,
+        ]);
+        $this->emit($contracts, $report);
 
         return self::SUCCESS;
     }
