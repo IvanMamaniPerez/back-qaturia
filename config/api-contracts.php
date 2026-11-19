@@ -9,6 +9,7 @@ return [
         'max_bytes' => 1048576,
         'max_download_bytes' => 16777216,
     ],
+    'excluded_routes' => [],
     'routes' => [
         'laravel-crm.api.v2.auth.password.request',
         'laravel-crm.api.v2.auth.login',

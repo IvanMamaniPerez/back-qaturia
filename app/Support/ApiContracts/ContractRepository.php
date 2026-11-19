@@ -402,6 +402,95 @@ class ContractRepository
         return ['version' => $version, 'spec' => $spec, 'index' => $index, 'files' => $files];
     }
 
+    /**
+     * Compare diagnostic identities separately from their payload so changed errors cannot hide behind a count.
+     *
+     * @param  list<array<string, mixed>>  $before
+     * @param  list<array<string, mixed>>  $after
+     * @return array{added: list<array<string, mixed>>, removed: list<array<string, mixed>>, modified: list<array{before: list<array<string, mixed>>, after: list<array<string, mixed>>}>}
+     */
+    public function diagnosticChanges(array $before, array $after): array
+    {
+        $group = function (array $diagnostics): array {
+            $groups = [];
+            foreach ($diagnostics as $diagnostic) {
+                $locations = array_values(array_filter($diagnostic['details'] ?? [], fn (array $detail): bool => $detail[0] === 'Located at'));
+                $identity = $this->hash([$diagnostic['context'] ?? [], $locations]);
+                $groups[$identity][] = $diagnostic;
+            }
+            foreach ($groups as &$entries) {
+                usort($entries, fn (array $a, array $b): int => strcmp($this->json($a), $this->json($b)));
+            }
+            unset($entries);
+            ksort($groups);
+
+            return $groups;
+        };
+        $old = $group($before);
+        $new = $group($after);
+        $result = ['added' => [], 'removed' => [], 'modified' => []];
+        foreach (array_unique([...array_keys($old), ...array_keys($new)]) as $identity) {
+            if (! isset($old[$identity])) {
+                array_push($result['added'], ...$new[$identity]);
+            } elseif (! isset($new[$identity])) {
+                array_push($result['removed'], ...$old[$identity]);
+            } elseif ($this->hash($old[$identity]) !== $this->hash($new[$identity])) {
+                $result['modified'][] = ['before' => $old[$identity], 'after' => $new[$identity]];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Stage and verify the entire set before replacing any published file; restore it on write failure.
+     * The caller must hold the exclusive writer lock.
+     *
+     * @param  array<string, array<string, mixed>>  $documents
+     */
+    public function publish(string $directory, array $documents): void
+    {
+        $stage = $directory.'/.staging-'.bin2hex(random_bytes(8));
+        File::ensureDirectoryExists($stage);
+        $originals = [];
+        $replaced = [];
+        try {
+            foreach (self::ARTIFACTS as $name) {
+                $originals[$name] = is_file($directory.'/'.$name) ? File::get($directory.'/'.$name) : null;
+                File::put($stage.'/'.$name, $this->json($documents[$name]));
+            }
+            $this->verify($stage);
+            if ($originals['openapi.json'] !== null) {
+                $oldSpec = $this->decode($originals['openapi.json']);
+                if ($this->hash($oldSpec) !== $this->hash($documents['openapi.json'])) {
+                    $revision = $directory.'/revisions/'.$this->hash($oldSpec);
+                    File::ensureDirectoryExists($revision);
+                    File::replace($revision.'/openapi.json', $originals['openapi.json']);
+                }
+            }
+            foreach (self::ARTIFACTS as $name) {
+                $contents = File::get($stage.'/'.$name);
+                if ($originals[$name] !== $contents) {
+                    File::replace($directory.'/'.$name, $contents);
+                    $replaced[$name] = $originals[$name] ?? null;
+                    chmod($directory.'/'.$name, 0644);
+                }
+            }
+            $this->verify($directory);
+        } catch (\Throwable $exception) {
+            foreach (array_reverse($replaced, true) as $name => $contents) {
+                if ($contents === null) {
+                    File::delete($directory.'/'.$name);
+                } else {
+                    File::replace($directory.'/'.$name, $contents);
+                }
+            }
+            throw $exception;
+        } finally {
+            File::deleteDirectory($stage);
+        }
+    }
+
     public function sourceHash(): string
     {
         $files = [base_path('composer.json'), base_path('composer.lock')];

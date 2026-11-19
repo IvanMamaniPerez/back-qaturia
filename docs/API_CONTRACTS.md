@@ -158,7 +158,7 @@ php artisan package:discover --no-interaction
     export CACHE_STORE=array SESSION_DRIVER=array BROADCAST_CONNECTION=log
     touch "$DB_DATABASE"
     php artisan migrate --force --no-interaction
-    php artisan api:contracts generate --allow-partial
+    composer api:docs
 )
 php artisan api:contracts check
 python3 -m jsonschema -i contracts/openapi.json tests/Fixtures/openapi-3.1-schema.json
@@ -178,7 +178,21 @@ php artisan scramble:export --routes=laravel-crm.api.v2.products.index --stdout 
 php artisan scramble:export --path=/tmp/openapi-raw.json
 ```
 
-Estos comandos también requieren la base migrada. La exportación directa no crea el índice, las revisiones ni los diagnósticos vinculados de `api:contracts generate`. `scramble:analyze --fail-on-unknown` sigue fallando mientras existan las limitaciones conocidas; no se presenta ese resultado como una comprobación exitosa. Sin `--allow-partial`, nuestro generador rechaza cualquier diagnóstico y conserva los artefactos anteriores.
+Estos comandos son solo diagnósticos y también requieren la base migrada. No publicar su exportación directa: `composer api:docs` es el único flujo principal de actualización y validación, basado en `api:contracts generate --fail-on-breaking` y `api:contracts check`. `scramble:analyze --fail-on-unknown` sigue fallando por las limitaciones conocidas y no es el gate de cierre.
+
+### Cierre automático de tareas de agentes
+
+Codex y Claude Code deben ejecutar el bloque reproducible anterior al cerrar cualquier tarea backend y adjuntar el conjunto actualizado al PR. No se necesita otro comando ni un segundo sistema. `AGENTS.md` define la política compartida; `CLAUDE.md` importa ese mismo archivo mediante `@AGENTS.md`, sin duplicar instrucciones. Esta [importación está documentada por Claude Code](https://code.claude.com/docs/en/memory#import-additional-files) y cubre también versiones que no cargan AGENTS directamente.
+
+La generación compara con el conjunto íntegro de `--baseline=contracts` (predeterminado); al generar en otro directorio también usa esa línea base. Conserva los 44 diagnósticos conocidos. Compara identidad (contexto y ubicación) y contenido, incluidos mensaje, severidad y fuente: errores nuevos o modificados bloquean **antes de publicar**, incluso con `--allow-partial`. Las desapariciones se informan y no convierten automáticamente el borrador en estable. No cambiar el baseline para eludir el gate; una nueva línea base requiere revisión explícita y un conjunto íntegro. CI usa el conjunto de la rama base del PR, impidiendo aceptar errores nuevos solo editando los artefactos del PR.
+
+Cada ejecución devuelve `message`, `contract_changed`, `source_changed`, `producer_metadata_changed`, `metadata_only`, diferencias de operaciones/esquemas, `requires_review` y diferencias de diagnósticos. Un cambio en fuentes internas puede producir `API contract unchanged` con `source_changed=true`. Solo `contract_sha256` determina si el consumidor necesita regenerar su cliente; los checksums de cada archivo siguen protegiendo todo el conjunto.
+
+Se detectan rutas candidatas dentro del prefijo API configurado, incluso sin nombre. La tarea debe autorizar su exposición antes de incluirlas en `routes`; las rutas privadas con nombre se clasifican explícitamente en `excluded_routes`. Las candidatas sin clasificar bloquean sin exponerlas. No se documentan automáticamente rutas administrativas fuera del prefijo.
+
+Los cambios en operaciones/esquemas existentes bloquean `composer api:docs` por su política conservadora. El informe identifica cuáles. Tras revisión y autorización explícita, generar con `php artisan api:contracts generate --no-interaction` y verificar con `php artisan api:contracts check --no-interaction`; no suprimir el gate de CI silenciosamente. Las adiciones independientes pueden publicarse sin ese bloqueo.
+
+Ejemplo de cierre sin cambios: `API contract unchanged; contract_sha256=<hash>; operaciones agregadas/modificadas/eliminadas: ninguna; diagnósticos nuevos/modificados: 0; pruebas y composer api:docs correctos.` Con cambios, enumerar IDs y esquemas afectados, hash, revisión de compatibilidad y resultados de validación. Un fallo impide declarar el cierre completamente validado.
 
 ## Versionado, cambios y compatibilidad
 
@@ -193,7 +207,7 @@ contracts/
 
 El hash del contrato corresponde al JSON canónico ordenado y guardado en `openapi.json`; se puede verificar con `sha256sum`. Las listas conservan su orden y los objetos vacíos siguen siendo objetos. El índice y los diagnósticos llevan el mismo hash. El manifest añade versión del generador, commit productor, indicación de árbol sucio y un hash de los archivos fuente relevantes. El hash de fuentes permite asociar exactamente el borrador aunque se genere antes del commit que lo incorpora; no se pretende que un commit contenga su propio SHA.
 
-No incluir `.env`, datos de clientes, tokens, credenciales o ejemplos reales. Las revisiones previas se archivan por hash antes de reemplazar la actual. Los lectores rechazan un conjunto mezclado y un lock evita dos escritores simultáneos. Ante una interrupción durante el reemplazo de archivos, restaurar el conjunto desde Git o regenerar en un directorio nuevo; no publicar un conjunto que falle `check`.
+No incluir `.env`, datos de clientes, tokens, credenciales o ejemplos reales. Las revisiones previas se archivan por hash antes de reemplazar la actual. Los lectores rechazan un conjunto mezclado y un lock cubre la generación completa para evitar dos escritores simultáneos. Antes de reemplazar archivos se prepara y verifica el conjunto completo en staging; una excepción de escritura restaura los bytes anteriores. No se reescriben archivos idénticos ni se archivan revisiones iguales. Ante una interrupción durante el reemplazo de archivos, restaurar el conjunto desde Git o regenerar en un directorio nuevo; no publicar un conjunto que falle `check`.
 
 ```bash
 php artisan api:contracts changes SHA256_ANTERIOR
@@ -205,7 +219,7 @@ La política de compatibilidad es **conservadora**: cualquier operación o esque
 
 ## Publicación de artefactos para consumidores externos
 
-CI genera otra copia, compara bytes con el contrato versionado, ejecuta validaciones y pruebas HTTP y sube un artefacto **draft** ligado al SHA de Git. La revisión de compatibilidad y de operaciones parciales debe completarse antes de publicar una versión estable del contrato.
+CI genera otra copia contra los diagnósticos aceptados de la base del PR, verifica su hash de fuentes y compara bytes de OpenAPI, índice y diagnósticos con el contrato versionado (el commit y estado del productor pueden diferir), ejecuta validaciones y pruebas HTTP y sube un artefacto **draft** ligado al SHA de Git. La revisión de compatibilidad y de operaciones parciales debe completarse antes de publicar una versión estable del contrato.
 
 Para preparar una copia verificable en un directorio nuevo:
 
