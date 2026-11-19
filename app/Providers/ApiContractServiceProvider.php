@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Support\ApiContracts\LiveOperationTransformer;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\Operation;
@@ -54,6 +55,9 @@ class ApiContractServiceProvider extends ServiceProvider
             ->routes(fn (Route $route): bool => in_array($route->getName(), config('api-contracts.routes'), true))
             ->resolveOperationMethodsUsing(fn (Route $route): array => array_values(array_diff($route->methods(), ['HEAD'])))
             ->withOperationTransformers(function (Operation $operation, RouteInfo $info): void {
+                if (str_starts_with($info->route->getName(), 'live.v1.')) {
+                    return;
+                }
                 $name = Str::after($info->route->getName(), 'laravel-crm.api.v2.');
                 $operation->operationId = 'crm.v2.'.$name.'.'.strtolower($operation->method);
                 $operation->summary = Str::headline(str_replace('.', ' ', $name));
@@ -100,6 +104,7 @@ class ApiContractServiceProvider extends ServiceProvider
                 }
                 $operation->parameters = array_values($parameters);
             })
+            ->withOperationTransformers(LiveOperationTransformer::class)
             ->withDocumentTransformers(function (OpenApi $document): void {
                 $document->components->addSecurityScheme('frontendSession', SecurityScheme::apiKey('cookie', config('session.cookie'))->setDescription('Sanctum stateful SPA session. First GET /sanctum/csrf-cookie; send credentials and X-XSRF-TOKEN for unsafe requests from a configured stateful origin.'));
             });

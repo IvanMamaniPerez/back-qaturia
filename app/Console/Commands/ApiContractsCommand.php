@@ -109,9 +109,9 @@ class ApiContractsCommand extends Command
         $baseline = $contracts->snapshot($this->directory((string) $this->option('baseline')));
         $previous = is_file($directory.'/openapi.json') ? $contracts->snapshot($directory) : $baseline;
         $candidates = [];
-        $apiPath = trim(config('scramble.api_path'), '/');
+        $apiPaths = [trim(config('scramble.api_path'), '/'), ...config('api-contracts.additional_api_paths', [])];
         foreach (app('router')->getRoutes()->getRoutes() as $route) {
-            if (($route->uri() === $apiPath || str_starts_with($route->uri(), $apiPath.'/'))
+            if (collect($apiPaths)->contains(fn (string $apiPath): bool => $route->uri() === $apiPath || str_starts_with($route->uri(), $apiPath.'/'))
                 && ! in_array($route->getName(), config('api-contracts.routes'), true)
                 && (! $route->getName() || ! in_array($route->getName(), config('api-contracts.excluded_routes', []), true))) {
                 $candidates[] = ['name' => $route->getName(), 'path' => $route->uri(), 'methods' => $route->methods()];
@@ -160,7 +160,7 @@ class ApiContractsCommand extends Command
         foreach (config('api-contracts.routes') as $name) {
             $route = $registered->get($name) ?? throw new RuntimeException("Approved route disappeared: {$name}");
             foreach (array_diff($route->methods(), ['HEAD']) as $method) {
-                $id = 'crm.v2.'.str_replace('laravel-crm.api.v2.', '', $name).'.'.strtolower($method);
+                $id = (str_starts_with($name, 'live.v1.') ? $name : 'crm.v2.'.str_replace('laravel-crm.api.v2.', '', $name)).'.'.strtolower($method);
                 if (! isset($contracts->operations($spec)[$id])) {
                     throw new RuntimeException("Scramble omitted an approved operation: {$id}");
                 }

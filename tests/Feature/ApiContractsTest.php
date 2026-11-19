@@ -30,7 +30,7 @@ test('Scramble generates approved module routes and selectively retrieves their 
 
     expect($version['status'])->toBe('draft');
     expect($version['source_sha256'])->toBe($repository->sourceHash());
-    expect($index['operations'])->toHaveCount(77);
+    expect($index['operations'])->toHaveCount(85);
     expect($spec['paths'])->toHaveKey('/auth/token')->toHaveKey('/products/{product}/variations/{productVariation}');
     expect($spec['paths']['/products/{product}'])->toHaveKey('patch')->toHaveKey('put');
     expect($spec['paths'])->not->toHaveKey('/crm/users')->not->toHaveKey('/docs/api');

@@ -289,3 +289,9 @@ Las APIs de stock, reservas, POS y pagos no se inventaron. Backoffice Blade/Live
 - `.github/workflows/api-contracts.yml`: auditoría Composer, pruebas funcionales, integridad/frescura, reproducibilidad, esquema oficial, generación real con Orval, revisión conservadora y artefacto draft.
 
 Para actualizar solo la documentación no ejecutar migraciones contra una base compartida. Para verificar que está al día: `api:contracts check` y reproducir la generación en el perfil anterior. Los resultados locales y límites de herramientas se registran en el PR de esta implementación. La suite previa tiene dos fallos reproducidos también en un checkout temporal del commit base: desajuste de claves de traducción española y una expectativa de moneda distinta de PEN, aunque PEN es ahora el valor predeterminado. El workflow específico de contratos selecciona las pruebas de aislamiento API relacionadas; el workflow general conserva toda su cobertura y esos fallos no se ocultaron ni modificaron.
+
+## Dominio LIVE v1 — QAT-04
+
+LIVE publica ocho operaciones propias `live.v1.*`, tag `LIVE`, mediante el mismo generador e índice oficial. Sus paths completos `/api/v1/live/*` sobrescriben el servidor con `/`; las operaciones CRM conservan sus identificadores, paths y servidor anteriores. La detección de rutas sin clasificar también cubre el prefijo LIVE. No hay un generador ni allowlist automáticos adicionales.
+
+El contrato normalizado, la autorización de instancias, la idempotencia PostgreSQL, las consultas y condiciones pendientes de integración están en [LIVE_API.md](LIVE_API.md). Las fixtures transferibles están en `tests/Fixtures/live-v1.batch.json`. La fixture Orval usa `getBaseUrlFromSpecification` para respetar el servidor de cada dominio. Los 44 diagnósticos originales siguen siendo la línea base; ninguna operación LIVE debe introducir diagnósticos nuevos o modificados.

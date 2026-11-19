@@ -1,5 +1,5 @@
 {
-    "contract_sha256": "664e68e407c95206c2b349b6fed7919455fbdd45e43d06c0816df1dafa391bca",
+    "contract_sha256": "21ae77e25dd009a25543222f4d1d9734ef2b3fac230ab77767f747a49e69220d",
     "operations": [
         {
             "description": "",
@@ -1131,6 +1131,118 @@
                 "quotes"
             ],
             "url_path": "/crm/api/v2/quotes/{quote}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "DELETE",
+            "operationId": "live.v1.connectors.destroy.delete",
+            "path": "/api/v1/live/sessions/{session}/connectors/{connector}",
+            "revision": "e08faa42c31915f5e7a4608ed90b7fdc51943a2b4b94f570624935c58686b7c3",
+            "status": "inferred",
+            "summary": "",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/sessions/{session}/connectors/{connector}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "live.v1.connectors.store.post",
+            "path": "/api/v1/live/sessions/{session}/connectors",
+            "revision": "7e716fdb6d6cafb2aae8f1b98b5c3a49fbc9e6f7ff3511ec570aef48109f4ccb",
+            "status": "inferred",
+            "summary": "Explicitly authorize this user and instance for this session. A missing deviceId registers a server-owned device; trust flags confer no permission",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/sessions/{session}/connectors"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "live.v1.coverage.index.get",
+            "path": "/api/v1/live/sessions/{session}/coverage",
+            "revision": "19541b482d676d5514cd624a3b64baea50140653596c2529dfaa8f454d7db37b",
+            "status": "inferred",
+            "summary": "Observed intervals by instance and epoch. Gaps between intervals and time after lastObservedAt are unverified; these are not billable minutes",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/sessions/{session}/coverage"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "live.v1.events.index.get",
+            "path": "/api/v1/live/sessions/{session}/events",
+            "revision": "f991e72aaf5f18bb7e78a30baf647f3508e59212a58fb733c0ffd9fff05e689c",
+            "status": "inferred",
+            "summary": "",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/sessions/{session}/events"
+        },
+        {
+            "description": " Each event has an independent result. The entire persistence transaction commits before acknowledgment; a 503 acknowledges none and must be retried unchanged. Captions and viewer-picks diagnostics are disabled by default. Source timestamps retain supplied provenance; local observation times are not official TikTok times. Events without stable source IDs only deduplicate transport retries. See docs/LIVE_API.md.",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "live.v1.events.ingest.post",
+            "path": "/api/v1/live/ingest/batches",
+            "revision": "aed702946c907a21048ab9afb0f35010725f0976e6b92631cdcb19c9ca5f0b12",
+            "status": "inferred",
+            "summary": "Persist a bounded batch atomically; 200 includes per-event rejections. accepted means committed ingestion, not commercial processing",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/ingest/batches"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "live.v1.sessions.index.get",
+            "path": "/api/v1/live/sessions",
+            "revision": "955cd4c2d3306544509eb716eb2969adc65e1b7bf49ac4d30faaa697f7f1eaf2",
+            "status": "inferred",
+            "summary": "",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/sessions"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "GET",
+            "operationId": "live.v1.sessions.show.get",
+            "path": "/api/v1/live/sessions/{session}",
+            "revision": "852903e86a059366a882786422ec354f6bc42c70ccb6889acb164f2c5d7a8011",
+            "status": "inferred",
+            "summary": "",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/sessions/{session}"
+        },
+        {
+            "description": "",
+            "limitations": [],
+            "method": "POST",
+            "operationId": "live.v1.sessions.store.post",
+            "path": "/api/v1/live/sessions",
+            "revision": "ade49bb8e5f946b16539242177489873ef28c9a4d3196234dd86e8bf8d65deab",
+            "status": "inferred",
+            "summary": "Create a room authorization. Retrying clientSessionId returns the existing session; a different room returns 409",
+            "tags": [
+                "LIVE"
+            ],
+            "url_path": "//api/v1/live/sessions"
         }
     ]
 }

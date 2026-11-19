@@ -6,11 +6,14 @@ use App\Models\Business;
 use App\Models\Permission;
 use App\Models\Role;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use VentureDrake\LaravelCrm\Support\BusinessContext;
@@ -33,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        RateLimiter::for('live', fn (Request $request): Limit => Limit::perMinute(config('live.requests_per_minute'))
+            ->by((string) $request->user()?->team_id.':'.(string) $request->user()?->id));
         Gate::before(function ($user, string $ability, array $arguments = []) {
             if (! config('laravel-crm.teams')) {
                 return null;

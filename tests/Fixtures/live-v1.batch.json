@@ -1,0 +1,264 @@
+{
+  "batchId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  "contractVersion": 1,
+  "liveSessionId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+  "events": [
+    {
+      "eventId": "00000000-0000-4000-8000-000000000001",
+      "eventType": "live.started.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:1",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 1,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "ENTER_ROOM",
+      "sourceMessageId": "message-1",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:01.123456Z",
+      "payload": {
+        "title": "Venta LIVE",
+        "creator": "shop.test"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000002",
+      "eventType": "live.comment.received.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:2",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 2,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "CHAT",
+      "sourceMessageId": "message-2",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:02.123456Z",
+      "payload": {
+        "text": "precio de la blusa",
+        "authorId": "viewer-123",
+        "authorName": "Ana"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000003",
+      "eventType": "live.audience.sampled.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:3",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 3,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "ROOM_USER",
+      "sourceMessageId": "message-3",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:03.123456Z",
+      "payload": {
+        "concurrent": 42,
+        "cumulative": 1000,
+        "popularity": 1200,
+        "quality": "reported"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000004",
+      "eventType": "live.likes.sampled.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:4",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 4,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "LIKE",
+      "sourceMessageId": "message-4",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:04.123456Z",
+      "payload": {
+        "increment": 3,
+        "total": 200,
+        "quality": "reported"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000005",
+      "eventType": "live.social.action.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:5",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 5,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "FOLLOW",
+      "sourceMessageId": "message-5",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:05.123456Z",
+      "payload": {
+        "action": "follow",
+        "authorId": "viewer-123"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000006",
+      "eventType": "live.system.notice.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:6",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 6,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "NOTICE",
+      "sourceMessageId": "message-6",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:06.123456Z",
+      "payload": {
+        "text": "Aviso de plataforma",
+        "code": "platform_notice"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000007",
+      "eventType": "live.moderation.observed.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:7",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 7,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "IM_DELETE",
+      "sourceMessageId": "message-7",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:07.123456Z",
+      "payload": {
+        "targetMessageId": "message-2"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000008",
+      "eventType": "live.stream.control.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:8",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 8,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "CONTROL_MESSAGE",
+      "sourceMessageId": "message-8",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:08.123456Z",
+      "payload": {
+        "action": "notice",
+        "reason": "Señal observada"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-000000000009",
+      "eventType": "live.connector.status.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:9",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 9,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "CONNECTED",
+      "sourceMessageId": "message-9",
+      "sourceKind": "connector",
+      "observedAt": "2026-11-18T12:00:09.123456Z",
+      "payload": {
+        "state": "tracking"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-00000000000a",
+      "eventType": "live.room.metadata.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:10",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 10,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "ROOM_USER",
+      "sourceMessageId": "message-10",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:10.123456Z",
+      "payload": {
+        "title": "Nuevo título"
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-00000000000b",
+      "eventType": "live.caption.observed.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:11",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 11,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "CAPTION_MESSAGE",
+      "sourceMessageId": "message-11",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:11.123456Z",
+      "payload": {
+        "segments": [
+          {
+            "text": "Hola a todos",
+            "startMs": 1200,
+            "endMs": 2400
+          }
+        ]
+      }
+    },
+    {
+      "eventId": "00000000-0000-4000-8000-00000000000c",
+      "eventType": "live.ended.v1",
+      "schemaVersion": 1,
+      "idempotencyKey": "fixture:12",
+      "platform": "tiktok",
+      "connectorKind": "desktop",
+      "connectorInstanceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "connectionEpoch": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "sequence": 12,
+      "clientSessionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceRoomId": "room-fixture-490",
+      "sourceEventType": "STREAM_END",
+      "sourceMessageId": "message-12",
+      "sourceKind": "platform",
+      "observedAt": "2026-11-18T12:00:12.123456Z",
+      "payload": {
+        "kind": "confirmed"
+      }
+    }
+  ]
+}

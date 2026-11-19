@@ -10,6 +10,11 @@ parameters:
         - database/
         - routes/
 
+    # Scramble's public rule helpers reference these aliases from its own PHPStan config.
+    typeAliases:
+        Rule: 'string|\Illuminate\Contracts\Validation\ValidationRule'
+        RuleSet: 'Rule|Rule[]'
+
     level: 7
 
     ignoreErrors:

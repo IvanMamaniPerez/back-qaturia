@@ -188,6 +188,77 @@
                 "title": "ForgotPasswordRequest",
                 "type": "object"
             },
+            "IngestLiveBatchRequest": {
+                "properties": {
+                    "batchId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "contractVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "events": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/LiveStartedV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveCommentReceivedV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveAudienceSampledV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveLikesSampledV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveSocialActionV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveSystemNoticeV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveModerationObservedV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveStreamControlV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveConnectorStatusV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveRoomMetadataV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveCaptionObservedV1Envelope"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/LiveEndedV1Envelope"
+                                }
+                            ]
+                        },
+                        "maxItems": 100,
+                        "minItems": 1,
+                        "type": "array"
+                    },
+                    "liveSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "batchId",
+                    "contractVersion",
+                    "liveSessionId",
+                    "events"
+                ],
+                "title": "IngestLiveBatchRequest",
+                "type": "object"
+            },
             "InvoiceLineResource": {
                 "properties": {
                     "amount": {
@@ -657,6 +728,2546 @@
                     "deleted_at"
                 ],
                 "title": "LeadResource",
+                "type": "object"
+            },
+            "LiveAudienceSampledV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.audience.sampled.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "concurrent": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "cumulative": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "popularity": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "quality": {
+                                "enum": [
+                                    "reported",
+                                    "estimated",
+                                    "unknown"
+                                ],
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "quality"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "ROOM_USER"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveAudienceSampledV1Envelope",
+                "type": "object"
+            },
+            "LiveCaptionObservedV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.caption.observed.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "segments": {
+                                "items": {
+                                    "additionalProperties": false,
+                                    "minProperties": 1,
+                                    "properties": {
+                                        "endMs": {
+                                            "maximum": 9007199254740991,
+                                            "minimum": 0,
+                                            "type": "integer"
+                                        },
+                                        "startMs": {
+                                            "maximum": 9007199254740991,
+                                            "minimum": 0,
+                                            "type": "integer"
+                                        },
+                                        "text": {
+                                            "maxLength": 1000,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "text",
+                                        "startMs",
+                                        "endMs"
+                                    ],
+                                    "type": "object"
+                                },
+                                "maxItems": 20,
+                                "minItems": 1,
+                                "type": "array"
+                            }
+                        },
+                        "required": [
+                            "segments"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "CAPTION_MESSAGE"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveCaptionObservedV1Envelope",
+                "type": "object"
+            },
+            "LiveCommentReceivedV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.comment.received.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "authorId": {
+                                "maxLength": 128,
+                                "type": "string"
+                            },
+                            "authorName": {
+                                "maxLength": 255,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "text": {
+                                "maxLength": 4000,
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "text",
+                            "authorId",
+                            "authorName"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "CHAT",
+                            "QUESTION_NEW"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveCommentReceivedV1Envelope",
+                "type": "object"
+            },
+            "LiveConnectorResource": {
+                "properties": {
+                    "connectorInstanceId": {
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "type": "string"
+                    },
+                    "deviceId": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "liveSessionId": {
+                        "type": "string"
+                    },
+                    "observedState": {
+                        "type": "string"
+                    },
+                    "revokedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "stateObservedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "liveSessionId",
+                    "deviceId",
+                    "connectorInstanceId",
+                    "connectorKind",
+                    "observedState",
+                    "stateObservedAt",
+                    "revokedAt"
+                ],
+                "title": "LiveConnectorResource",
+                "type": "object"
+            },
+            "LiveConnectorStatusV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.connector.status.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "bytesObserved": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "messagesObserved": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "reason": {
+                                "maxLength": 1000,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "state": {
+                                "enum": [
+                                    "connecting",
+                                    "connected",
+                                    "tracking",
+                                    "reconnecting",
+                                    "disconnected",
+                                    "error",
+                                    "suspended",
+                                    "stopped",
+                                    "ended_unverified"
+                                ],
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "state"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "CONNECTED",
+                            "DISCONNECTED",
+                            "ERROR",
+                            "WEBSOCKET_CONNECTED",
+                            "ENTER_ROOM",
+                            "WEBSOCKET_DATA",
+                            "DECODED_DATA",
+                            "RAW_DATA",
+                            "VIEWER_PICKS_UPDATE"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveConnectorStatusV1Envelope",
+                "type": "object"
+            },
+            "LiveEndedV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.ended.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "kind": {
+                                "enum": [
+                                    "confirmed",
+                                    "unverified",
+                                    "manual",
+                                    "suspended"
+                                ],
+                                "type": "string"
+                            },
+                            "reason": {
+                                "maxLength": 1000,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "kind"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "CONTROL_MESSAGE",
+                            "STREAM_END",
+                            "DISCONNECTED"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveEndedV1Envelope",
+                "type": "object"
+            },
+            "LiveEventResource": {
+                "properties": {
+                    "commentDeleted": {
+                        "type": "boolean"
+                    },
+                    "connectorId": {
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "identityQuality": {
+                        "type": "string"
+                    },
+                    "liveSessionId": {
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "creator": {
+                                        "maxLength": 255,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "title": {
+                                        "maxLength": 255,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "authorId": {
+                                        "maxLength": 128,
+                                        "type": "string"
+                                    },
+                                    "authorName": {
+                                        "maxLength": 255,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "text": {
+                                        "maxLength": 4000,
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "text",
+                                    "authorId",
+                                    "authorName"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "concurrent": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "cumulative": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "popularity": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "quality": {
+                                        "enum": [
+                                            "reported",
+                                            "estimated",
+                                            "unknown"
+                                        ],
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "quality"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "increment": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "quality": {
+                                        "enum": [
+                                            "reported",
+                                            "estimated",
+                                            "unknown"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    "total": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "quality"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "action": {
+                                        "enum": [
+                                            "follow",
+                                            "share",
+                                            "unknown"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    "authorId": {
+                                        "maxLength": 128,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "detail": {
+                                        "maxLength": 1000,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "action"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "code": {
+                                        "maxLength": 128,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "text": {
+                                        "maxLength": 4000,
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "text"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "code": {
+                                        "maxLength": 128,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "targetMessageId": {
+                                        "maxLength": 128,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "text": {
+                                        "maxLength": 4000,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "action": {
+                                        "enum": [
+                                            "suspend",
+                                            "resume",
+                                            "stop",
+                                            "end_unverified",
+                                            "end_confirmed",
+                                            "notice"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    "reason": {
+                                        "maxLength": 1000,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "action"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "bytesObserved": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "messagesObserved": {
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0,
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "maxLength": 1000,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "state": {
+                                        "enum": [
+                                            "connecting",
+                                            "connected",
+                                            "tracking",
+                                            "reconnecting",
+                                            "disconnected",
+                                            "error",
+                                            "suspended",
+                                            "stopped",
+                                            "ended_unverified"
+                                        ],
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "state"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "creator": {
+                                        "maxLength": 255,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "title": {
+                                        "maxLength": 255,
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "title"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "segments": {
+                                        "items": {
+                                            "additionalProperties": false,
+                                            "minProperties": 1,
+                                            "properties": {
+                                                "endMs": {
+                                                    "maximum": 9007199254740991,
+                                                    "minimum": 0,
+                                                    "type": "integer"
+                                                },
+                                                "startMs": {
+                                                    "maximum": 9007199254740991,
+                                                    "minimum": 0,
+                                                    "type": "integer"
+                                                },
+                                                "text": {
+                                                    "maxLength": 1000,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "text",
+                                                "startMs",
+                                                "endMs"
+                                            ],
+                                            "type": "object"
+                                        },
+                                        "maxItems": 20,
+                                        "minItems": 1,
+                                        "type": "array"
+                                    }
+                                },
+                                "required": [
+                                    "segments"
+                                ],
+                                "type": "object"
+                            },
+                            {
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "kind": {
+                                        "enum": [
+                                            "confirmed",
+                                            "unverified",
+                                            "manual",
+                                            "suspended"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    "reason": {
+                                        "maxLength": 1000,
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "kind"
+                                ],
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "processingStatus": {
+                        "type": "string"
+                    },
+                    "receivedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "schemaVersion": {
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "eventId",
+                    "eventType",
+                    "liveSessionId",
+                    "connectorId",
+                    "schemaVersion",
+                    "sourceEventType",
+                    "sourceMessageId",
+                    "sourceKind",
+                    "identityQuality",
+                    "occurredAt",
+                    "occurredAtSource",
+                    "observedAt",
+                    "receivedAt",
+                    "processingStatus",
+                    "payload",
+                    "commentDeleted"
+                ],
+                "title": "LiveEventResource",
+                "type": "object"
+            },
+            "LiveLikesSampledV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.likes.sampled.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "increment": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "quality": {
+                                "enum": [
+                                    "reported",
+                                    "estimated",
+                                    "unknown"
+                                ],
+                                "type": "string"
+                            },
+                            "total": {
+                                "maximum": 9007199254740991,
+                                "minimum": 0,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "quality"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "LIKE"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveLikesSampledV1Envelope",
+                "type": "object"
+            },
+            "LiveModerationObservedV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.moderation.observed.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "code": {
+                                "maxLength": 128,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "targetMessageId": {
+                                "maxLength": 128,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "text": {
+                                "maxLength": 4000,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "IM_DELETE",
+                            "UNAUTHORIZED_MEMBER",
+                            "MSG_DETECT",
+                            "ROOM_VERIFY",
+                            "ACCESS_CONTROL",
+                            "ACCESS_RECALL",
+                            "PERCEPTION"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveModerationObservedV1Envelope",
+                "type": "object"
+            },
+            "LiveRoomMetadataV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.room.metadata.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "creator": {
+                                "maxLength": 255,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "title": {
+                                "maxLength": 255,
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "title"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "ROOM_USER",
+                            "ENTER_ROOM"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveRoomMetadataV1Envelope",
+                "type": "object"
+            },
+            "LiveSessionResource": {
+                "properties": {
+                    "audienceConcurrent": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "audienceCumulative": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "audienceObservedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "audiencePopularity": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "audienceQuality": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "clientSessionId": {
+                        "type": "string"
+                    },
+                    "coverageQuality": {
+                        "const": "observed_only",
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "creator": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "firstObservedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "followCount": {
+                        "type": "integer"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "lastObservedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "likesIncrement": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "likesObservedAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "likesQuality": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "likesTotal": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "platform": {
+                        "type": "string"
+                    },
+                    "shareCount": {
+                        "type": "integer"
+                    },
+                    "sourceRoomId": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "unknownSocialCount": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "clientSessionId",
+                    "platform",
+                    "sourceRoomId",
+                    "creator",
+                    "status",
+                    "title",
+                    "firstObservedAt",
+                    "lastObservedAt",
+                    "createdAt",
+                    "audienceConcurrent",
+                    "audienceCumulative",
+                    "audiencePopularity",
+                    "audienceObservedAt",
+                    "audienceQuality",
+                    "likesTotal",
+                    "likesIncrement",
+                    "likesObservedAt",
+                    "likesQuality",
+                    "followCount",
+                    "shareCount",
+                    "unknownSocialCount",
+                    "coverageQuality"
+                ],
+                "title": "LiveSessionResource",
+                "type": "object"
+            },
+            "LiveSocialActionV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.social.action.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "action": {
+                                "enum": [
+                                    "follow",
+                                    "share",
+                                    "unknown"
+                                ],
+                                "type": "string"
+                            },
+                            "authorId": {
+                                "maxLength": 128,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "detail": {
+                                "maxLength": 1000,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "action"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "FOLLOW",
+                            "SHARE",
+                            "SOCIAL"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveSocialActionV1Envelope",
+                "type": "object"
+            },
+            "LiveStartedV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.started.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "creator": {
+                                "maxLength": 255,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "title": {
+                                "maxLength": 255,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "CONNECTED",
+                            "ENTER_ROOM"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveStartedV1Envelope",
+                "type": "object"
+            },
+            "LiveStreamControlV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.stream.control.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "action": {
+                                "enum": [
+                                    "suspend",
+                                    "resume",
+                                    "stop",
+                                    "end_unverified",
+                                    "end_confirmed",
+                                    "notice"
+                                ],
+                                "type": "string"
+                            },
+                            "reason": {
+                                "maxLength": 1000,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "action"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "CONTROL_MESSAGE",
+                            "STREAM_END"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveStreamControlV1Envelope",
+                "type": "object"
+            },
+            "LiveSystemNoticeV1Envelope": {
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectionEpoch": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "eventId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "eventType": {
+                        "enum": [
+                            "live.system.notice.v1"
+                        ],
+                        "type": "string"
+                    },
+                    "idempotencyKey": {
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "observedAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                    },
+                    "occurredAt": {
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "occurredAtSource": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            null
+                        ],
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "payload": {
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                            "code": {
+                                "maxLength": 128,
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "text": {
+                                "maxLength": 4000,
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "text"
+                        ],
+                        "type": "object"
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "schemaVersion": {
+                        "enum": [
+                            1
+                        ],
+                        "type": "integer"
+                    },
+                    "sequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "sourceEventType": {
+                        "enum": [
+                            "NOTICE",
+                            "SYSTEM"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceKind": {
+                        "enum": [
+                            "platform",
+                            "connector",
+                            "derived"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceMessageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "eventId",
+                    "eventType",
+                    "schemaVersion",
+                    "idempotencyKey",
+                    "platform",
+                    "connectorKind",
+                    "connectorInstanceId",
+                    "connectionEpoch",
+                    "sequence",
+                    "clientSessionId",
+                    "sourceRoomId",
+                    "sourceEventType",
+                    "sourceKind",
+                    "observedAt",
+                    "payload"
+                ],
+                "title": "LiveSystemNoticeV1Envelope",
                 "type": "object"
             },
             "LoginRequest": {
@@ -2287,6 +4898,73 @@
                 "title": "StoreLeadRequest",
                 "type": "object"
             },
+            "StoreLiveConnectorRequest": {
+                "properties": {
+                    "connectorInstanceId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "connectorKind": {
+                        "enum": [
+                            "desktop",
+                            "android"
+                        ],
+                        "type": "string"
+                    },
+                    "deviceId": {
+                        "format": "uuid",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "connectorInstanceId",
+                    "connectorKind"
+                ],
+                "title": "StoreLiveConnectorRequest",
+                "type": "object"
+            },
+            "StoreLiveSessionRequest": {
+                "properties": {
+                    "clientSessionId": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "creator": {
+                        "maxLength": 255,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "platform": {
+                        "enum": [
+                            "tiktok"
+                        ],
+                        "type": "string"
+                    },
+                    "sourceRoomId": {
+                        "maxLength": 128,
+                        "type": "string"
+                    },
+                    "title": {
+                        "maxLength": 255,
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "clientSessionId",
+                    "platform",
+                    "sourceRoomId"
+                ],
+                "title": "StoreLiveSessionRequest",
+                "type": "object"
+            },
             "StoreOrderRequest": {
                 "properties": {
                     "adjustments": {
@@ -3911,6 +6589,1271 @@
     },
     "openapi": "3.1.2",
     "paths": {
+        "/api/v1/live/ingest/batches": {
+            "post": {
+                "description": " Each event has an independent result. The entire persistence transaction commits before acknowledgment; a 503 acknowledges none and must be retried unchanged. Captions and viewer-picks diagnostics are disabled by default. Source timestamps retain supplied provenance; local observation times are not official TikTok times. Events without stable source IDs only deduplicate transport retries. See docs/LIVE_API.md.",
+                "operationId": "live.v1.events.ingest.post",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestLiveBatchRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "batchId": {
+                                            "format": "uuid",
+                                            "type": "string"
+                                        },
+                                        "results": {
+                                            "items": {
+                                                "properties": {
+                                                    "canonicalEventId": {
+                                                        "format": "uuid",
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "code": {
+                                                        "enum": [
+                                                            "INVALID_EVENT",
+                                                            "EVENT_TOO_LARGE",
+                                                            "UNSUPPORTED_SCHEMA_VERSION",
+                                                            "UNSUPPORTED_EVENT_TYPE",
+                                                            "FEATURE_DISABLED",
+                                                            "SESSION_MISMATCH",
+                                                            "CONNECTOR_NOT_AUTHORIZED",
+                                                            "IDEMPOTENCY_CONFLICT",
+                                                            null
+                                                        ],
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "errors": {
+                                                        "additionalProperties": {
+                                                            "items": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": "array"
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "eventId": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "status": {
+                                                        "enum": [
+                                                            "accepted",
+                                                            "duplicate",
+                                                            "rejected"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "eventId",
+                                                    "status",
+                                                    "code",
+                                                    "canonicalEventId",
+                                                    "errors"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "batchId",
+                                        "results"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    },
+                    "503": {
+                        "description": "PERSISTENCE_UNAVAILABLE: no event in this transaction was acknowledged. Retry identical identities."
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "summary": "Persist a bounded batch atomically; 200 includes per-event rejections. accepted means committed ingestion, not commercial processing",
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "servers": [
+                {
+                    "url": "/"
+                }
+            ]
+        },
+        "/api/v1/live/sessions": {
+            "get": {
+                "operationId": "live.v1.sessions.index.get",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "eventType",
+                        "schema": {
+                            "maxLength": 64,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "minimum": 1,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "per_page",
+                        "schema": {
+                            "maximum": 100,
+                            "minimum": 1,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/LiveSessionResource"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ],
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "minimum": 1,
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "minimum": 1,
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last_page": {
+                                                    "minimum": 1,
+                                                    "type": "integer"
+                                                },
+                                                "links": {
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "properties": {
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ],
+                                                        "type": "object"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "path": {
+                                                    "description": "Base path for paginator generated URLs.",
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "per_page": {
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0,
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1,
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "total": {
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0,
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Paginated set of `LiveSessionResource`"
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "post": {
+                "operationId": "live.v1.sessions.store.post",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreLiveSessionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LiveSessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "`LiveSessionResource`"
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "409": {
+                        "description": "Session or connector identity conflicts with an existing authorization."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "summary": "Create a room authorization. Retrying clientSessionId returns the existing session; a different room returns 409",
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "servers": [
+                {
+                    "url": "/"
+                }
+            ]
+        },
+        "/api/v1/live/sessions/{session}": {
+            "get": {
+                "operationId": "live.v1.sessions.show.get",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "session",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LiveSessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "`LiveSessionResource`"
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "servers": [
+                {
+                    "url": "/"
+                }
+            ]
+        },
+        "/api/v1/live/sessions/{session}/connectors": {
+            "post": {
+                "operationId": "live.v1.connectors.store.post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "session",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreLiveConnectorRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LiveConnectorResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "`LiveConnectorResource`"
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "409": {
+                        "description": "Session or connector identity conflicts with an existing authorization."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "summary": "Explicitly authorize this user and instance for this session. A missing deviceId registers a server-owned device; trust flags confer no permission",
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "servers": [
+                {
+                    "url": "/"
+                }
+            ]
+        },
+        "/api/v1/live/sessions/{session}/connectors/{connector}": {
+            "delete": {
+                "operationId": "live.v1.connectors.destroy.delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "session",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "connector",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LiveConnectorResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "`LiveConnectorResource`"
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "servers": [
+                {
+                    "url": "/"
+                }
+            ]
+        },
+        "/api/v1/live/sessions/{session}/coverage": {
+            "get": {
+                "operationId": "live.v1.coverage.index.get",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "session",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "eventType",
+                        "schema": {
+                            "maxLength": 64,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "minimum": 1,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "per_page",
+                        "schema": {
+                            "maximum": 100,
+                            "minimum": 1,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "items": {
+                                                "properties": {
+                                                    "connectionEpoch": {
+                                                        "type": "string"
+                                                    },
+                                                    "connectorId": {
+                                                        "type": "string"
+                                                    },
+                                                    "endReason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "endedAt": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "lastObservedAt": {
+                                                        "type": "string"
+                                                    },
+                                                    "startedAt": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "connectorId",
+                                                    "connectionEpoch",
+                                                    "startedAt",
+                                                    "lastObservedAt",
+                                                    "endedAt",
+                                                    "endReason"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "page": {
+                                                    "type": "integer"
+                                                },
+                                                "perPage": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "page",
+                                                "perPage",
+                                                "total"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "summary": "Observed intervals by instance and epoch. Gaps between intervals and time after lastObservedAt are unverified; these are not billable minutes",
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "servers": [
+                {
+                    "url": "/"
+                }
+            ]
+        },
+        "/api/v1/live/sessions/{session}/events": {
+            "get": {
+                "operationId": "live.v1.events.index.get",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "session",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "eventType",
+                        "schema": {
+                            "maxLength": 64,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "minimum": 1,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "per_page",
+                        "schema": {
+                            "maximum": 100,
+                            "minimum": 1,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Accept",
+                        "schema": {
+                            "enum": [
+                                "application/json"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Optional assertion only; must match the authenticated business.",
+                        "in": "header",
+                        "name": "X-Team-ID",
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/LiveEventResource"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ],
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "minimum": 1,
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "minimum": 1,
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last_page": {
+                                                    "minimum": 1,
+                                                    "type": "integer"
+                                                },
+                                                "links": {
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "properties": {
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ],
+                                                        "type": "object"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "path": {
+                                                    "description": "Base path for paginator generated URLs.",
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "per_page": {
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0,
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1,
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "total": {
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0,
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Paginated set of `LiveEventResource`"
+                    },
+                    "401": {
+                        "description": "Missing, expired or revoked authentication."
+                    },
+                    "403": {
+                        "description": "LIVE permission or business assertion denied."
+                    },
+                    "413": {
+                        "description": "Payload byte limit exceeded."
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error overview.",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                },
+                "security": [
+                    {
+                        "http": []
+                    },
+                    {
+                        "frontendSession": []
+                    }
+                ],
+                "tags": [
+                    "LIVE"
+                ]
+            },
+            "servers": [
+                {
+                    "url": "/"
+                }
+            ]
+        },
         "/auth/forgot-password": {
             "post": {
                 "operationId": "crm.v2.auth.password.request.post",

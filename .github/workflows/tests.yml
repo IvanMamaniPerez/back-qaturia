@@ -36,3 +36,48 @@ jobs:
 
       - name: Run CI Checks
         run: composer ci:check
+
+  live-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: qaturia_live_test
+          POSTGRES_USER: qaturia_test
+          POSTGRES_PASSWORD: test-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U qaturia_test -d qaturia_live_test"
+          --health-interval=5s --health-timeout=5s --health-retries=12
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: '5432'
+      DB_DATABASE: qaturia_live_test
+      DB_USERNAME: qaturia_test
+      DB_PASSWORD: test-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      BROADCAST_CONNECTION: log
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
+        with:
+          php-version: '8.5'
+          extensions: pdo_pgsql, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+      - name: Install without application upgrade hooks
+        run: |
+          cp .env.example .env
+          composer install --no-scripts --no-interaction --prefer-dist --no-progress
+          php artisan package:discover --no-interaction
+          php artisan key:generate --no-interaction
+      - name: Verify durable LIVE concurrency on PostgreSQL
+        run: vendor/bin/pest --configuration=phpunit.live-pgsql.xml --compact

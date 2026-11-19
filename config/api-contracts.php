@@ -10,7 +10,17 @@ return [
         'max_download_bytes' => 16777216,
     ],
     'excluded_routes' => [],
+    'additional_api_paths' => ['api/v1/live'],
     'routes' => [
+        'live.v1.events.ingest',
+        'live.v1.coverage.index',
+        'live.v1.sessions.index',
+        'live.v1.sessions.store',
+        'live.v1.sessions.show',
+        'live.v1.connectors.store',
+        'live.v1.connectors.destroy',
+        'live.v1.events.index',
+
         'laravel-crm.api.v2.auth.password.request',
         'laravel-crm.api.v2.auth.login',
         'laravel-crm.api.v2.auth.logout',

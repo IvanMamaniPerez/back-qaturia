@@ -4,18 +4,20 @@ namespace Tests;
 
 class PostgresTestCase extends TestCase
 {
-    private static bool $migrated = false;
+    /** @var array<string, bool> */
+    private static array $migrated = [];
 
     protected function setUp(): void
     {
         parent::setUp();
         if (! app()->environment('testing') || config('database.default') !== 'pgsql'
-            || config('database.connections.pgsql.database') !== 'qaturia_variants_test') {
-            throw new \RuntimeException('PostgreSQL matrix tests require qaturia_variants_test.');
+            || ! in_array(config('database.connections.pgsql.database'), ['qaturia_variants_test', 'qaturia_live_test'], true)) {
+            throw new \RuntimeException('PostgreSQL tests require qaturia_variants_test or qaturia_live_test.');
         }
-        if (! self::$migrated) {
+        $database = config('database.connections.pgsql.database');
+        if (! (self::$migrated[$database] ?? false)) {
             $this->artisan('migrate:fresh', ['--force' => true])->assertSuccessful();
-            self::$migrated = true;
+            self::$migrated[$database] = true;
         }
     }
 }

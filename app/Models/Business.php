@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\BusinessFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +16,9 @@ use VentureDrake\LaravelCrm\Traits\HasCrmPhones;
 class Business extends Model
 {
     use HasCrmAddresses, HasCrmEmails, HasCrmPhones, HasUuids;
+
+    /** @use HasFactory<BusinessFactory> */
+    use HasFactory;
 
     protected $guarded = ['id', 'owner_user_id'];
 

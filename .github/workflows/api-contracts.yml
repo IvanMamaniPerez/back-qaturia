@@ -46,7 +46,7 @@ jobs:
       - name: Dependency audit and endpoint behavior tests
         run: |
           composer audit --locked
-          php artisan test --compact tests/Unit/ApiContractRepositoryTest.php tests/Feature/ApiContractsTest.php tests/Feature/ApiContractHttpTest.php tests/Feature/ApiAuthenticationTest.php tests/Feature/ProductVariantMatrixTest.php tests/Tenancy/AccountLifecycleTest.php
+          php artisan test --compact tests/Unit/ApiContractRepositoryTest.php tests/Feature/ApiContractsTest.php tests/Feature/ApiContractHttpTest.php tests/Feature/ApiAuthenticationTest.php tests/Feature/ProductVariantMatrixTest.php tests/Tenancy/AccountLifecycleTest.php tests/Feature/LiveIngestionTest.php tests/Feature/LiveContractTest.php tests/Tenancy/LiveBusinessIsolationTest.php
           php artisan test --compact tests/Tenancy/BusinessIsolationTest.php --filter='API rejects selecting|Sanctum issues a real|foreign business IDs'
       - name: Verify committed artifact integrity and freshness
         run: php artisan api:contracts check
@@ -72,6 +72,7 @@ jobs:
         run: |
           python3 -m pip install 'jsonschema==4.25.1'
           python3 -m jsonschema -i contracts/openapi.json tests/Fixtures/openapi-3.1-schema.json
+          python3 -m unittest discover -s tests/Support -p test_live_contract.py
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22.19.0'

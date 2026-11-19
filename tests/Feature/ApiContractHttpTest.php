@@ -23,7 +23,7 @@ test('local clients discover query links and search without knowing a business r
     app()->instance('env', 'local');
 
     $discovery = $this->getJson('/.well-known/api-contracts')->assertOk()
-        ->assertJsonPath('operation_count', 77)
+        ->assertJsonPath('operation_count', 85)
         ->assertJsonPath('status', 'draft')
         ->assertJsonPath('links.query', route('api-contracts.query'));
     expect($discovery->headers->get('Cache-Control'))->toContain('private')->toContain('no-store');
